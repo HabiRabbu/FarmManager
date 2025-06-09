@@ -5,8 +5,12 @@ namespace Harvey.Farm.FieldScripts
 {
     public class FieldManager : MonoBehaviour
     {
-        public static FieldManager Instance { get; private set; }
 
+        [Header("Field Settings")]
+        [SerializeField] public float tileSize;
+
+
+        public static FieldManager Instance { get; private set; }
         readonly List<Field> fields = new();
 
         void Awake()

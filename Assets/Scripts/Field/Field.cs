@@ -6,7 +6,7 @@ namespace Harvey.Farm.FieldScripts
     {
         [SerializeField] GameObject tilePrefab;
         [SerializeField] int width, height;
-        [SerializeField] float tileSize = 1f;
+        private float tileSize = 1f;
 
         private TileGrid grid;
         private FieldTile[] tiles;
@@ -15,6 +15,8 @@ namespace Harvey.Farm.FieldScripts
 
         void Awake()
         {
+            tileSize = FieldManager.Instance.tileSize;
+            
             FieldManager.Instance.RegisterField(this);
             grid = new TileGrid(width, height, tileSize, transform.position);
             tiles = grid.Generate(tilePrefab, transform);
