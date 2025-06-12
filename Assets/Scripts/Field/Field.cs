@@ -1,5 +1,6 @@
 using UnityEngine;
 using Harvey.Farm.VehicleScripts;
+using Harvey.Farm.Events;
 
 namespace Harvey.Farm.FieldScripts
 {
@@ -72,8 +73,12 @@ namespace Harvey.Farm.FieldScripts
 
             tractor.StartTask(tile);
 
-            if (System.Array.TrueForAll(tiles, t => t.IsPlowed))
+            if (System.Array.TrueForAll(tiles, t => t.IsPlowed) && currentState != State.Plowed)
+            {
                 currentState = State.Plowed;
+                WorldEvents.FieldCompleted(this);
+            }
+
         }
 
 

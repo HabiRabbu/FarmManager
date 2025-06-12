@@ -15,7 +15,7 @@ namespace Harvey.Farm.VehicleScripts
 
         private IEnumerator StartPlowing(FieldTile startTile)
         {
-            IsBusy = true;
+            SetBusy(true);
 
             var field = startTile.GetComponentInParent<Field>();
             var serp = field.GetSerpentineTiles();
@@ -30,7 +30,7 @@ namespace Harvey.Farm.VehicleScripts
                     serp[i].Plow();
             });
 
-            IsBusy = false;
+            SetBusy(false);
         }
 
     }

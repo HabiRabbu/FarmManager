@@ -2,6 +2,7 @@ using UnityEngine;
 using Harvey.Farm.FieldScripts;
 using System.Collections;
 using System.Collections.Generic;
+using Harvey.Farm.Events;
 
 namespace Harvey.Farm.VehicleScripts
 {
@@ -20,6 +21,12 @@ namespace Harvey.Farm.VehicleScripts
         }
 
         public abstract void StartTask(FieldTile targetTile);
+
+        protected void SetBusy(bool value)
+        {
+            IsBusy = value;
+            VehicleEvents.VehicleBusyChanged(this, value);
+        }
 
         void FlatLookAt(Vector3 target)
         {

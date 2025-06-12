@@ -1,7 +1,6 @@
 using UnityEngine;
 using Harvey.Farm.FieldScripts;
 using UnityEngine.InputSystem;
-using System;
 
 namespace Harvey.Farm.InputScripts
 {

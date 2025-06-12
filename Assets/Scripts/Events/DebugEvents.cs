@@ -5,11 +5,12 @@ using System;
 /// Subscribers register in OnEnable, unregister in OnDisable.
 /// </summary>
 
-namespace Harvey.Farm.Utilities
+namespace Harvey.Farm.Events
 {
     public static class DebugEvents
     {
         public static event Action<bool> OnDebugModeToggled;
+
 
         public static void DebugModeToggled(bool enabled) => OnDebugModeToggled?.Invoke(enabled);
     }

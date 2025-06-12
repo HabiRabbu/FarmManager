@@ -1,15 +1,16 @@
 using TMPro;
 using UnityEngine;
+using Harvey.Farm.Events;
 
 namespace Harvey.Farm.FieldScripts
 {
     [RequireComponent(typeof(MeshRenderer))]
     public class FieldTile : MonoBehaviour
     {
-
-        //DEBUG
+        [Header("Debug")]
         [SerializeField] private TMP_Text debugTextLabel;
-
+        void OnEnable() => DebugEvents.OnDebugModeToggled += SetLabelVisible;
+        void OnDisable() => DebugEvents.OnDebugModeToggled -= SetLabelVisible;
 
 
         [SerializeField] private Material earthMat;
@@ -33,7 +34,8 @@ namespace Harvey.Farm.FieldScripts
             IsPlowed = false;
 
             //Debug
-            debugTextLabel.text = "(" + GridX + "," + GridZ + ")";
+            if (debugTextLabel != null) { debugTextLabel.text = $"({GridX},{GridZ})"; }
+            if (debugTextLabel.gameObject.activeSelf) { SetLabelVisible(false); }
         }
 
         public void Plow()
@@ -41,6 +43,14 @@ namespace Harvey.Farm.FieldScripts
             if (IsPlowed) return;
             IsPlowed = true;
             rndr.material = plowedMat;
+
+            WorldEvents.TilePloughed(this);
+        }
+
+        private void SetLabelVisible(bool show)
+        {
+            if (debugTextLabel != null)
+                debugTextLabel.gameObject.SetActive(show);
         }
     }
 }
