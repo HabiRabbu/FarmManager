@@ -1,30 +1,47 @@
+using TMPro;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshRenderer))]
-public class FieldTile : MonoBehaviour
+namespace Harvey.Farm.FieldScripts
 {
-    [SerializeField] private Material earthMat;
-    [SerializeField] private Material plowedMat;
-
-    public bool IsPlowed { get; private set; }
-
-    private MeshRenderer rndr;
-    public int GridX { get; private set; }
-    public int GridZ { get; private set; }
-
-    public void Init(int x, int z)
+    [RequireComponent(typeof(MeshRenderer))]
+    public class FieldTile : MonoBehaviour
     {
-        GridX = x;
-        GridZ = z;
-        rndr = GetComponent<MeshRenderer>();
-        rndr.material = earthMat;
-        IsPlowed = false;
-    }
 
-    public void Plow()
-    {
-        if (IsPlowed) return;
-        IsPlowed = true;
-        rndr.material = plowedMat;
+        //DEBUG
+        [SerializeField] private TMP_Text debugTextLabel;
+
+
+
+        [SerializeField] private Material earthMat;
+        [SerializeField] private Material plowedMat;
+
+        [SerializeField] public int GridX { get; private set; }
+        [SerializeField] public int GridZ { get; private set; }
+
+        public bool IsPlowed { get; private set; }
+
+        private MeshRenderer rndr;
+
+        public Vector3 WorldPosition => transform.position;
+
+        public void Init(int x, int z)
+        {
+            GridX = x;
+            GridZ = z;
+            rndr = GetComponent<MeshRenderer>();
+            rndr.material = earthMat;
+            IsPlowed = false;
+
+            //Debug
+            debugTextLabel.text = "(" + GridX + "," + GridZ + ")";
+        }
+
+        public void Plow()
+        {
+            if (IsPlowed) return;
+            IsPlowed = true;
+            rndr.material = plowedMat;
+        }
     }
 }
+

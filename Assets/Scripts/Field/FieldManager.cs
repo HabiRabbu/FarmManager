@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Harvey.Farm.Utilities;
 
 namespace Harvey.Farm.FieldScripts
 {
     public class FieldManager : MonoBehaviour
     {
-
         [Header("Field Settings")]
         [SerializeField] public float tileSize;
 

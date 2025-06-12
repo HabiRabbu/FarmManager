@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Harvey.Farm.FieldScripts
@@ -9,6 +10,43 @@ namespace Harvey.Farm.FieldScripts
         public readonly Vector3 Origin;      // world-space center
         private readonly Vector2[] centers;  // flattened array of XZ centers
 
+        public FieldTile[] BuildSerpentineRows(FieldTile[] tiles)
+        {
+            var path = new List<FieldTile>(tiles.Length);
+
+            for (int z = 0; z < Height; z++)
+            {
+                if ((z & 1) == 0)
+                    for (int x = 0; x < Width; x++)
+                        path.Add(tiles[z * Width + x]);
+                else
+                    for (int x = Width - 1; x >= 0; x--)
+                        path.Add(tiles[z * Width + x]);
+            }
+            return path.ToArray();
+        }
+
+        public FieldTile[] BuildSerpentineColumns(FieldTile[] tiles)
+        {
+            var path = new List<FieldTile>(tiles.Length);
+
+            for (int x = 0; x < Width; x++)
+            {
+                if ((x & 1) == 0)
+                {
+                    for (int z = Height - 1; z >= 0; z--)
+                        path.Add(tiles[z * Width + x]);
+                }
+                else
+                {
+                    for (int z = 0; z < Height; z++)
+                        path.Add(tiles[z * Width + x]);
+                }
+            }
+            return path.ToArray();
+        }
+
+
         public TileGrid(int width, int height, float tileSize, Vector3 origin)
         {
             Width = width;
@@ -17,18 +55,24 @@ namespace Harvey.Farm.FieldScripts
             Origin = origin;
 
             centers = new Vector2[width * height];
-            float xOff = -((width - 1) * tileSize) / 2f;
-            float zOff = -((height - 1) * tileSize) / 2f;
+
+            float xOff = -((width - 1) * tileSize) * 0.5f;
+            float zOff = -((height - 1) * tileSize) * 0.5f;
 
             int i = 0;
-            for (int x = 0; x < width; x++)
-                for (int z = 0; z < height; z++)
+
+            // ---- ROW-MAJOR: z outer, x inner ----
+            for (int z = 0; z < height; z++)
+            {
+                for (int x = 0; x < width; x++)
                 {
-                    float wx = origin.x + x * tileSize + xOff;
-                    float wz = origin.z + z * tileSize + zOff;
+                    float wx = origin.x + x * tileSize + xOff;   // centre X
+                    float wz = origin.z + z * tileSize + zOff;   // centre Z
                     centers[i++] = new Vector2(wx, wz);
                 }
+            }
         }
+
 
         public bool Contains(Vector3 worldPos)
         {
@@ -56,22 +100,31 @@ namespace Harvey.Farm.FieldScripts
             return bestI;
         }
 
-        /// <summary>
-        /// Instantiate prefabs at each tile centre, parented under `parent`,
-        /// set their localScale to (tileSize, y, tileSize),
-        /// and return a flat array of their Tile scripts.
-        /// </summary>
-        public FieldTile[] Generate(GameObject tilePrefab, Transform parent, float tileYScale = 0.2f)
+        public FieldTile[] Generate(GameObject tilePrefab, Transform parent,
+                            float yScale = 0.2f)
         {
-            var tiles = new FieldTile[centers.Length];
+            FieldTile[] tiles = new FieldTile[centers.Length];
+
             for (int i = 0; i < centers.Length; i++)
             {
-                Vector3 pos = new Vector3(centers[i].x, parent.position.y, centers[i].y);
+                // i = z*Width + x  (row-major)
+                int z = i / Width;     // row  (GridZ)
+                int x = i % Width;     // col  (GridX)
+
+                Vector3 pos = new Vector3(
+                    centers[i].x,
+                    parent.position.y,   // align Y to field
+                    centers[i].y);
+
                 var go = Object.Instantiate(tilePrefab, pos, Quaternion.identity, parent);
-                go.transform.localScale = new Vector3(TileSize, tileYScale, TileSize);
-                go.name = $"Tile_{i}";
-                tiles[i] = go.GetComponent<FieldTile>();
-                tiles[i].Init(i % Width, i / Width);
+                go.transform.localScale = new Vector3(TileSize, yScale, TileSize);
+
+                FieldTile tile = go.GetComponent<FieldTile>();
+                tile.Init(x, z);
+
+                go.name = $"Tile_{x}_{z}";
+                tiles[i] = tile;
+                if (i < 10) Debug.Log($"i={i}  =>  ({x},{z})");
             }
             return tiles;
         }
