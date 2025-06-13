@@ -10,6 +10,9 @@ namespace Harvey.Farm.VehicleScripts
         public override void StartTask(FieldTile startTile)
         {
             if (IsBusy) return;
+
+            CurrentField = startTile.GetComponentInParent<Field>();
+
             StartCoroutine(StartPlowing(startTile));
         }
 

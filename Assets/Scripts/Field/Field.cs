@@ -1,6 +1,8 @@
 using UnityEngine;
 using Harvey.Farm.VehicleScripts;
 using Harvey.Farm.Events;
+using Harvey.Farm.UI;
+using System.Collections.Generic;
 
 namespace Harvey.Farm.FieldScripts
 {
@@ -14,13 +16,33 @@ namespace Harvey.Farm.FieldScripts
         private FieldTile[] tiles;
         private FieldTile[] serpentinePath;
         public FieldTile[] GetSerpentineTiles() => serpentinePath;
+
         private enum State { Idle, Plowing, Plowed }
         [SerializeField] State currentState = State.Idle;
+        public bool IsPlowing => currentState == State.Plowing;
+        public bool IsPlowed => currentState == State.Plowed;
+
+        [Header("UI")]
+        [SerializeField] FieldJobPanel panel;
+
+        Queue<FieldTile> pendingTiles = new Queue<FieldTile>();
+        int remainingTiles;
 
 
         //DEBUG - GIZMOS
         private Vector3[] waypointWorlds;
         //---------------
+
+        public float TilesPloughedFraction
+        {
+            get
+            {
+                int ploughed = 0;
+                foreach (var t in tiles)
+                    if (t.IsPlowed) ploughed++;
+                return (float)ploughed / tiles.Length;
+            }
+        }
 
         void Start()
         {
@@ -36,6 +58,49 @@ namespace Harvey.Farm.FieldScripts
             waypointWorlds = new Vector3[serpentinePath.Length];
             for (int i = 0; i < serpentinePath.Length; i++)
                 waypointWorlds[i] = serpentinePath[i].WorldPosition + Vector3.up * 0.5f;
+
+            //Setup Field UI
+            panel.Init(this);
+            UIManager.Instance.Register(panel);
+
+            remainingTiles = tiles.Length;
+        }
+
+        public void HandleTileClick(Vector3 worldPos)
+        {
+            if (!grid.Contains(worldPos)) return;
+            panel.Show(worldPos);
+        }
+
+        public void EnqueuePlowJob(Vehicle tractor)
+        {
+            if (IsPlowing || IsPlowed) return;
+
+            currentState = State.Plowing;
+
+            foreach (var t in serpentinePath)
+                if (!t.IsPlowed) pendingTiles.Enqueue(t);
+
+            DispatchNextTile(tractor);
+        }
+
+        public void DispatchNextTile(Vehicle tractor)
+        {
+            if (tractor.IsBusy || pendingTiles.Count == 0) return;
+
+            var next = pendingTiles.Dequeue();
+            tractor.StartTask(next);
+        }
+
+        void HandleTilePlowed(FieldTile t)
+        {
+            if (t.transform.parent != transform) return;
+            remainingTiles--;
+            if (remainingTiles <= 0 && currentState != State.Plowed)
+            {
+                currentState = State.Plowed;
+                WorldEvents.FieldCompleted(this);
+            }
         }
 
         private void GenerateSerpentinePath()
@@ -57,66 +122,48 @@ namespace Harvey.Farm.FieldScripts
 
         public bool ContainsPoint(Vector3 worldPos) => grid.Contains(worldPos);
 
-        public void HandleTileClick(Vector3 worldPos)
-        {
-            if (!grid.Contains(worldPos)) return;
-
-            int idx = grid.IndexOfNearest(worldPos);
-            var tile = tiles[idx];
-
-            Tractor tractor = VehicleManager.Instance.GetAvailableVehicle<Tractor>();
-            if (tractor == null)
-            {
-                Debug.Log("No available tractors.");
-                return;
-            }
-
-            tractor.StartTask(tile);
-
-            if (System.Array.TrueForAll(tiles, t => t.IsPlowed) && currentState != State.Plowed)
-            {
-                currentState = State.Plowed;
-                WorldEvents.FieldCompleted(this);
-            }
-
-        }
-
-
-
-
 #if UNITY_EDITOR
         void OnDrawGizmos()
         {
-            if (width <= 0 || height <= 0 || tileSize <= 0f)
-                return;
+            if (width <= 0 || height <= 0 || tileSize <= 0f) return;
 
             Gizmos.color = Color.green;
 
-            float xOffset = -((width - 1) * tileSize) / 2f;
-            float zOffset = -((height - 1) * tileSize) / 2f;
-            Vector3 origin = transform.position + new Vector3(xOffset, 0f, zOffset);
+            Vector3 centre = transform.position;
+            float halfW = width * tileSize * 0.5f;
+            float halfH = height * tileSize * 0.5f;
+            float y = centre.y;
 
-            Vector3 topRight = origin + new Vector3(width * tileSize, 0f, 0f);
-            Vector3 bottomLeft = origin + new Vector3(0f, 0f, height * tileSize);
-            Vector3 bottomRight = origin + new Vector3(width * tileSize, 0f, height * tileSize);
-            Gizmos.DrawLine(origin, topRight);
-            Gizmos.DrawLine(topRight, bottomRight);
-            Gizmos.DrawLine(bottomRight, bottomLeft);
-            Gizmos.DrawLine(bottomLeft, origin);
+            // ----- outer frame -----
+            Vector3 bl = new Vector3(centre.x - halfW, y, centre.z - halfH);
+            Vector3 br = new Vector3(centre.x + halfW, y, centre.z - halfH);
+            Vector3 tl = new Vector3(centre.x - halfW, y, centre.z + halfH);
+            Vector3 tr = new Vector3(centre.x + halfW, y, centre.z + halfH);
 
+            Gizmos.DrawLine(tl, tr);
+            Gizmos.DrawLine(tr, br);
+            Gizmos.DrawLine(br, bl);
+            Gizmos.DrawLine(bl, tl);
+
+            // ----- internal grid (vertical) -----
             for (int x = 1; x < width; x++)
             {
-                Vector3 start = origin + new Vector3(x * tileSize, 0f, 0f);
-                Vector3 end = start + new Vector3(0f, 0f, height * tileSize);
-                Gizmos.DrawLine(start, end);
+                float xPos = centre.x - halfW + x * tileSize;
+                Gizmos.DrawLine(
+                    new Vector3(xPos, y, centre.z - halfH),
+                    new Vector3(xPos, y, centre.z + halfH));
             }
+
+            // ----- internal grid (horizontal) -----
             for (int z = 1; z < height; z++)
             {
-                Vector3 start = origin + new Vector3(0f, 0f, z * tileSize);
-                Vector3 end = start + new Vector3(width * tileSize, 0f, 0f);
-                Gizmos.DrawLine(start, end);
+                float zPos = centre.z - halfH + z * tileSize;
+                Gizmos.DrawLine(
+                    new Vector3(centre.x - halfW, y, zPos),
+                    new Vector3(centre.x + halfW, y, zPos));
             }
         }
+
 
         void OnDrawGizmosSelected()
         {
@@ -132,6 +179,5 @@ namespace Harvey.Farm.FieldScripts
                 Gizmos.DrawLine(waypointWorlds[i], waypointWorlds[i + 1]);
         }
 #endif
-
     }
 }

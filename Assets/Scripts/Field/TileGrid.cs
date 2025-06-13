@@ -111,9 +111,13 @@ namespace Harvey.Farm.FieldScripts
                 int z = i / Width;     // row  (GridZ)
                 int x = i % Width;     // col  (GridX)
 
+                float y = Terrain.activeTerrain ?
+                        Terrain.activeTerrain.SampleHeight(new Vector3(x, 0, z)) :
+                        parent.position.y;
+
                 Vector3 pos = new Vector3(
                     centers[i].x,
-                    parent.position.y,   // align Y to field
+                    y,
                     centers[i].y);
 
                 var go = Object.Instantiate(tilePrefab, pos, Quaternion.identity, parent);

@@ -11,6 +11,17 @@ namespace Harvey.Farm.VehicleScripts
 
         public IReadOnlyList<Vehicle> AllVehicles => vehicles;
 
+        public List<Vehicle> IdleVehicles
+        {
+            get
+            {
+                List<Vehicle> idle = new();
+                foreach (var v in vehicles)
+                    if (!v.IsBusy) idle.Add(v);
+                return idle;
+            }
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) Destroy(gameObject);

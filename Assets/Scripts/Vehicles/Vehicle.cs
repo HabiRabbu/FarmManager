@@ -12,8 +12,10 @@ namespace Harvey.Farm.VehicleScripts
         [SerializeField] private Transform rootTransform;
         [SerializeField] private float moveSpeed = 2f;
 
-        [SerializeField] protected string vehicleName = "Vehicle";
+        [SerializeField] public string vehicleName = "Vehicle";
         public bool IsBusy { get; protected set; }
+        public Queue<FieldTile> JobQueue { get; } = new();
+        public Field CurrentField { get; protected set; }
 
         protected virtual void Start()
         {
@@ -30,7 +32,7 @@ namespace Harvey.Farm.VehicleScripts
 
         void FlatLookAt(Vector3 target)
         {
-            // Build a target point that has SAME Y as the tractor, so no pitch.
+            // Build a target point that has SAME Y as the tractor, so no pitch, just yaw..
             Vector3 flatTarget = new Vector3(target.x, rootTransform.position.y, target.z);
             rootTransform.LookAt(flatTarget);
         }
@@ -61,6 +63,5 @@ namespace Harvey.Farm.VehicleScripts
                 onArrive?.Invoke(i);
             }
         }
-
     }
 }

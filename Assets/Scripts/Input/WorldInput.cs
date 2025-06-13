@@ -1,6 +1,8 @@
 using UnityEngine;
 using Harvey.Farm.FieldScripts;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
+using Harvey.Farm.UI;
 
 namespace Harvey.Farm.InputScripts
 {
@@ -32,14 +34,28 @@ namespace Harvey.Farm.InputScripts
 
         void OnSelect(InputAction.CallbackContext ctx)
         {
-            Vector2 sp = input.World.Pointer.ReadValue<Vector2>();
-            Ray ray = cam.ScreenPointToRay(sp);
-
-            if (!Physics.Raycast(ray, out RaycastHit hit, maxRayDist, groundLayer))
+            if (EventSystem.current.IsPointerOverGameObject())
                 return;
 
-            var field = FieldManager.Instance.GetFieldAtPoint(hit.point);
-            field?.HandleTileClick(hit.point);
+            Vector2 screenPos = input.World.Pointer.ReadValue<Vector2>();
+            Ray ray = cam.ScreenPointToRay(screenPos);
+
+            if (!Physics.Raycast(ray, out RaycastHit hit, maxRayDist, groundLayer))
+            {
+                UIManager.Instance.CloseAll();
+                return;
+            }
+
+            Field clickedField = FieldManager.Instance.GetFieldAtPoint(hit.point);
+
+            if (clickedField != null)
+            {
+                clickedField.HandleTileClick(hit.point);
+            }
+            else
+            {
+                UIManager.Instance.CloseAll();
+            }
         }
     }
 }
