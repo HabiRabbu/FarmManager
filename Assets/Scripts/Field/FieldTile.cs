@@ -19,7 +19,9 @@ namespace Harvey.Farm.FieldScripts
         [SerializeField] public int GridX { get; private set; }
         [SerializeField] public int GridZ { get; private set; }
 
-        public bool IsPlowed { get; private set; }
+        public bool IsPlowed { get; private set; } = false;
+        public bool IsSeeded { get; private set; } = false;
+        public bool IsHarvested { get; private set; } = false;
 
         private MeshRenderer rndr;
 
@@ -44,7 +46,7 @@ namespace Harvey.Farm.FieldScripts
             IsPlowed = true;
             rndr.material = plowedMat;
 
-            WorldEvents.TilePloughed(this);
+            GameEvents.TilePloughed(this);
         }
 
         private void SetLabelVisible(bool show)

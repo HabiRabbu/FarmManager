@@ -16,12 +16,12 @@ namespace Harvey.Farm.Utilities
             this.parent = parent;
         }
 
-        public GameObject Get()
+        public GameObject UIGetOrInstantiate()
         {
-            return PoolManager.Instance.Get(prefab, parent);
+            return PoolManager.Instance.GetOrInstantiate(prefab, parent);
         }
 
-        public void Release(GameObject instance)
+        public void UIRelease(GameObject instance)
         {
             PoolManager.Instance.Release(prefab, instance);
         }

@@ -13,21 +13,25 @@ namespace Harvey.Farm.VehicleScripts
         [SerializeField] private float moveSpeed = 2f;
 
         [SerializeField] public string vehicleName = "Vehicle";
+
+
         public bool IsBusy { get; protected set; }
-        public Queue<FieldTile> JobQueue { get; } = new();
         public Field CurrentField { get; protected set; }
 
-        protected virtual void Start()
-        {
-            VehicleManager.Instance.RegisterVehicle(this);
-        }
+        public Queue<FieldJob> JobQueue { get; } = new();
 
-        public abstract void StartTask(FieldTile targetTile);
+        public abstract bool CanDo(JobType type);
+        public abstract void StartTask(FieldJob job);
 
         protected void SetBusy(bool value)
         {
             IsBusy = value;
-            VehicleEvents.VehicleBusyChanged(this, value);
+            GameEvents.VehicleBusyChanged(this, value);
+        }
+
+        protected virtual void Start()
+        {
+            VehicleManager.Instance.RegisterVehicle(this);
         }
 
         void FlatLookAt(Vector3 target)

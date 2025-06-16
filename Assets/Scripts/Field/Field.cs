@@ -8,15 +8,18 @@ namespace Harvey.Farm.FieldScripts
 {
     public class Field : MonoBehaviour
     {
+        [SerializeField] public string fieldName = "fieldNameNotSet";
+
+        // Tile + Grid Stuff
         [SerializeField] GameObject tilePrefab;
         [SerializeField] int width, height;
         private float tileSize = 1f;
-
         private TileGrid grid;
         private FieldTile[] tiles;
         private FieldTile[] serpentinePath;
         public FieldTile[] GetSerpentineTiles() => serpentinePath;
 
+        // States
         private enum State { Idle, Plowing, Plowed }
         [SerializeField] State currentState = State.Idle;
         public bool IsPlowing => currentState == State.Plowing;
@@ -25,15 +28,14 @@ namespace Harvey.Farm.FieldScripts
         [Header("UI")]
         [SerializeField] FieldJobPanel panel;
 
-        Queue<FieldTile> pendingTiles = new Queue<FieldTile>();
         int remainingTiles;
 
 
-        //DEBUG - GIZMOS
+        //--DEBUG - GIZMOS--
         private Vector3[] waypointWorlds;
-        //---------------
+        //------------------
 
-        public float TilesPloughedFraction
+        public float TilesPlowedFraction
         {
             get
             {
@@ -43,6 +45,11 @@ namespace Harvey.Farm.FieldScripts
                 return (float)ploughed / tiles.Length;
             }
         }
+
+        public bool ContainsPoint(Vector3 worldPos) => grid.Contains(worldPos);
+
+        void OnEnable() => GameEvents.OnTilePloughed += HandleTilePlowed;
+        void OnDisable() => GameEvents.OnTilePloughed -= HandleTilePlowed;
 
         void Start()
         {
@@ -72,26 +79,6 @@ namespace Harvey.Farm.FieldScripts
             panel.Show(worldPos);
         }
 
-        public void EnqueuePlowJob(Vehicle tractor)
-        {
-            if (IsPlowing || IsPlowed) return;
-
-            currentState = State.Plowing;
-
-            foreach (var t in serpentinePath)
-                if (!t.IsPlowed) pendingTiles.Enqueue(t);
-
-            DispatchNextTile(tractor);
-        }
-
-        public void DispatchNextTile(Vehicle tractor)
-        {
-            if (tractor.IsBusy || pendingTiles.Count == 0) return;
-
-            var next = pendingTiles.Dequeue();
-            tractor.StartTask(next);
-        }
-
         void HandleTilePlowed(FieldTile t)
         {
             if (t.transform.parent != transform) return;
@@ -99,7 +86,7 @@ namespace Harvey.Farm.FieldScripts
             if (remainingTiles <= 0 && currentState != State.Plowed)
             {
                 currentState = State.Plowed;
-                WorldEvents.FieldCompleted(this);
+                GameEvents.FieldCompleted(this);
             }
         }
 
@@ -119,8 +106,6 @@ namespace Harvey.Farm.FieldScripts
         {
             FieldManager.Instance.UnregisterField(this);
         }
-
-        public bool ContainsPoint(Vector3 worldPos) => grid.Contains(worldPos);
 
 #if UNITY_EDITOR
         void OnDrawGizmos()

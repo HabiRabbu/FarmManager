@@ -20,7 +20,7 @@ namespace Harvey.Farm.Utilities
 
         private readonly Dictionary<GameObject, Queue<GameObject>> pools = new();
 
-        public GameObject Get(GameObject prefab, Transform parent = null)
+        public GameObject GetOrInstantiate(GameObject prefab, Transform parent = null)
         {
             if (!pools.TryGetValue(prefab, out var q))
             {

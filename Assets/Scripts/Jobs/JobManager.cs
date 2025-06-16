@@ -1,8 +1,8 @@
 using System.Collections.Generic;
+using UnityEngine;
 using Harvey.Farm.Events;
 using Harvey.Farm.FieldScripts;
 using Harvey.Farm.VehicleScripts;
-using UnityEngine;
 
 namespace Harvey.Farm.JobScripts
 {
@@ -11,26 +11,34 @@ namespace Harvey.Farm.JobScripts
         public static JobManager Instance { get; private set; }
         void Awake() { if (Instance) Destroy(gameObject); else Instance = this; }
 
-        public void EnqueuePlowJob(Field field, Vehicle tractor)
+        bool JobNeeded(FieldTile t, JobType type) => type switch
         {
-            if (tractor == null) return;
-            field.EnqueuePlowJob(tractor);
+            JobType.Plow    => !t.IsPlowed,
+            JobType.Seed    => t.IsPlowed && !t.IsSeeded,
+            JobType.Harvest => t.IsSeeded && !t.IsHarvested,
+            _               => false
+        };
+
+        public void EnqueueJob(Field field, Vehicle v, JobType type)
+        {
+            if (v == null || !v.CanDo(type)) return;
+
+            foreach (var t in field.GetSerpentineTiles())
+                if (JobNeeded(t, type))
+                    v.JobQueue.Enqueue(new FieldJob(t, type, field));
+
+            DispatchIfIdle(v, field, type);
+
         }
 
-        void DispatchIfIdle(Vehicle v)
+        void DispatchIfIdle(Vehicle v, Field f, JobType j)
         {
-            if (!v.IsBusy && v.JobQueue.Count > 0)
-                v.StartTask(v.JobQueue.Dequeue());
-        }
+            if (v.IsBusy || v.JobQueue.Count == 0) return;
 
-        void OnEnable()
-        {
-            VehicleEvents.OnVehicleBusyChanged += (v, busy) =>
-            {
-                if (!busy && v.CurrentField != null)
-                    v.CurrentField.DispatchNextTile(v);
-            };
+            var job = v.JobQueue.Dequeue();
+
+            GameEvents.JobStarted(v, f, j);
+            v.StartTask(job);
         }
     }
 }
-

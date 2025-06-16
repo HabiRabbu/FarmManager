@@ -7,20 +7,22 @@ namespace Harvey.Farm.VehicleScripts
 {
     public class Tractor : Vehicle
     {
-        public override void StartTask(FieldTile startTile)
+
+        public override bool CanDo(JobType type) => type == JobType.Plow; //Tractor plows (and only plows) for now.
+
+        public override void StartTask(FieldJob job)
         {
-            if (IsBusy) return;
+            if (IsBusy || !CanDo(job.Type)) return;
 
-            CurrentField = startTile.GetComponentInParent<Field>();
-
-            StartCoroutine(StartPlowing(startTile));
+            CurrentField = job.Field;
+            StartCoroutine(StartJob(job));
         }
 
-        private IEnumerator StartPlowing(FieldTile startTile)
+        private IEnumerator StartJob(FieldJob job)
         {
             SetBusy(true);
 
-            var field = startTile.GetComponentInParent<Field>();
+            var field = job.Field;
             var serp = field.GetSerpentineTiles();
 
             var waypoints = new List<Vector3>(serp.Length);
@@ -29,11 +31,15 @@ namespace Harvey.Farm.VehicleScripts
 
             yield return MoveAlong(waypoints, i =>
             {
-                if (!serp[i].IsPlowed)
-                    serp[i].Plow();
+                FieldTile tile = serp[i];
+
+                if (job.Type == JobType.Plow && !tile.IsPlowed)
+                    tile.Plow();
+                // later: else-if Seed/Harvest …
             });
 
             SetBusy(false);
+            CurrentField = null;
         }
 
     }

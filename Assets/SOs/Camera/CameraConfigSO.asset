@@ -20,9 +20,9 @@ MonoBehaviour:
   <MaxPanX>k__BackingField: 24.89364
   <MinPanZ>k__BackingField: -25.014997
   <MaxPanZ>k__BackingField: 25.021067
-  <ZoomSpeed>k__BackingField: 15
-  <ScrollWheelMultiplier>k__BackingField: 15
+  <ZoomSpeed>k__BackingField: 25
+  <ScrollWheelMultiplier>k__BackingField: 25
   <MinZoomDistance>k__BackingField: 1
-  <MaxZoomDistance>k__BackingField: 20
+  <MaxZoomDistance>k__BackingField: 40
   <RotationSpeed>k__BackingField: 100
   <RotationClamp>k__BackingField: {x: -50, y: 20}

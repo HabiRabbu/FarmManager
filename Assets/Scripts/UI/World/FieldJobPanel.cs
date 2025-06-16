@@ -65,15 +65,15 @@ namespace Harvey.Farm.UI
             if (dropdown.interactable && idleCache.Count > 0)
                 chosen = idleCache[dropdown.value];
 
-            UIEvents.JobButtonPressed(field, chosen);
+            UIEvents.JobButtonPressed(field, chosen, JobType.Plow);
             Hide();
         }
 
         /* ------------------------- INTERNAL --------------------------- */
         void Awake()
         {
-            WorldEvents.OnTilePloughed += _ => UpdateBar();
-            WorldEvents.OnFieldCompleted += f =>
+            GameEvents.OnTilePloughed += _ => UpdateBar();
+            GameEvents.OnFieldCompleted += f =>
             {
                 if (f == field) progress.value = 1f;
             };
@@ -101,7 +101,7 @@ namespace Harvey.Farm.UI
         void UpdateBar()
         {
             if (!field || progress == null) return;
-            progress.value = field.TilesPloughedFraction;
+            progress.value = field.TilesPlowedFraction;
         }
     }
 }
