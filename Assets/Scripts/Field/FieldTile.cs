@@ -27,12 +27,14 @@ namespace Harvey.Farm.FieldScripts
 
         public Vector3 WorldPosition => transform.position;
 
+        void Awake() => rndr = GetComponent<MeshRenderer>();
+
         public void Init(int x, int z)
         {
             GridX = x;
             GridZ = z;
             rndr = GetComponent<MeshRenderer>();
-            rndr.material = earthMat;
+            rndr.sharedMaterial = earthMat;
             IsPlowed = false;
 
             //Debug

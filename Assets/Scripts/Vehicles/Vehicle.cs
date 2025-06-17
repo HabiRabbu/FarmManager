@@ -3,6 +3,8 @@ using Harvey.Farm.FieldScripts;
 using System.Collections;
 using System.Collections.Generic;
 using Harvey.Farm.Events;
+using Harvey.Farm.JobScripts;
+using DG.Tweening;
 
 namespace Harvey.Farm.VehicleScripts
 {
@@ -34,13 +36,6 @@ namespace Harvey.Farm.VehicleScripts
             VehicleManager.Instance.RegisterVehicle(this);
         }
 
-        void FlatLookAt(Vector3 target)
-        {
-            // Build a target point that has SAME Y as the tractor, so no pitch, just yaw..
-            Vector3 flatTarget = new Vector3(target.x, rootTransform.position.y, target.z);
-            rootTransform.LookAt(flatTarget);
-        }
-
         public void TeleportTo(Vector3 worldPos)
         {
             if (rootTransform != null)
@@ -49,23 +44,38 @@ namespace Harvey.Farm.VehicleScripts
                 Debug.LogWarning($"{vehicleName} has no rootToMove set!");
         }
 
-        protected IEnumerator MoveAlong(List<Vector3> waypoints, System.Action<int> onArrive)
+        protected IEnumerator MoveAlong(List<Vector3> waypoints,
+                                System.Action<int> onArrive)
         {
             for (int i = 0; i < waypoints.Count; i++)
             {
                 Vector3 target = waypoints[i];
-                FlatLookAt(target);
-                while (Vector3.Distance(rootTransform.position, target) > 0.01f)
-                {
-                    rootTransform.position = Vector3.MoveTowards(
-                        rootTransform.position,
-                        target,
-                        moveSpeed * Time.deltaTime);
-                    yield return null; // Wait af rame
-                }
+                float dist = Vector3.Distance(rootTransform.position, target);
+                float travelTime = dist / moveSpeed;
 
+                // Build a one-off sequence for this leg
+                Sequence leg = DOTween.Sequence()
+                    // Turn for the first 30 % of the leg, but overlap with move
+                    .Join(YawLookAt(target, travelTime * 0.30f))
+                    .Join(MoveTo(target, travelTime));
+
+                yield return leg.WaitForCompletion();
                 onArrive?.Invoke(i);
             }
         }
+
+        protected Tween YawLookAt(Vector3 target, float turnTime)
+        {
+            Vector3 flat = new(target.x, rootTransform.position.y, target.z);
+            return rootTransform.DOLookAt(flat, turnTime, AxisConstraint.Y)
+                                .SetEase(Ease.Linear);
+        }
+
+        protected Tween MoveTo(Vector3 target, float time)
+        {
+            return rootTransform.DOMove(target, time)
+                                .SetEase(Ease.Linear);
+        }
+
     }
 }

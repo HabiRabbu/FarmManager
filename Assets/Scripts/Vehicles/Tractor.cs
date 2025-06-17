@@ -2,6 +2,7 @@ using UnityEngine;
 using Harvey.Farm.FieldScripts;
 using System.Collections;
 using System.Collections.Generic;
+using Harvey.Farm.JobScripts;
 
 namespace Harvey.Farm.VehicleScripts
 {
@@ -20,26 +21,26 @@ namespace Harvey.Farm.VehicleScripts
 
         private IEnumerator StartJob(FieldJob job)
         {
-            SetBusy(true);
-
-            var field = job.Field;
-            var serp = field.GetSerpentineTiles();
-
-            var waypoints = new List<Vector3>(serp.Length);
-            foreach (var t in serp)
-                waypoints.Add(t.WorldPosition);
-
-            yield return MoveAlong(waypoints, i =>
+            do
             {
-                FieldTile tile = serp[i];
+                SetBusy(true);
+                var field = job.Field;
+                field.Begin(job.Type);
 
-                if (job.Type == JobType.Plow && !tile.IsPlowed)
-                    tile.Plow();
-                // later: else-if Seed/Harvest …
-            });
+                var serp = field.GetSerpentineTiles();
+                var waypoints = new List<Vector3>(serp.Length);
+                foreach (var t in serp) waypoints.Add(t.WorldPosition);
 
-            SetBusy(false);
-            CurrentField = null;
+                yield return MoveAlong(waypoints, i =>
+                {
+                    FieldTile tile = serp[i];
+                    if (job.Type == JobType.Plow && !tile.IsPlowed) tile.Plow();
+                });
+
+                SetBusy(false);
+                CurrentField = null;
+            }
+            while (JobQueue.TryDequeue(out job));
         }
 
     }

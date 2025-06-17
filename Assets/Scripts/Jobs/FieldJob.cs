@@ -1,15 +1,16 @@
 using Harvey.Farm.FieldScripts;
 
-public struct FieldJob
+namespace Harvey.Farm.JobScripts
 {
-    public readonly FieldTile Tile;
-    public readonly JobType Type;
-    public readonly Field Field;
-
-    public FieldJob(FieldTile tile, JobType type, Field field)
+    public readonly struct FieldJob
     {
-        Tile = tile;
-        Type = type;
-        Field = field;
+        public readonly Field Field;
+        public readonly JobType Type;
+
+        public FieldJob(Field field, JobType type)
+        {
+            Field = field;
+            Type = type;
+        }
     }
 }

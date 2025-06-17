@@ -11,14 +11,12 @@ namespace Harvey.Farm.VehicleScripts
 
         public IReadOnlyList<Vehicle> AllVehicles => vehicles;
 
-        public List<Vehicle> IdleVehicles
+        public IEnumerable<Vehicle> IdleVehicles
         {
             get
             {
-                List<Vehicle> idle = new();
                 foreach (var v in vehicles)
-                    if (!v.IsBusy) idle.Add(v);
-                return idle;
+                    if (!v.IsBusy) yield return v;
             }
         }
 

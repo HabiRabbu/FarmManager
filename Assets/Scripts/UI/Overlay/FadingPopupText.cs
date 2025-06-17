@@ -16,15 +16,15 @@ public class FadingPopupText : MonoBehaviour
         tmpText = GetComponentInChildren<TMP_Text>();
     }
 
-    public void Show(PopupMessageModel msg, Action onComplete)
+    public void Show(FadingPopupData data, Action onComplete)
     {
         if (fadeRoutine != null) StopCoroutine(fadeRoutine);
         canvasGroup.alpha = 1f;
 
-        tmpText.text = msg.text;
-        tmpText.color = msg.color;
+        tmpText.text = data.Text;
+        tmpText.color = data.Color;
 
-        fadeRoutine = StartCoroutine(FadeOut(msg.fadeDuration, onComplete));
+        fadeRoutine = StartCoroutine(FadeOut(data.FadeDuration, onComplete));
     }
 
     private IEnumerator FadeOut(float duration, Action onComplete)

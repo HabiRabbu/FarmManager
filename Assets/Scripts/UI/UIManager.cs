@@ -6,6 +6,8 @@ using Harvey.Farm.VehicleScripts;
 using UnityEngine;
 using Harvey.Farm.Utilities;
 using UnityEngine.Playables;
+using UnityEngine.UI;
+using UnityEditor.Rendering.Universal.ShaderGraph;
 
 namespace Harvey.Farm.UI
 {
@@ -13,6 +15,7 @@ namespace Harvey.Farm.UI
     {
         public static UIManager Instance { get; private set; }
         public static void Notify(in NotificationData data) => Instance?.ShowNotification(data);
+        public static void CentrePopup(in FadingPopupData data) => Instance?.ShowCentrePopup(data);
 
 
         [SerializeField] private Transform canvasTransform;
@@ -21,7 +24,6 @@ namespace Harvey.Farm.UI
 
         [Header("Fading Popup Config")]
         [SerializeField] private GameObject fadingTextPopupPrefab;
-        [SerializeField] private PopupMessageModel jobStartedPopupMsg;
 
         [Header("Notification Popup Config")]
         [SerializeField] private GameObject notificationPopupPrefab;
@@ -49,11 +51,13 @@ namespace Harvey.Farm.UI
         {
             UIEvents.OnJobButtonPressed += HandleJobBtn;
             GameEvents.OnJobStarted += HandleJobStarted;
+            GameEvents.OnFieldCompleted += HandleFieldCompleted;
         }
         void OnDisable()
         {
             UIEvents.OnJobButtonPressed -= HandleJobBtn;
             GameEvents.OnJobStarted -= HandleJobStarted;
+            GameEvents.OnFieldCompleted -= HandleFieldCompleted;
         }
 
         public void Register(FieldJobPanel p) => panels.Add(p);
@@ -66,7 +70,6 @@ namespace Harvey.Farm.UI
 
         private void HandleJobStarted(Vehicle v, Field f, JobType j)
         {
-            JobStartedPopup(v, f, j);
 
             var n = new NotificationData
             (
@@ -79,15 +82,23 @@ namespace Harvey.Farm.UI
             ShowNotification(n);
         }
 
-        private void JobStartedPopup(Vehicle v, Field f, JobType j)
+        private void HandleFieldCompleted(Field field)
+        {
+            var n = new FadingPopupData
+            (
+                text: $"Work completed on field {field.fieldName}",
+                color: Color.white,
+                fadeDuration: 2f
+            );
+
+            ShowCentrePopup(n);
+        }
+
+        public void ShowCentrePopup(in FadingPopupData data)
         {
             var go = fadingPopupPool.UIGetOrInstantiate();
             var popup = go.GetComponent<FadingPopupText>();
-
-            string popupText = v.vehicleName + " started work on field " + f.fieldName;
-            jobStartedPopupMsg.text = popupText;
-
-            popup.Show(jobStartedPopupMsg, () => fadingPopupPool.UIRelease(go));
+            popup.Show(data, () => notificationPopupPool.UIRelease(go));
         }
 
         public void ShowNotification(in NotificationData data)

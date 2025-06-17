@@ -11,34 +11,20 @@ namespace Harvey.Farm.JobScripts
         public static JobManager Instance { get; private set; }
         void Awake() { if (Instance) Destroy(gameObject); else Instance = this; }
 
-        bool JobNeeded(FieldTile t, JobType type) => type switch
-        {
-            JobType.Plow    => !t.IsPlowed,
-            JobType.Seed    => t.IsPlowed && !t.IsSeeded,
-            JobType.Harvest => t.IsSeeded && !t.IsHarvested,
-            _               => false
-        };
-
         public void EnqueueJob(Field field, Vehicle v, JobType type)
         {
             if (v == null || !v.CanDo(type)) return;
+            if (!field.Needs(type)) return;
 
-            foreach (var t in field.GetSerpentineTiles())
-                if (JobNeeded(t, type))
-                    v.JobQueue.Enqueue(new FieldJob(t, type, field));
+            v.JobQueue.Clear();
+            v.JobQueue.Enqueue(new FieldJob(field, type));
 
-            DispatchIfIdle(v, field, type);
-
-        }
-
-        void DispatchIfIdle(Vehicle v, Field f, JobType j)
-        {
-            if (v.IsBusy || v.JobQueue.Count == 0) return;
-
-            var job = v.JobQueue.Dequeue();
-
-            GameEvents.JobStarted(v, f, j);
-            v.StartTask(job);
+            // --- inline DispatchIfIdle ---
+            if (!v.IsBusy && v.JobQueue.TryDequeue(out var job))
+            {
+                GameEvents.JobStarted(v, job.Field, job.Type);
+                v.StartTask(job);
+            }
         }
     }
 }

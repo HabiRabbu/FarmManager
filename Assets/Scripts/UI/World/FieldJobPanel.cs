@@ -5,6 +5,7 @@ using Harvey.Farm.VehicleScripts;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 namespace Harvey.Farm.UI
 {
@@ -31,28 +32,7 @@ namespace Harvey.Farm.UI
             transform.position = new Vector3(worldPos.x, worldPos.y + 3.5f, worldPos.z);
 
             BuildDropdownOptions();
-
-            if (field.IsPlowed)
-            {
-                plowButton.gameObject.SetActive(false);
-                dropdown.gameObject.SetActive(false);
-                statusLabel.gameObject.SetActive(true);
-                statusLabel.text = "Field plowed";
-            }
-            else if (field.IsPlowing)
-            {
-                plowButton.gameObject.SetActive(false);
-                dropdown.gameObject.SetActive(false);
-                statusLabel.gameObject.SetActive(true);
-                statusLabel.text = "Plowing in progress…";
-            }
-            else
-            {
-                statusLabel.gameObject.SetActive(false);
-                plowButton.gameObject.SetActive(true);
-                dropdown.gameObject.SetActive(true);
-            }
-
+            UpdateVisualState();
             gameObject.SetActive(true);
         }
         public void Hide() => gameObject.SetActive(false);
@@ -81,7 +61,7 @@ namespace Harvey.Farm.UI
 
         void BuildDropdownOptions()
         {
-            idleCache = VehicleManager.Instance.IdleVehicles;
+            idleCache = VehicleManager.Instance.IdleVehicles.ToList();
             dropdown.ClearOptions();
 
             if (idleCache.Count == 0)
@@ -96,6 +76,30 @@ namespace Harvey.Farm.UI
 
             dropdown.AddOptions(names);
             dropdown.interactable = true;
+        }
+
+        void UpdateVisualState()
+        {
+            if (field.IsPlowed)
+            {
+                plowButton.gameObject.SetActive(false);
+                dropdown.gameObject.SetActive(false);
+                statusLabel.gameObject.SetActive(true);
+                statusLabel.text = "Field plowed";
+            }
+            else if (field.IsPlowing)
+            {
+                plowButton.gameObject.SetActive(false);
+                dropdown.gameObject.SetActive(false);
+                statusLabel.gameObject.SetActive(true);
+                statusLabel.text = "Plowing in progress…";
+            }
+            else
+            {
+                statusLabel.gameObject.SetActive(false);
+                plowButton.gameObject.SetActive(true);
+                dropdown.gameObject.SetActive(true);
+            }
         }
 
         void UpdateBar()

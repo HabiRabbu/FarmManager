@@ -15,12 +15,8 @@ namespace Harvey.Farm.FieldScripts
 
         void Awake()
         {
-            if (Instance != null && Instance != this) Destroy(gameObject);
-            else
-            {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
+            if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+            Instance = this;
         }
 
         public void RegisterField(Field f) => fields.Add(f);

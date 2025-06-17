@@ -8,6 +8,7 @@ namespace Harvey.Farm.FieldScripts
 {
     public class Field : MonoBehaviour
     {
+        private int plowedSoFar = 0;
         [SerializeField] public string fieldName = "fieldNameNotSet";
 
         // Tile + Grid Stuff
@@ -19,11 +20,34 @@ namespace Harvey.Farm.FieldScripts
         private FieldTile[] serpentinePath;
         public FieldTile[] GetSerpentineTiles() => serpentinePath;
 
-        // States
-        private enum State { Idle, Plowing, Plowed }
+        //----------------------------- STATES ---------------------------------------
         [SerializeField] State currentState = State.Idle;
+        private enum State
+        {
+            Idle,
+
+            // Ploughing
+            Plowing,
+            Plowed,
+
+            // Seeding
+            Seeding,
+            Seeded,
+
+            // Harvesting
+            Harvesting,
+            Harvested
+        }
+        public bool IsIdle => currentState == State.Idle;
         public bool IsPlowing => currentState == State.Plowing;
         public bool IsPlowed => currentState == State.Plowed;
+
+        public bool IsSeeding => currentState == State.Seeding;
+        public bool IsSeeded => currentState == State.Seeded;
+
+        public bool IsHarvesting => currentState == State.Harvesting;
+        public bool IsHarvested => currentState == State.Harvested;
+        // --------------------------------------------------------------------------------
 
         [Header("UI")]
         [SerializeField] FieldJobPanel panel;
@@ -35,16 +59,7 @@ namespace Harvey.Farm.FieldScripts
         private Vector3[] waypointWorlds;
         //------------------
 
-        public float TilesPlowedFraction
-        {
-            get
-            {
-                int ploughed = 0;
-                foreach (var t in tiles)
-                    if (t.IsPlowed) ploughed++;
-                return (float)ploughed / tiles.Length;
-            }
-        }
+        public float TilesPlowedFraction => (float)plowedSoFar / tiles.Length;
 
         public bool ContainsPoint(Vector3 worldPos) => grid.Contains(worldPos);
 
@@ -79,11 +94,36 @@ namespace Harvey.Farm.FieldScripts
             panel.Show(worldPos);
         }
 
+        // Does this field need <type> work?
+        public bool Needs(JobType type) => type switch
+        {
+            JobType.Plow => !IsPlowed,
+            JobType.Seed => IsPlowed && !IsSeeded,
+            JobType.Harvest => IsSeeded && !IsHarvested,
+            _ => false
+        };
+
+        // Call when a tractor is about to start <type>.
+        public void Begin(JobType type)
+        {
+            currentState = type switch
+            {
+                JobType.Plow => State.Plowing,
+                JobType.Seed => State.Seeding,
+                JobType.Harvest => State.Harvesting,
+                _ => currentState
+            };
+
+            plowedSoFar = 0;
+            remainingTiles = tiles.Length;
+        }
+
         void HandleTilePlowed(FieldTile t)
         {
             if (t.transform.parent != transform) return;
-            remainingTiles--;
-            if (remainingTiles <= 0 && currentState != State.Plowed)
+
+            plowedSoFar++;
+            if (plowedSoFar >= tiles.Length && currentState == State.Plowing)
             {
                 currentState = State.Plowed;
                 GameEvents.FieldCompleted(this);

@@ -257,7 +257,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5144958, y: 0.000000023331229, z: -0.000000013998739, w: 0.8574929}
+  m_LocalRotation: {x: 0.46438414, y: -0.000000006545551, z: 0.0000000034321743, w: 0.8856339}
   m_LocalPosition: {x: 0, y: 15, z: -22.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1042,7 +1042,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Composition:
-    ScreenPosition: {x: 0, y: 0}
+    ScreenPosition: {x: 0, y: 0.1}
     DeadZone:
       Enabled: 0
       Size: {x: 0.2, y: 0.2}
@@ -1128,7 +1128,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1180150553}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5144958, y: 0.00000002333123, z: -0.000000013998741, w: 0.8574929}
+  m_LocalRotation: {x: 0.46438408, y: -0.0000000065455503, z: 0.0000000034321737, w: 0.88563395}
   m_LocalPosition: {x: 0, y: 15, z: -22.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1494,10 +1494,6 @@ MonoBehaviour:
   canvasTransform: {fileID: 873685458}
   notificationContainer: {fileID: 2065802427}
   fadingTextPopupPrefab: {fileID: 9096874576194517134, guid: 6a60f95139b20f541a72091ba1ed7f55, type: 3}
-  jobStartedPopupMsg:
-    text: Placeholder
-    color: {r: 1, g: 1, b: 1, a: 1}
-    fadeDuration: 2
   notificationPopupPrefab: {fileID: 8141138985865803427, guid: 8798ffa3757d05e45b8bc106db67858b, type: 3}
 --- !u!4 &1955920155
 Transform:
