@@ -1,0 +1,1 @@
+public enum ImplementType { Plow, Mower, Seeder, Sprayer, Cultivator, Fertilizer }

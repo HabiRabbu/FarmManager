@@ -6,11 +6,8 @@ using Harvey.Farm.VehicleScripts;
 
 namespace Harvey.Farm.JobScripts
 {
-    public class JobManager : MonoBehaviour
+    public class JobManager : Singleton<JobManager>
     {
-        public static JobManager Instance { get; private set; }
-        void Awake() { if (Instance) Destroy(gameObject); else Instance = this; }
-
         public void EnqueueJob(Field field, Vehicle v, JobType type)
         {
             if (v == null || !v.CanDo(type)) return;

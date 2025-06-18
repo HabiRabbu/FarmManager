@@ -6,19 +6,11 @@ using UnityEngine;
 /// Single Update() loop that manages ALL delayed callbacks in one place.
 /// Eliminates per-job coroutines and reduces GC pressure.
 /// </summary>
-public class TimerService : MonoBehaviour
+public class TimerService : Singleton<TimerService>
 {
-    public static TimerService Instance { get; private set; }
-
     struct Timer { public float remaining; public Action callback; }
 
     private readonly List<Timer> timers = new();
-
-    void Awake()
-    {
-        if (Instance != null) { Destroy(gameObject); return; }
-        Instance = this;
-    }
 
     void Update()
     {

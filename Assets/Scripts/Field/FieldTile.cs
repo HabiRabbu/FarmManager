@@ -9,8 +9,8 @@ namespace Harvey.Farm.FieldScripts
     {
         [Header("Debug")]
         [SerializeField] private TMP_Text debugTextLabel;
-        void OnEnable() => DebugEvents.OnDebugModeToggled += SetLabelVisible;
-        void OnDisable() => DebugEvents.OnDebugModeToggled -= SetLabelVisible;
+        void OnEnable() => GameEvents.OnDebugModeToggled += SetLabelVisible;
+        void OnDisable() => GameEvents.OnDebugModeToggled -= SetLabelVisible;
 
 
         [SerializeField] private Material earthMat;

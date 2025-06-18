@@ -11,9 +11,8 @@ using UnityEditor.Rendering.Universal.ShaderGraph;
 
 namespace Harvey.Farm.UI
 {
-    public class UIManager : MonoBehaviour
+    public class UIManager : Singleton<UIManager>
     {
-        public static UIManager Instance { get; private set; }
         public static void Notify(in NotificationData data) => Instance?.ShowNotification(data);
         public static void CentrePopup(in FadingPopupData data) => Instance?.ShowCentrePopup(data);
 
@@ -36,26 +35,24 @@ namespace Harvey.Farm.UI
         private UIPrefabPool fadingPopupPool;
         private UIPrefabPool notificationPopupPool;
 
-
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             fadingPopupPool = new UIPrefabPool(fadingTextPopupPrefab, canvasTransform);
             notificationPopupPool = new UIPrefabPool(notificationPopupPrefab, notificationContainer);
-
-            if (Instance != null && Instance != this) Destroy(gameObject);
-            else Instance = this;
         }
         readonly List<FieldJobPanel> panels = new();
 
         void OnEnable()
         {
-            UIEvents.OnJobButtonPressed += HandleJobBtn;
+            GameEvents.OnJobButtonPressed += HandleJobBtn;
             GameEvents.OnJobStarted += HandleJobStarted;
             GameEvents.OnFieldCompleted += HandleFieldCompleted;
         }
         void OnDisable()
         {
-            UIEvents.OnJobButtonPressed -= HandleJobBtn;
+            GameEvents.OnJobButtonPressed -= HandleJobBtn;
             GameEvents.OnJobStarted -= HandleJobStarted;
             GameEvents.OnFieldCompleted -= HandleFieldCompleted;
         }

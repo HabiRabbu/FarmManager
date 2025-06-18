@@ -21,6 +21,14 @@ namespace Harvey.Farm.Events
         // *------------------- Jobs -------------------*
         public static event Action<Vehicle, Field, JobType> OnJobStarted;
         public static void JobStarted(Vehicle v, Field f, JobType j) => OnJobStarted?.Invoke(v, f, j);
+        
+        // *------------------- Debug -------------------*
+        public static event Action<bool> OnDebugModeToggled;
+        public static void DebugModeToggled(bool enabled) => OnDebugModeToggled?.Invoke(enabled);
+
+        // *------------------- UI -------------------*
+        public static event Action<Field, Vehicle, JobType> OnJobButtonPressed;
+        public static void JobButtonPressed(Field f, Vehicle v, JobType t) => OnJobButtonPressed?.Invoke(f, v, t);
 
     }
 }

@@ -3,10 +3,8 @@ using UnityEngine;
 
 namespace Harvey.Farm.VehicleScripts
 {
-    public class VehicleManager : MonoBehaviour
+    public class VehicleManager : Singleton<VehicleManager>
     {
-        public static VehicleManager Instance { get; private set; }
-
         private List<Vehicle> vehicles = new();
 
         public IReadOnlyList<Vehicle> AllVehicles => vehicles;
@@ -18,12 +16,6 @@ namespace Harvey.Farm.VehicleScripts
                 foreach (var v in vehicles)
                     if (!v.IsBusy) yield return v;
             }
-        }
-
-        void Awake()
-        {
-            if (Instance != null && Instance != this) Destroy(gameObject);
-            else Instance = this;
         }
 
         public void RegisterVehicle(Vehicle v)

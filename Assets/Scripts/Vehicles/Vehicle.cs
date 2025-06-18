@@ -11,8 +11,15 @@ namespace Harvey.Farm.VehicleScripts
     public abstract class Vehicle : MonoBehaviour
     {
 
+        [SerializeField] private VehicleDefinition definition;
+        public VehicleDefinition Def => definition;
+        public VehicleType Type => definition.Type;
+
         [SerializeField] private Transform rootTransform;
-        [SerializeField] private float moveSpeed = 2f;
+
+        [SerializeField, Tooltip("Used only when no VehicleDefinition is assigned")]
+        private float fallbackMoveSpeed = 2f;
+        protected float MoveSpeed => definition ? definition.MoveSpeed : fallbackMoveSpeed;
 
         [SerializeField] public string vehicleName = "Vehicle";
 
@@ -25,14 +32,23 @@ namespace Harvey.Farm.VehicleScripts
         public abstract bool CanDo(JobType type);
         public abstract void StartTask(FieldJob job);
 
-        protected void SetBusy(bool value)
+        void Awake()
         {
-            IsBusy = value;
-            GameEvents.VehicleBusyChanged(this, value);
+            if (!definition)
+            {
+                Debug.LogWarning($"<color=yellow>{name}</color> has no VehicleDefinition assigned; " +
+                                 $"using fallback stats.", this);
+            }
+            else
+            {
+                vehicleName = definition.DisplayName;
+                //Set others properties from definition?
+            }
         }
 
         protected virtual void Start()
         {
+
             VehicleManager.Instance.RegisterVehicle(this);
         }
 
@@ -44,6 +60,7 @@ namespace Harvey.Farm.VehicleScripts
                 Debug.LogWarning($"{vehicleName} has no rootToMove set!");
         }
 
+        // ------------------------------ MOVEMENT ------------------------------
         protected IEnumerator MoveAlong(List<Vector3> waypoints,
                                 System.Action<int> onArrive)
         {
@@ -51,11 +68,9 @@ namespace Harvey.Farm.VehicleScripts
             {
                 Vector3 target = waypoints[i];
                 float dist = Vector3.Distance(rootTransform.position, target);
-                float travelTime = dist / moveSpeed;
+                float travelTime = dist / MoveSpeed;
 
-                // Build a one-off sequence for this leg
                 Sequence leg = DOTween.Sequence()
-                    // Turn for the first 30 % of the leg, but overlap with move
                     .Join(YawLookAt(target, travelTime * 0.30f))
                     .Join(MoveTo(target, travelTime));
 
@@ -75,6 +90,13 @@ namespace Harvey.Farm.VehicleScripts
         {
             return rootTransform.DOMove(target, time)
                                 .SetEase(Ease.Linear);
+        }
+        // ------------------------------------------------------------------------
+
+        protected void SetBusy(bool value)
+        {
+            IsBusy = value;
+            GameEvents.VehicleBusyChanged(this, value);
         }
 
     }

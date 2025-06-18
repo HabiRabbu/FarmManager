@@ -9,7 +9,8 @@ namespace Harvey.Farm.VehicleScripts
     public class Tractor : Vehicle
     {
 
-        public override bool CanDo(JobType type) => type == JobType.Plow; //Tractor plows (and only plows) for now.
+        public override bool CanDo(JobType type) =>
+            type == JobType.Plow && !IsBusy && Def.Type == VehicleType.Tractor;
 
         public override void StartTask(FieldJob job)
         {

@@ -2,10 +2,12 @@ using System.Collections.Generic;
 using Harvey.Farm.Events;
 using Harvey.Farm.FieldScripts;
 using Harvey.Farm.VehicleScripts;
+using Harvey.Farm.Utilities;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using DG.Tweening;
 
 namespace Harvey.Farm.UI
 {
@@ -13,7 +15,7 @@ namespace Harvey.Farm.UI
     {
         [Header("UI refs")]
         [SerializeField] private TMP_Dropdown dropdown;
-        [SerializeField] private Slider progress;
+        [SerializeField] private Image progressBar;
         [SerializeField] private Button plowButton;
         [SerializeField] private TMP_Text statusLabel;
 
@@ -33,6 +35,7 @@ namespace Harvey.Farm.UI
 
             BuildDropdownOptions();
             UpdateVisualState();
+            UpdateBar();
             gameObject.SetActive(true);
         }
         public void Hide() => gameObject.SetActive(false);
@@ -45,7 +48,7 @@ namespace Harvey.Farm.UI
             if (dropdown.interactable && idleCache.Count > 0)
                 chosen = idleCache[dropdown.value];
 
-            UIEvents.JobButtonPressed(field, chosen, JobType.Plow);
+            GameEvents.JobButtonPressed(field, chosen, JobType.Plow);
             Hide();
         }
 
@@ -55,7 +58,7 @@ namespace Harvey.Farm.UI
             GameEvents.OnTilePloughed += _ => UpdateBar();
             GameEvents.OnFieldCompleted += f =>
             {
-                if (f == field) progress.value = 1f;
+                if (f == field) progressBar.fillAmount = 1f;
             };
         }
 
@@ -80,14 +83,14 @@ namespace Harvey.Farm.UI
 
         void UpdateVisualState()
         {
-            if (field.IsPlowed)
+            if (field.Is(Field.State.Plowed))
             {
                 plowButton.gameObject.SetActive(false);
                 dropdown.gameObject.SetActive(false);
                 statusLabel.gameObject.SetActive(true);
                 statusLabel.text = "Field plowed";
             }
-            else if (field.IsPlowing)
+            else if (field.Is(Field.State.Plowing))
             {
                 plowButton.gameObject.SetActive(false);
                 dropdown.gameObject.SetActive(false);
@@ -104,8 +107,16 @@ namespace Harvey.Farm.UI
 
         void UpdateBar()
         {
-            if (!field || progress == null) return;
-            progress.value = field.TilesPlowedFraction;
+            if (!field || progressBar == null) return;
+
+            float frac = field.TilesPlowedFraction;
+            progressBar.fillAmount = frac;
+
+            Color target = frac < 0.5f
+                ? Color.Lerp(Colors.COLOR_RED, Colors.COLOR_YELLOW, frac * 2f)
+                : Color.Lerp(Colors.COLOR_YELLOW, Colors.COLOR_GREEN, (frac - 0.5f) * 2f);
+
+            progressBar.DOColor(target, 0.25f);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Harvey.Farm.FieldScripts
 
         //----------------------------- STATES ---------------------------------------
         [SerializeField] State currentState = State.Idle;
-        private enum State
+        public enum State
         {
             Idle,
 
@@ -38,15 +38,8 @@ namespace Harvey.Farm.FieldScripts
             Harvesting,
             Harvested
         }
-        public bool IsIdle => currentState == State.Idle;
-        public bool IsPlowing => currentState == State.Plowing;
-        public bool IsPlowed => currentState == State.Plowed;
-
-        public bool IsSeeding => currentState == State.Seeding;
-        public bool IsSeeded => currentState == State.Seeded;
-
-        public bool IsHarvesting => currentState == State.Harvesting;
-        public bool IsHarvested => currentState == State.Harvested;
+        public State Current => currentState;
+        public bool Is(State s) => currentState == s;
         // --------------------------------------------------------------------------------
 
         [Header("UI")]
@@ -97,9 +90,9 @@ namespace Harvey.Farm.FieldScripts
         // Does this field need <type> work?
         public bool Needs(JobType type) => type switch
         {
-            JobType.Plow => !IsPlowed,
-            JobType.Seed => IsPlowed && !IsSeeded,
-            JobType.Harvest => IsSeeded && !IsHarvested,
+            JobType.Plow => !Is(State.Plowed),
+            JobType.Seed => Is(State.Plowed) && !Is(State.Seeded),
+            JobType.Harvest => Is(State.Seeded) && !Is(State.Harvested),
             _ => false
         };
 
