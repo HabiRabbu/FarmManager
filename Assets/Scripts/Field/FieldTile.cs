@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using Harvey.Farm.Events;
+using Harvey.Farm.Crops;
 
 namespace Harvey.Farm.FieldScripts
 {
@@ -12,9 +13,10 @@ namespace Harvey.Farm.FieldScripts
         void OnEnable() => GameEvents.OnDebugModeToggled += SetLabelVisible;
         void OnDisable() => GameEvents.OnDebugModeToggled -= SetLabelVisible;
 
-
         [SerializeField] private Material earthMat;
         [SerializeField] private Material plowedMat;
+        public Transform cropAnchor;
+        private GameObject currentCropVisual;
 
         [SerializeField] public int GridX { get; private set; }
         [SerializeField] public int GridZ { get; private set; }
@@ -48,7 +50,23 @@ namespace Harvey.Farm.FieldScripts
             IsPlowed = true;
             rndr.material = plowedMat;
 
-            GameEvents.TilePloughed(this);
+            GameEvents.TilePlowed(this);
+        }
+
+        public void Seed(CropDefinition crop)
+        {
+            if (IsSeeded) return;
+            IsSeeded = true;
+            SetCropVisual(crop.growthPrefabs[0]); // Set initial crop visual
+
+            GameEvents.TileSeeded(this, crop);
+        }
+
+        public void SetCropVisual(GameObject prefab)
+        {
+            if (currentCropVisual) Destroy(currentCropVisual);
+            if (prefab)
+                currentCropVisual = Instantiate(prefab, cropAnchor);
         }
 
         private void SetLabelVisible(bool show)

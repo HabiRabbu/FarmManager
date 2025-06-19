@@ -3,12 +3,14 @@ using Harvey.Farm.VehicleScripts;
 using Harvey.Farm.Events;
 using Harvey.Farm.UI;
 using System.Collections.Generic;
+using Harvey.Farm.Crops;
+using System.Collections;
 
 namespace Harvey.Farm.FieldScripts
 {
     public class Field : MonoBehaviour
     {
-        private int plowedSoFar = 0;
+        private int tilesCompletedSoFar = 0;
         [SerializeField] public string fieldName = "fieldNameNotSet";
 
         // Tile + Grid Stuff
@@ -34,30 +36,45 @@ namespace Harvey.Farm.FieldScripts
             Seeding,
             Seeded,
 
+            //Growing
+            Growing,
+            ReadyToHarvest,
+
             // Harvesting
             Harvesting,
             Harvested
         }
         public State Current => currentState;
         public bool Is(State s) => currentState == s;
+        public void SetState(State s)
+        {
+            currentState = s;
+        }
         // --------------------------------------------------------------------------------
+
+        [SerializeField] public CropDefinition currentCrop;
 
         [Header("UI")]
         [SerializeField] FieldJobPanel panel;
-
-        int remainingTiles;
-
 
         //--DEBUG - GIZMOS--
         private Vector3[] waypointWorlds;
         //------------------
 
-        public float TilesPlowedFraction => (float)plowedSoFar / tiles.Length;
+        public float TilesCompletedFraction => (float)tilesCompletedSoFar / tiles.Length;
 
         public bool ContainsPoint(Vector3 worldPos) => grid.Contains(worldPos);
 
-        void OnEnable() => GameEvents.OnTilePloughed += HandleTilePlowed;
-        void OnDisable() => GameEvents.OnTilePloughed -= HandleTilePlowed;
+        void OnEnable()
+        {
+            GameEvents.OnTilePlowed += HandleTilePlowed;
+            GameEvents.OnTileSeeded += HandleTileSeeded;
+        }
+        void OnDisable()
+        {
+            GameEvents.OnTilePlowed -= HandleTilePlowed;
+            GameEvents.OnTileSeeded -= HandleTileSeeded;
+        }
 
         void Start()
         {
@@ -77,8 +94,37 @@ namespace Harvey.Farm.FieldScripts
             //Setup Field UI
             panel.Init(this);
             UIManager.Instance.Register(panel);
+        }
 
-            remainingTiles = tiles.Length;
+        private void HandleTilePlowed(FieldTile t)
+        {
+            HandleTileCompleted(t, null);
+        }
+        private void HandleTileSeeded(FieldTile t, CropDefinition crop)
+        {
+            HandleTileCompleted(t, crop);
+        }
+        void HandleTileCompleted(FieldTile t, CropDefinition crop = null)
+        {
+            if (t.transform.parent != transform) return;
+            tilesCompletedSoFar++;
+
+            if (tilesCompletedSoFar >= tiles.Length && currentState == State.Plowing)
+            {
+                SetState(State.Plowed);
+                GameEvents.FieldCompleted(this);
+            }
+            if (tilesCompletedSoFar >= tiles.Length && currentState == State.Seeding)
+            {
+                SetState(State.Seeded);
+                GameEvents.FieldCompleted(this);
+                StartGrowing();
+            }
+            if (tilesCompletedSoFar >= tiles.Length && currentState == State.Harvesting)
+            {
+                SetState(State.Harvested);
+                GameEvents.FieldCompleted(this);
+            }
         }
 
         public void HandleTileClick(Vector3 worldPos)
@@ -92,12 +138,12 @@ namespace Harvey.Farm.FieldScripts
         {
             JobType.Plow => !Is(State.Plowed),
             JobType.Seed => Is(State.Plowed) && !Is(State.Seeded),
-            JobType.Harvest => Is(State.Seeded) && !Is(State.Harvested),
+            JobType.Harvest => Is(State.ReadyToHarvest) && !Is(State.Harvested),
             _ => false
         };
 
         // Call when a tractor is about to start <type>.
-        public void Begin(JobType type)
+        public void Begin(JobType type, CropDefinition crop = null)
         {
             currentState = type switch
             {
@@ -107,20 +153,43 @@ namespace Harvey.Farm.FieldScripts
                 _ => currentState
             };
 
-            plowedSoFar = 0;
-            remainingTiles = tiles.Length;
+            if (type == JobType.Seed && crop != null)
+                currentCrop = crop;
+
+            tilesCompletedSoFar = 0;
         }
 
-        void HandleTilePlowed(FieldTile t)
+        private void StartGrowing()
         {
-            if (t.transform.parent != transform) return;
-
-            plowedSoFar++;
-            if (plowedSoFar >= tiles.Length && currentState == State.Plowing)
+            if (Is(State.Seeded) && currentCrop != null)
             {
-                currentState = State.Plowed;
-                GameEvents.FieldCompleted(this);
+                SetState(State.Growing);
+                StartCoroutine(GrowRoutine());
             }
+            else
+            {
+                Debug.LogWarning($"Field {fieldName} cannot grow: not seeded or crop not set.");
+            }
+        }
+
+        IEnumerator GrowRoutine()
+        {
+            SetState(State.Growing);
+
+            float step = currentCrop.growSeconds / 2f;   // 3 stages → 2 intervals
+            yield return new WaitForSeconds(step);
+
+            // halfway visual
+            foreach (var t in tiles)
+                t.SetCropVisual(currentCrop.growthPrefabs[1]);
+
+            yield return new WaitForSeconds(step);
+
+            foreach (var t in tiles)
+                t.SetCropVisual(currentCrop.growthPrefabs[2]);
+
+            currentState = State.ReadyToHarvest;
+            GameEvents.FieldGrown(this);
         }
 
         private void GenerateSerpentinePath()

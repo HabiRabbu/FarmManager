@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using DG.Tweening;
+using Harvey.Farm.JobScripts;
 
 namespace Harvey.Farm.UI
 {
@@ -48,14 +49,28 @@ namespace Harvey.Farm.UI
             if (dropdown.interactable && idleCache.Count > 0)
                 chosen = idleCache[dropdown.value];
 
-            GameEvents.JobButtonPressed(field, chosen, JobType.Plow);
+            var job = new FieldJob(field, JobType.Plow, null);
+            GameEvents.JobButtonPressed(job, chosen);
+            Hide();
+        }
+
+        public void OnSeedClicked()
+        {
+            Vehicle chosen = null;
+
+            //Dropdown might need to be reworked idk
+            if (dropdown.interactable && idleCache.Count > 0)
+                chosen = idleCache[dropdown.value];
+
+            var job = new FieldJob(field, JobType.Seed, null);
+            GameEvents.JobButtonPressed(job, chosen);
             Hide();
         }
 
         /* ------------------------- INTERNAL --------------------------- */
         void Awake()
         {
-            GameEvents.OnTilePloughed += _ => UpdateBar();
+            GameEvents.OnTilePlowed += _ => UpdateBar();
             GameEvents.OnFieldCompleted += f =>
             {
                 if (f == field) progressBar.fillAmount = 1f;
@@ -109,7 +124,7 @@ namespace Harvey.Farm.UI
         {
             if (!field || progressBar == null) return;
 
-            float frac = field.TilesPlowedFraction;
+            float frac = field.TilesCompletedFraction;
             progressBar.fillAmount = frac;
 
             Color target = frac < 0.5f

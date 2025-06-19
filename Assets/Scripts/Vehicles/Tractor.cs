@@ -3,6 +3,7 @@ using Harvey.Farm.FieldScripts;
 using System.Collections;
 using System.Collections.Generic;
 using Harvey.Farm.JobScripts;
+using Harvey.Farm.Events;
 
 namespace Harvey.Farm.VehicleScripts
 {
@@ -10,7 +11,9 @@ namespace Harvey.Farm.VehicleScripts
     {
 
         public override bool CanDo(JobType type) =>
-            type == JobType.Plow && !IsBusy && Def.Type == VehicleType.Tractor;
+            (type == JobType.Plow || type == JobType.Seed)
+            && !IsBusy
+            && Def.Type == VehicleType.Tractor;
 
         public override void StartTask(FieldJob job)
         {
@@ -26,7 +29,11 @@ namespace Harvey.Farm.VehicleScripts
             {
                 SetBusy(true);
                 var field = job.Field;
-                field.Begin(job.Type);
+
+                if (job.Type == JobType.Seed)
+                    field.Begin(job.Type, job.Crop);
+                else
+                    field.Begin(job.Type);
 
                 var serp = field.GetSerpentineTiles();
                 var waypoints = new List<Vector3>(serp.Length);
@@ -35,7 +42,17 @@ namespace Harvey.Farm.VehicleScripts
                 yield return MoveAlong(waypoints, i =>
                 {
                     FieldTile tile = serp[i];
-                    if (job.Type == JobType.Plow && !tile.IsPlowed) tile.Plow();
+
+                    switch (job.Type)
+                    {
+                        case JobType.Plow:
+                            if (!tile.IsPlowed) tile.Plow();
+                            break;
+
+                        case JobType.Seed:
+                            if (!tile.IsSeeded) tile.Seed(field.currentCrop);
+                            break;
+                    }
                 });
 
                 SetBusy(false);

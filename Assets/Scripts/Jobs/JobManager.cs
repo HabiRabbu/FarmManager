@@ -3,12 +3,13 @@ using UnityEngine;
 using Harvey.Farm.Events;
 using Harvey.Farm.FieldScripts;
 using Harvey.Farm.VehicleScripts;
+using Harvey.Farm.Crops;
 
 namespace Harvey.Farm.JobScripts
 {
     public class JobManager : Singleton<JobManager>
     {
-        public void EnqueueJob(Field field, Vehicle v, JobType type)
+        public void EnqueueJob(Field field, Vehicle v, JobType type, CropDefinition crop = null)
         {
             if (v == null || !v.CanDo(type)) return;
             if (!field.Needs(type)) return;

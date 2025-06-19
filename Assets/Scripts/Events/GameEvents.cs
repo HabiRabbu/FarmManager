@@ -1,5 +1,7 @@
 using System;
+using Harvey.Farm.Crops;
 using Harvey.Farm.FieldScripts;
+using Harvey.Farm.JobScripts;
 using Harvey.Farm.VehicleScripts;
 
 namespace Harvey.Farm.Events
@@ -12,11 +14,15 @@ namespace Harvey.Farm.Events
         public static void VehicleBusyChanged(Vehicle v, bool isBusy) => OnVehicleBusyChanged?.Invoke(v, isBusy);
 
         // *------------------- Fields -------------------*
-        public static event Action<FieldTile> OnTilePloughed;
+        public static event Action<FieldTile> OnTilePlowed;
+        public static event Action<FieldTile, CropDefinition> OnTileSeeded;
         public static event Action<Field> OnFieldCompleted;
+        public static event Action<Field> OnFieldGrown;
 
-        public static void TilePloughed(FieldTile tile) => OnTilePloughed?.Invoke(tile);
+        public static void TilePlowed(FieldTile tile) => OnTilePlowed?.Invoke(tile);
+        public static void TileSeeded(FieldTile tile, CropDefinition crop) => OnTileSeeded?.Invoke(tile, crop);
         public static void FieldCompleted(Field field) => OnFieldCompleted?.Invoke(field);
+        public static void FieldGrown(Field field) => OnFieldGrown?.Invoke(field);
 
         // *------------------- Jobs -------------------*
         public static event Action<Vehicle, Field, JobType> OnJobStarted;
@@ -27,8 +33,8 @@ namespace Harvey.Farm.Events
         public static void DebugModeToggled(bool enabled) => OnDebugModeToggled?.Invoke(enabled);
 
         // *------------------- UI -------------------*
-        public static event Action<Field, Vehicle, JobType> OnJobButtonPressed;
-        public static void JobButtonPressed(Field f, Vehicle v, JobType t) => OnJobButtonPressed?.Invoke(f, v, t);
+        public static event Action<FieldJob, Vehicle> OnJobButtonPressed;
+        public static void JobButtonPressed(FieldJob j, Vehicle v) => OnJobButtonPressed?.Invoke(j, v);
 
     }
 }

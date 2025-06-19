@@ -49,20 +49,22 @@ namespace Harvey.Farm.UI
             GameEvents.OnJobButtonPressed += HandleJobBtn;
             GameEvents.OnJobStarted += HandleJobStarted;
             GameEvents.OnFieldCompleted += HandleFieldCompleted;
+            GameEvents.OnFieldGrown += HandleFieldGrown;
         }
         void OnDisable()
         {
             GameEvents.OnJobButtonPressed -= HandleJobBtn;
             GameEvents.OnJobStarted -= HandleJobStarted;
             GameEvents.OnFieldCompleted -= HandleFieldCompleted;
+            GameEvents.OnFieldGrown -= HandleFieldGrown;
         }
 
         public void Register(FieldJobPanel p) => panels.Add(p);
         public void CloseAll() { foreach (var p in panels) p.Hide(); }
 
-        void HandleJobBtn(Field f, Vehicle v, JobType t)
+        void HandleJobBtn(FieldJob j, Vehicle v)
         {
-            JobManager.Instance.EnqueueJob(f, v, t);
+            JobManager.Instance.EnqueueJob(j.Field, v, j.Type, j.Crop);
         }
 
         private void HandleJobStarted(Vehicle v, Field f, JobType j)
@@ -91,11 +93,24 @@ namespace Harvey.Farm.UI
             ShowCentrePopup(n);
         }
 
+        private void HandleFieldGrown(Field field)
+        {
+            var n = new NotificationData
+            (
+                $"Crops on {field.fieldName} are ready to harvest!",
+                textColor: Color.white,
+                backgroundColor: Colors.COLOR_YELLOW,
+                fadeDuration: 6f
+            );
+
+            ShowNotification(n);
+        }
+
         public void ShowCentrePopup(in FadingPopupData data)
         {
             var go = fadingPopupPool.UIGetOrInstantiate();
             var popup = go.GetComponent<FadingPopupText>();
-            popup.Show(data, () => notificationPopupPool.UIRelease(go));
+            popup.Show(data, () => fadingPopupPool.UIRelease(go));
         }
 
         public void ShowNotification(in NotificationData data)
