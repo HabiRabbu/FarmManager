@@ -101,7 +101,7 @@ namespace Harvey.Farm.FieldScripts
         }
 
         public FieldTile[] Generate(GameObject tilePrefab, Transform parent,
-                            float yScale = 0.2f)
+                            float yScale = 1f)
         {
             FieldTile[] tiles = new FieldTile[centers.Length];
 
@@ -111,16 +111,18 @@ namespace Harvey.Farm.FieldScripts
                 int z = i / Width;     // row  (GridZ)
                 int x = i % Width;     // col  (GridX)
 
-                float y = Terrain.activeTerrain ?
-                        Terrain.activeTerrain.SampleHeight(new Vector3(x, 0, z)) :
-                        parent.position.y;
+                float groundY = Terrain.activeTerrain
+                    ? Terrain.activeTerrain.SampleHeight(new Vector3(centers[i].x, 0f, centers[i].y))
+                    : parent.position.y;
 
                 Vector3 pos = new Vector3(
                     centers[i].x,
-                    y,
+                    groundY - 0.4f, // offset to avoid floating
                     centers[i].y);
 
                 var go = Object.Instantiate(tilePrefab, pos, Quaternion.identity, parent);
+
+                // full-height tile (no vertical squash)
                 go.transform.localScale = new Vector3(TileSize, yScale, TileSize);
 
                 FieldTile tile = go.GetComponent<FieldTile>();
@@ -128,7 +130,6 @@ namespace Harvey.Farm.FieldScripts
 
                 go.name = $"Tile_{x}_{z}";
                 tiles[i] = tile;
-                if (i < 10) Debug.Log($"i={i}  =>  ({x},{z})");
             }
             return tiles;
         }

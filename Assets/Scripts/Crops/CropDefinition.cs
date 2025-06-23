@@ -11,8 +11,6 @@ namespace Harvey.Farm.Crops
         [field: Header("Crop Definition")]
         public string cropName = "Wheat";
         public float growSeconds = 10f;
-
-        [Tooltip("0 = planted, 1 = mid-growth, 2 = ready")]
-        public GameObject[] growthPrefabs = new GameObject[3];
+        public GameObject cropPrefab;
     }
 }

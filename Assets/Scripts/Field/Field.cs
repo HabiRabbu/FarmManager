@@ -54,9 +54,6 @@ namespace Harvey.Farm.FieldScripts
 
         [SerializeField] public CropDefinition currentCrop;
 
-        [Header("UI")]
-        [SerializeField] FieldJobPanel panel;
-
         //--DEBUG - GIZMOS--
         private Vector3[] waypointWorlds;
         //------------------
@@ -90,10 +87,6 @@ namespace Harvey.Farm.FieldScripts
             waypointWorlds = new Vector3[serpentinePath.Length];
             for (int i = 0; i < serpentinePath.Length; i++)
                 waypointWorlds[i] = serpentinePath[i].WorldPosition + Vector3.up * 0.5f;
-
-            //Setup Field UI
-            panel.Init(this);
-            UIManager.Instance.Register(panel);
         }
 
         private void HandleTilePlowed(FieldTile t)
@@ -125,12 +118,6 @@ namespace Harvey.Farm.FieldScripts
                 SetState(State.Harvested);
                 GameEvents.FieldCompleted(this);
             }
-        }
-
-        public void HandleTileClick(Vector3 worldPos)
-        {
-            if (!grid.Contains(worldPos)) return;
-            panel.Show(worldPos);
         }
 
         // Does this field need <type> work?
@@ -176,19 +163,15 @@ namespace Harvey.Farm.FieldScripts
         {
             SetState(State.Growing);
 
-            float step = currentCrop.growSeconds / 2f;   // 3 stages → 2 intervals
-            yield return new WaitForSeconds(step);
-
-            // halfway visual
-            foreach (var t in tiles)
-                t.SetCropVisual(currentCrop.growthPrefabs[1]);
+            float step = currentCrop.growSeconds / 2f;
 
             yield return new WaitForSeconds(step);
+            foreach (var t in tiles) t.SetStage(1);
 
-            foreach (var t in tiles)
-                t.SetCropVisual(currentCrop.growthPrefabs[2]);
+            yield return new WaitForSeconds(step);
+            foreach (var t in tiles) t.SetStage(2);
 
-            currentState = State.ReadyToHarvest;
+            SetState(State.ReadyToHarvest);
             GameEvents.FieldGrown(this);
         }
 

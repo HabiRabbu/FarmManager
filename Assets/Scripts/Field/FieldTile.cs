@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using Harvey.Farm.Events;
 using Harvey.Farm.Crops;
+using Harvey.Farm.Factory;
 
 namespace Harvey.Farm.FieldScripts
 {
@@ -10,13 +11,13 @@ namespace Harvey.Farm.FieldScripts
     {
         [Header("Debug")]
         [SerializeField] private TMP_Text debugTextLabel;
-        void OnEnable() => GameEvents.OnDebugModeToggled += SetLabelVisible;
-        void OnDisable() => GameEvents.OnDebugModeToggled -= SetLabelVisible;
 
         [SerializeField] private Material earthMat;
         [SerializeField] private Material plowedMat;
         public Transform cropAnchor;
-        private GameObject currentCropVisual;
+        GameObject cropInstance;
+        CropDefinition currentCrop;
+        int currentStage = -1;
 
         [SerializeField] public int GridX { get; private set; }
         [SerializeField] public int GridZ { get; private set; }
@@ -38,17 +39,13 @@ namespace Harvey.Farm.FieldScripts
             rndr = GetComponent<MeshRenderer>();
             rndr.sharedMaterial = earthMat;
             IsPlowed = false;
-
-            //Debug
-            if (debugTextLabel != null) { debugTextLabel.text = $"({GridX},{GridZ})"; }
-            if (debugTextLabel.gameObject.activeSelf) { SetLabelVisible(false); }
         }
 
         public void Plow()
         {
             if (IsPlowed) return;
             IsPlowed = true;
-            rndr.material = plowedMat;
+            rndr.sharedMaterial = plowedMat;
 
             GameEvents.TilePlowed(this);
         }
@@ -56,23 +53,46 @@ namespace Harvey.Farm.FieldScripts
         public void Seed(CropDefinition crop)
         {
             if (IsSeeded) return;
+
             IsSeeded = true;
-            SetCropVisual(crop.growthPrefabs[0]); // Set initial crop visual
+            currentCrop = crop;
+            SpawnOrGetCrop();
+            SetStage(0);
 
             GameEvents.TileSeeded(this, crop);
         }
-
-        public void SetCropVisual(GameObject prefab)
+        public void SetStage(int stage)
         {
-            if (currentCropVisual) Destroy(currentCropVisual);
-            if (prefab)
-                currentCropVisual = Instantiate(prefab, cropAnchor);
+            if (!IsSeeded || currentStage == stage) return;
+
+            var meshes = cropInstance.transform.GetChild(0); // “Meshes”
+            for (int i = 0; i < meshes.childCount; i++)
+                meshes.GetChild(i).gameObject.SetActive(i == stage);
+
+            currentStage = stage;
         }
 
-        private void SetLabelVisible(bool show)
+        public void Harvest()
         {
-            if (debugTextLabel != null)
-                debugTextLabel.gameObject.SetActive(show);
+            if (!IsSeeded || IsHarvested) return;
+
+            IsHarvested = true;
+
+            CropFactory.Instance.Despawn(currentCrop, cropInstance);
+            cropInstance = null;
+            currentCrop = null;
+            currentStage = -1;
+        }
+
+        void SpawnOrGetCrop()
+        {
+            if (cropInstance != null) return;
+
+            cropInstance = CropFactory.Instance.Spawn(
+                currentCrop,
+                cropAnchor,
+                Vector3.zero
+            );
         }
     }
 }

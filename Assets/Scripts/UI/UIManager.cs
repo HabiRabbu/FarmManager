@@ -16,24 +16,24 @@ namespace Harvey.Farm.UI
         public static void Notify(in NotificationData data) => Instance?.ShowNotification(data);
         public static void CentrePopup(in FadingPopupData data) => Instance?.ShowCentrePopup(data);
 
-
         [SerializeField] private Transform canvasTransform;
         [SerializeField] private Transform notificationContainer;
 
-
-        [Header("Fading Popup Config")]
-        [SerializeField] private GameObject fadingTextPopupPrefab;
-
         [Header("Notification Popup Config")]
         [SerializeField] private GameObject notificationPopupPrefab;
+        [SerializeField] private GameObject fadingTextPopupPrefab;
 
-        // TODO: Eventually handle removing based on player input: 
-        // private readonly List<NotificationPopup> notifications = new();
-        // notifications.Add(entry); and .Remove(entry);
+        [Header("Field UI Config")]
+        [SerializeField] private GameObject fieldInfoPrefab;
+        [SerializeField] private GameObject fieldMenuPrefab;
 
         //Pools
         private UIPrefabPool fadingPopupPool;
         private UIPrefabPool notificationPopupPool;
+
+        //Current UI
+        private UIFieldInfo fieldInfo;
+        private UIFieldMenu fieldMenu;
 
         protected override void Awake()
         {
@@ -41,11 +41,19 @@ namespace Harvey.Farm.UI
 
             fadingPopupPool = new UIPrefabPool(fadingTextPopupPrefab, canvasTransform);
             notificationPopupPool = new UIPrefabPool(notificationPopupPrefab, notificationContainer);
+
+            fieldInfo = Instantiate(fieldInfoPrefab, canvasTransform).GetComponent<UIFieldInfo>();
+            fieldInfo.gameObject.SetActive(false);
+
+            fieldMenu = Instantiate(fieldMenuPrefab, canvasTransform).GetComponent<UIFieldMenu>();
+            fieldMenu.gameObject.SetActive(false);
         }
-        readonly List<FieldJobPanel> panels = new();
 
         void OnEnable()
         {
+            GameEvents.OnFieldSelected += HandleFieldSelected;
+            GameEvents.OnCloseUI += CloseAll;
+
             GameEvents.OnJobButtonPressed += HandleJobBtn;
             GameEvents.OnJobStarted += HandleJobStarted;
             GameEvents.OnFieldCompleted += HandleFieldCompleted;
@@ -53,14 +61,33 @@ namespace Harvey.Farm.UI
         }
         void OnDisable()
         {
+            GameEvents.OnFieldSelected -= HandleFieldSelected;
+            GameEvents.OnCloseUI -= CloseAll;
+
             GameEvents.OnJobButtonPressed -= HandleJobBtn;
             GameEvents.OnJobStarted -= HandleJobStarted;
             GameEvents.OnFieldCompleted -= HandleFieldCompleted;
             GameEvents.OnFieldGrown -= HandleFieldGrown;
         }
 
-        public void Register(FieldJobPanel p) => panels.Add(p);
-        public void CloseAll() { foreach (var p in panels) p.Hide(); }
+        public void CloseAll()
+        {
+            if (fieldInfo) fieldInfo.gameObject.SetActive(false);
+            if (fieldMenu) fieldMenu.gameObject.SetActive(false);
+        }
+
+        void HandleFieldSelected(Field f)
+        {
+            if (f)
+            {
+                OpenFieldInfo(f);
+            }
+            else
+            {
+                CloseAll();
+            }
+
+        }
 
         void HandleJobBtn(FieldJob j, Vehicle v)
         {
@@ -104,6 +131,32 @@ namespace Harvey.Farm.UI
             );
 
             ShowNotification(n);
+        }
+
+        public void OpenFieldInfo(Field f)
+        {
+            if (!fieldInfo)
+            {
+                Debug.LogError("Field Info UI is not initialized.");
+                return;
+            }
+
+            fieldInfo.gameObject.SetActive(true);
+            fieldInfo.Bind(f);
+
+            if (fieldMenu) fieldMenu.gameObject.SetActive(false);
+        }
+
+        public void OpenFieldMenu(Field f)
+        {
+            if (!fieldMenu)
+            {
+                Debug.LogError("Field Menu UI is not initialized.");
+                return;
+            }
+
+            fieldMenu.gameObject.SetActive(true);
+            fieldMenu.Show(f);
         }
 
         public void ShowCentrePopup(in FadingPopupData data)

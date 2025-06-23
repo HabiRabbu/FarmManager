@@ -14,7 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cropName: Wheat
   growSeconds: 10
-  growthPrefabs:
-  - {fileID: 4645790278780280987, guid: 1afaa1fd7fab7894a8909d6e05484f2e, type: 3}
-  - {fileID: 2962482500719262181, guid: cf9831fe397c14c46a1712351543a3e5, type: 3}
-  - {fileID: 3517173978816182926, guid: 0b8a6b6eb1272884cb0a032e98271c3a, type: 3}
+  cropPrefab: {fileID: 672455741178990936, guid: db049b6ce47e07b409a9ad99bb10c6fe, type: 3}

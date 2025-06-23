@@ -1,4 +1,6 @@
+using Harvey.Farm.Events;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Harvey.Farm.InputScripts
 {
@@ -11,21 +13,20 @@ namespace Harvey.Farm.InputScripts
         {
             input = new FarmInput();
         }
-         void OnEnable()
+        void OnEnable()
         {
-            // example - input.Debug.Enable();
-            // example - input.Debug.ToggleDebug.performed += OnToggleDebug;
+            input.UI.Enable();
+            input.UI.Escape.performed += OnEscapePressed;
         }
         void OnDisable()
         {
-            // example - input.Debug.ToggleDebug.performed -= OnToggleDebug;
-            // example - input.Debug.Disable();
+            input.UI.Escape.performed -= OnEscapePressed;
+            input.UI.Disable();
         }
 
-        // Update is called once per frame
-        void Update()
+        private void OnEscapePressed(InputAction.CallbackContext ctx)
         {
-
+            GameEvents.CloseUI();
         }
     }
 }

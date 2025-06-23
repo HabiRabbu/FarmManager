@@ -15,7 +15,7 @@ namespace Harvey.Farm.JobScripts
             if (!field.Needs(type)) return;
 
             v.JobQueue.Clear();
-            v.JobQueue.Enqueue(new FieldJob(field, type));
+            v.JobQueue.Enqueue(new FieldJob(field, type, crop));
 
             // --- inline DispatchIfIdle ---
             if (!v.IsBusy && v.JobQueue.TryDequeue(out var job))

@@ -3,6 +3,7 @@ using Harvey.Farm.FieldScripts;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using Harvey.Farm.UI;
+using Harvey.Farm.Events;
 
 namespace Harvey.Farm.InputScripts
 {
@@ -42,20 +43,12 @@ namespace Harvey.Farm.InputScripts
 
             if (!Physics.Raycast(ray, out RaycastHit hit, maxRayDist, groundLayer))
             {
-                UIManager.Instance.CloseAll();
+                FieldManager.Instance.SelectField(null);
                 return;
             }
 
             Field clickedField = FieldManager.Instance.GetFieldAtPoint(hit.point);
-
-            if (clickedField != null)
-            {
-                clickedField.HandleTileClick(hit.point);
-            }
-            else
-            {
-                UIManager.Instance.CloseAll();
-            }
+            FieldManager.Instance.SelectField(clickedField);
         }
     }
 }
