@@ -45,6 +45,9 @@ namespace Harvey.Farm.FieldScripts
         {
             if (IsPlowed) return;
             IsPlowed = true;
+            IsHarvested = false;
+            IsSeeded = false;
+            
             rndr.sharedMaterial = plowedMat;
 
             GameEvents.TilePlowed(this);
@@ -76,12 +79,17 @@ namespace Harvey.Farm.FieldScripts
         {
             if (!IsSeeded || IsHarvested) return;
 
+            rndr.sharedMaterial = earthMat;
             IsHarvested = true;
+            IsPlowed = false;
+            IsSeeded = false;
 
             CropFactory.Instance.Despawn(currentCrop, cropInstance);
             cropInstance = null;
             currentCrop = null;
             currentStage = -1;
+
+            GameEvents.TileHarvested(this);
         }
 
         void SpawnOrGetCrop()

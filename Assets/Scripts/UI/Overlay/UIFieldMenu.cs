@@ -20,7 +20,7 @@ public class UIFieldMenu : MonoBehaviour
     [SerializeField] private Button btnHarvest;
     [SerializeField] private Button btnClose;
     [SerializeField] private Button btnGo;
-    [SerializeField] private GameObject plowMenu, seedMenu, HarvestMenu;
+    [SerializeField] private GameObject plowMenu, seedMenu, harvestMenu;
 
     [Header("Plow Menu Refs")]
     [SerializeField] private TMP_Dropdown dpnTractorSelectPlow;
@@ -36,7 +36,10 @@ public class UIFieldMenu : MonoBehaviour
     [SerializeField] private TMP_Text txtImplementSelectSeed;
     [SerializeField] private TMP_Text txtCropSelectSeed;
 
-    //[Header("Harvest Menu Refs")]
+    [Header("Harvest Menu Refs")]
+    [SerializeField] private TMP_Dropdown dpnTractorSelectHarvest;
+    [SerializeField] private TMP_Text textTractorSelectHarvest;
+
 
     Field field;
     JobType selectedTask;
@@ -64,13 +67,13 @@ public class UIFieldMenu : MonoBehaviour
     /* ---------- task buttons ---------- */
     public void OnClickPlow() => SetTask(JobType.Plow, plowMenu);
     public void OnClickSeed() => SetTask(JobType.Seed, seedMenu);
-    public void OnClickHarvest() => SetTask(JobType.Harvest, HarvestMenu);
+    public void OnClickHarvest() => SetTask(JobType.Harvest, harvestMenu);
     void SetTask(JobType t, GameObject active)
     {
         selectedTask = t;
         plowMenu.SetActive(active == plowMenu);
         seedMenu.SetActive(active == seedMenu);
-        HarvestMenu.SetActive(active == HarvestMenu);
+        harvestMenu.SetActive(active == harvestMenu);
 
         PopulateTractors(t);
         PopulateImplements();
@@ -83,7 +86,7 @@ public class UIFieldMenu : MonoBehaviour
         {
             JobType.Plow => idleTractors[dpnTractorSelectPlow.value],
             JobType.Seed => idleTractors[dpnTractorSelectSeed.value],
-            JobType.Harvest => idleTractors[dpnTractorSelectPlow.value], //TODO: Implement Harvesting
+            JobType.Harvest => idleTractors[dpnTractorSelectHarvest.value],
             _ => null
         };
 
@@ -115,7 +118,8 @@ public class UIFieldMenu : MonoBehaviour
                 dpnTractorSelectSeed.AddOptions(names);
                 break;
             case JobType.Harvest:
-                //TODO: Implement Harvesting
+                dpnTractorSelectHarvest.ClearOptions();
+                dpnTractorSelectHarvest.AddOptions(names);
                 break;
         }
     }

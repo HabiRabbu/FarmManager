@@ -19,7 +19,7 @@ public class UIFieldInfo : MonoBehaviour
 
     Field boundField;
 
-    System.Action<FieldTile> onPlowed;
+    System.Action<FieldTile> onPlowed, onHarvested;
     System.Action<FieldTile, CropDefinition> onSeeded;
     System.Action<Field> onGrown, onComplete;
 
@@ -27,6 +27,7 @@ public class UIFieldInfo : MonoBehaviour
     {
         onPlowed = _ => Refresh();
         onSeeded = (_, __) => Refresh();
+        onHarvested = _ => Refresh();
         onGrown = f => { if (f == boundField) Refresh(); };
         onComplete = f => { if (f == boundField) Refresh(); };
 
@@ -37,6 +38,7 @@ public class UIFieldInfo : MonoBehaviour
     {
         GameEvents.OnTilePlowed += onPlowed;
         GameEvents.OnTileSeeded += onSeeded;
+        GameEvents.OnTileHarvested += onHarvested;
         GameEvents.OnFieldGrown += onGrown;
         GameEvents.OnFieldCompleted += onComplete;
     }
@@ -44,6 +46,7 @@ public class UIFieldInfo : MonoBehaviour
     {
         GameEvents.OnTilePlowed -= onPlowed;
         GameEvents.OnTileSeeded -= onSeeded;
+        GameEvents.OnTileHarvested -= onHarvested;
         GameEvents.OnFieldGrown -= onGrown;
         GameEvents.OnFieldCompleted -= onComplete;
     }

@@ -66,11 +66,13 @@ namespace Harvey.Farm.FieldScripts
         {
             GameEvents.OnTilePlowed += HandleTilePlowed;
             GameEvents.OnTileSeeded += HandleTileSeeded;
+            GameEvents.OnTileHarvested += HandleTileHarvested;
         }
         void OnDisable()
         {
             GameEvents.OnTilePlowed -= HandleTilePlowed;
             GameEvents.OnTileSeeded -= HandleTileSeeded;
+            GameEvents.OnTileHarvested -= HandleTileHarvested;
         }
 
         void Start()
@@ -97,6 +99,10 @@ namespace Harvey.Farm.FieldScripts
         {
             HandleTileCompleted(t, crop);
         }
+        private void HandleTileHarvested(FieldTile t)
+        {
+            HandleTileCompleted(t, null);
+        }
         void HandleTileCompleted(FieldTile t, CropDefinition crop = null)
         {
             if (t.transform.parent != transform) return;
@@ -116,16 +122,16 @@ namespace Harvey.Farm.FieldScripts
             if (tilesCompletedSoFar >= tiles.Length && currentState == State.Harvesting)
             {
                 SetState(State.Harvested);
-                GameEvents.FieldCompleted(this);
+                GameEvents.FieldHarvested(this);
             }
         }
 
         // Does this field need <type> work?
         public bool Needs(JobType type) => type switch
         {
-            JobType.Plow => !Is(State.Plowed),
-            JobType.Seed => Is(State.Plowed) && !Is(State.Seeded),
-            JobType.Harvest => Is(State.ReadyToHarvest) && !Is(State.Harvested),
+            JobType.Plow => Current is State.Idle or State.Harvested,
+            JobType.Seed => Current is State.Plowed,
+            JobType.Harvest => Current is State.ReadyToHarvest,
             _ => false
         };
 

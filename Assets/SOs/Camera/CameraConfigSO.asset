@@ -16,10 +16,10 @@ MonoBehaviour:
   <MousePanSpeed>k__BackingField: 15
   <EdgePanSize>k__BackingField: 50
   <KeyboardPanSpeed>k__BackingField: 15
-  <MinPanX>k__BackingField: -25.090456
-  <MaxPanX>k__BackingField: 24.89364
-  <MinPanZ>k__BackingField: -25.014997
-  <MaxPanZ>k__BackingField: 25.021067
+  <MinPanX>k__BackingField: -58.297157
+  <MaxPanX>k__BackingField: 68.969765
+  <MinPanZ>k__BackingField: -44.63393
+  <MaxPanZ>k__BackingField: 47.160477
   <ZoomSpeed>k__BackingField: 25
   <ScrollWheelMultiplier>k__BackingField: 25
   <MinZoomDistance>k__BackingField: 1

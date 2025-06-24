@@ -7,7 +7,6 @@ using UnityEngine;
 using Harvey.Farm.Utilities;
 using UnityEngine.Playables;
 using UnityEngine.UI;
-using UnityEditor.Rendering.Universal.ShaderGraph;
 
 namespace Harvey.Farm.UI
 {
@@ -58,6 +57,7 @@ namespace Harvey.Farm.UI
             GameEvents.OnJobStarted += HandleJobStarted;
             GameEvents.OnFieldCompleted += HandleFieldCompleted;
             GameEvents.OnFieldGrown += HandleFieldGrown;
+            GameEvents.OnFieldHarvested += HandleFieldHarvested;
         }
         void OnDisable()
         {
@@ -68,6 +68,7 @@ namespace Harvey.Farm.UI
             GameEvents.OnJobStarted -= HandleJobStarted;
             GameEvents.OnFieldCompleted -= HandleFieldCompleted;
             GameEvents.OnFieldGrown -= HandleFieldGrown;
+            GameEvents.OnFieldHarvested += HandleFieldHarvested;
         }
 
         public void CloseAll()
@@ -127,6 +128,19 @@ namespace Harvey.Farm.UI
                 $"Crops on {field.fieldName} are ready to harvest!",
                 textColor: Color.white,
                 backgroundColor: Colors.COLOR_YELLOW,
+                fadeDuration: 6f
+            );
+
+            ShowNotification(n);
+        }
+
+        private void HandleFieldHarvested(Field field)
+        {
+            var n = new NotificationData
+            (
+                $"{field.currentCrop.cropName} on {field.fieldName} has been harvested.",
+                textColor: Color.white,
+                backgroundColor: Colors.COLOR_TEAL,
                 fadeDuration: 6f
             );
 
