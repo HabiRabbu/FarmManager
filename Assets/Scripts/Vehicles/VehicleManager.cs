@@ -21,7 +21,10 @@ namespace Harvey.Farm.VehicleScripts
         public void RegisterVehicle(Vehicle v)
         {
             if (!vehicles.Contains(v))
+            {
+                Debug.Log($"Registering: {v.name}");
                 vehicles.Add(v);
+            }
         }
         public void UnregisterVehicle(Vehicle v)
         {
@@ -31,12 +34,12 @@ namespace Harvey.Farm.VehicleScripts
 
         public Vehicle GetAvailableVehicle()
         {
-            return vehicles.Find(v => !v.IsBusy);
+            return vehicles.Find(v => !v.Stats.IsBusy);
         }
 
         public T GetAvailableVehicle<T>() where T : Vehicle
         {
-            return vehicles.Find(v => v is T && !v.IsBusy) as T;
+            return vehicles.Find(v => v is T && !v.Stats.IsBusy) as T;
         }
     }
 }

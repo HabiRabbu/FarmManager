@@ -5,6 +5,7 @@ using Harvey.Farm.Implements;
 using System.Linq;
 using Harvey.Farm.Factory;
 using System;
+using Harvey.Farm.Events;
 
 namespace Harvey.Farm.Buildings
 {
@@ -36,6 +37,8 @@ namespace Harvey.Farm.Buildings
             {
                 reserved.Remove(id);
                 stock.Remove(id);
+
+                GameEvents.ShedInventoryChanged();
                 return true;
             }
             implement = null;
@@ -50,6 +53,8 @@ namespace Harvey.Farm.Buildings
             implement.Detach();
             var anchor = GetFreeAnchor();
             implement.AttachTo(anchor);
+
+            GameEvents.ShedInventoryChanged();
         }
 
         // ---------- Internal ----------

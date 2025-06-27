@@ -50,6 +50,7 @@ namespace Harvey.Farm.UI
 
         void OnEnable()
         {
+            GameEvents.OnShedInventoryChanged += RefreshUI;
             GameEvents.OnFieldSelected += HandleFieldSelected;
             GameEvents.OnCloseUI += CloseAll;
 
@@ -61,6 +62,7 @@ namespace Harvey.Farm.UI
         }
         void OnDisable()
         {
+            GameEvents.OnShedInventoryChanged -= RefreshUI;
             GameEvents.OnFieldSelected -= HandleFieldSelected;
             GameEvents.OnCloseUI -= CloseAll;
 
@@ -90,6 +92,14 @@ namespace Harvey.Farm.UI
 
         }
 
+        void RefreshUI()
+        {
+            if (fieldMenu && fieldMenu.gameObject.activeSelf)
+            {
+                fieldMenu.Refresh();
+            }
+        }
+
         void HandleJobBtn(FieldJob j, Vehicle v)
         {
             JobManager.Instance.EnqueueJob(j, v);
@@ -100,7 +110,7 @@ namespace Harvey.Farm.UI
 
             var n = new NotificationData
             (
-                $"{v.vehicleName} started to {j.Type} on {j.Field.fieldName}",
+                $"{v.Stats.vehicleName} started to {j.Type} on {j.Field.fieldName}",
                 textColor: Color.white,
                 backgroundColor: new Color(0.15f, 0.6f, 0.1f),
                 fadeDuration: 4f

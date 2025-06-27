@@ -122,56 +122,6 @@ Transform:
   - {fileID: 3905088927565801083}
   m_Father: {fileID: 7672555974253450862}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2685750883296464978
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2620692932386095232}
-  - component: {fileID: 5525010874193481881}
-  m_Layer: 0
-  m_Name: Brain
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2620692932386095232
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2685750883296464978}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 7672555974253450862}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5525010874193481881
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2685750883296464978}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56aeef7db6ea8b940b4800686a7d2158, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  definition: {fileID: 0}
-  rootTransform: {fileID: 7672555974253450862}
-  fallbackMoveSpeed: 2
-  vehicleName: Mazie Fergieson
-  hitchPoint: {fileID: 5700977899952194359}
-  implementLibrary: {fileID: 11400000, guid: 712feede2a0fa4d479d32970d8dca184, type: 2}
 --- !u!1 &3569308923155089431
 GameObject:
   m_ObjectHideFlags: 0
@@ -353,6 +303,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7672555974253450862}
+  - component: {fileID: 590937975617128335}
+  - component: {fileID: 4459476664721384991}
+  - component: {fileID: 645615731125746934}
+  - component: {fileID: 7332250704717880969}
+  - component: {fileID: 7053704592844264224}
   m_Layer: 0
   m_Name: Tractor
   m_TagString: Untagged
@@ -374,10 +329,79 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 25708530042252614}
-  - {fileID: 2620692932386095232}
   - {fileID: 5700977899952194359}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &590937975617128335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5252949776778261906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56aeef7db6ea8b940b4800686a7d2158, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4459476664721384991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5252949776778261906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 180956c1912d0f54d95570b99ddc98a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &645615731125746934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5252949776778261906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91331ca0aae30454d94a8b45f78ef507, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitchPoint: {fileID: 5700977899952194359}
+  library: {fileID: 11400000, guid: 712feede2a0fa4d479d32970d8dca184, type: 2}
+--- !u!114 &7332250704717880969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5252949776778261906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 115fb6fc9505db94eb7577543333794b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rootTransform: {fileID: 7672555974253450862}
+--- !u!114 &7053704592844264224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5252949776778261906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aba3a06824112214891a5fa4e2aef375, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  definition: {fileID: 0}
+  vehicleName: Vehicle
+  moveSpeed: 2
+  fuel: 100
+  durability: 100
+  price: 100
+  capacity: 100
 --- !u!1 &7550567541712448358
 GameObject:
   m_ObjectHideFlags: 0

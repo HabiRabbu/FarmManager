@@ -1,4 +1,5 @@
 using System;
+using Harvey.Farm.Buildings;
 using Harvey.Farm.Crops;
 using Harvey.Farm.FieldScripts;
 using Harvey.Farm.JobScripts;
@@ -34,6 +35,10 @@ namespace Harvey.Farm.Events
         // *------------------- Jobs -------------------*
         public static event Action<Vehicle, FieldJob> OnJobStarted;
         public static void JobStarted(Vehicle v, FieldJob fieldJob) => OnJobStarted?.Invoke(v, fieldJob);
+
+        // *------------------- Buildings -------------------*
+        public static event Action OnShedInventoryChanged;
+        public static void ShedInventoryChanged() => OnShedInventoryChanged?.Invoke();
 
         // *------------------- Debug -------------------*
         public static event Action<bool> OnDebugModeToggled;

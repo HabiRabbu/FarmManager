@@ -46,7 +46,7 @@ public class UIFieldMenu : MonoBehaviour
     List<Vehicle> idleTractors = new();
     List<ImplementBehaviour> implementChoices = new();
 
-    void Awake()
+    void Start()
     {
         gameObject.SetActive(false);
         btnPlow.onClick.AddListener(() => SetTask(JobType.Plow, plowMenu));
@@ -67,6 +67,29 @@ public class UIFieldMenu : MonoBehaviour
     }
     public void Hide() => gameObject.SetActive(false);
 
+    public void Refresh()
+    {
+        if (!field) return;
+
+        switch (selectedTask)
+        {
+            case JobType.Plow:
+                PopulateTractors();
+                PopulateImplements();
+                break;
+            case JobType.Seed:
+                PopulateTractors();
+                PopulateImplements();
+                PopulateCrops();
+                break;
+            case JobType.Harvest:
+                PopulateTractors();
+                break;
+        }
+
+        ValidateReady();
+    }
+
     /* ---------- task buttons ---------- */
     void SetTask(JobType job, GameObject menu)
     {
@@ -86,7 +109,7 @@ public class UIFieldMenu : MonoBehaviour
     {
         idleTractors = VehicleManager.Instance.IdleVehicles
             .Where(v => v.CanDo(selectedTask)).ToList();
-        var names = idleTractors.Select(t => t.vehicleName).ToList();
+        var names = idleTractors.Select(t => t.DisplayName).ToList();
 
         switch (selectedTask)
         {
@@ -145,7 +168,6 @@ public class UIFieldMenu : MonoBehaviour
 
     int CurrentImplementIndex() => selectedTask switch
     {
-        //TODO: Could be the second one, sure - But that's not MFPlow which is in position 3?
         JobType.Plow => dpnImplementSelectPlow.value,
         JobType.Seed => dpnImplementSelectSeed.value,
         _ => -1

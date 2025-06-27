@@ -18,7 +18,7 @@ namespace Harvey.Farm.JobScripts
             v.JobQueue.Enqueue(j);
 
             // --- inline DispatchIfIdle ---
-            if (!v.IsBusy && v.JobQueue.TryDequeue(out var job))
+            if (!v.Stats.IsBusy && v.JobQueue.TryDequeue(out var job))
             {
                 GameEvents.JobStarted(v, job);
                 v.StartTask(job);

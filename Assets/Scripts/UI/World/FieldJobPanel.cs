@@ -90,7 +90,7 @@ namespace Harvey.Farm.UI
 
             var names = new List<string>();
             foreach (var v in idleCache)
-                names.Add(v.vehicleName);
+                names.Add(v.DisplayName);
 
             dropdown.AddOptions(names);
             dropdown.interactable = true;

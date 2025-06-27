@@ -10,92 +10,31 @@ namespace Harvey.Farm.VehicleScripts
 {
     public abstract class Vehicle : MonoBehaviour
     {
-
-        [SerializeField] private VehicleDefinition definition;
-        public VehicleDefinition Def => definition;
-        public VehicleType Type => definition.Type;
-
-        [SerializeField] private Transform rootTransform;
-
-        [SerializeField, Tooltip("Used only when no VehicleDefinition is assigned")]
-        private float fallbackMoveSpeed = 2f;
-        protected float MoveSpeed => definition ? definition.MoveSpeed : fallbackMoveSpeed;
-
-        [SerializeField] public string vehicleName = "Vehicle";
-
-
-        public bool IsBusy { get; protected set; }
         public Field CurrentField { get; protected set; }
-
         public Queue<FieldJob> JobQueue { get; } = new();
 
         public abstract bool CanDo(JobType type);
         public abstract void StartTask(FieldJob job);
 
-        void Awake()
+        // Cache
+        public VehicleStats Stats { get; private set; }
+
+        public bool IsBusy => Stats.IsBusy;
+        public string DisplayName => Stats.vehicleName;
+
+        protected virtual void Awake()
         {
-            if (!definition)
-            {
-                Debug.LogWarning($"<color=yellow>{name}</color> has no VehicleDefinition assigned; " +
-                                 $"using fallback stats.", this);
-            }
-            else
-            {
-                vehicleName = definition.DisplayName;
-                //Set others properties from definition?
-            }
+            Stats = GetComponent<VehicleStats>();
         }
 
         protected virtual void Start()
         {
-
             VehicleManager.Instance.RegisterVehicle(this);
         }
 
-        public void TeleportTo(Vector3 worldPos)
+        public void SetBusy(bool value)
         {
-            if (rootTransform != null)
-                rootTransform.position = worldPos;
-            else
-                Debug.LogWarning($"{vehicleName} has no rootToMove set!");
-        }
-
-        // ------------------------------ MOVEMENT ------------------------------
-        protected IEnumerator MoveAlong(List<Vector3> waypoints,
-                                System.Action<int> onArrive)
-        {
-            for (int i = 0; i < waypoints.Count; i++)
-            {
-                Vector3 target = waypoints[i];
-                float dist = Vector3.Distance(rootTransform.position, target);
-                float travelTime = dist / MoveSpeed;
-
-                Sequence leg = DOTween.Sequence()
-                    .Join(YawLookAt(target, travelTime * 0.30f))
-                    .Join(MoveTo(target, travelTime));
-
-                yield return leg.WaitForCompletion();
-                onArrive?.Invoke(i);
-            }
-        }
-
-        protected Tween YawLookAt(Vector3 target, float turnTime)
-        {
-            Vector3 flat = new(target.x, rootTransform.position.y, target.z);
-            return rootTransform.DOLookAt(flat, turnTime, AxisConstraint.Y)
-                                .SetEase(Ease.Linear);
-        }
-
-        protected Tween MoveTo(Vector3 target, float time)
-        {
-            return rootTransform.DOMove(target, time)
-                                .SetEase(Ease.Linear);
-        }
-        // ------------------------------------------------------------------------
-
-        protected void SetBusy(bool value)
-        {
-            IsBusy = value;
+            Stats.SetBusy(value);
             GameEvents.VehicleBusyChanged(this, value);
         }
 

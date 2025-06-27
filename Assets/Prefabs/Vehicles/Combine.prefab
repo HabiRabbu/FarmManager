@@ -338,54 +338,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &2625429786815625221
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4877458738638331507}
-  - component: {fileID: 95842326498002028}
-  m_Layer: 0
-  m_Name: Brain
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4877458738638331507
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2625429786815625221}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 7054218617575256859}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &95842326498002028
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2625429786815625221}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c819bae5e921c364bb5f604b880c1c4b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  definition: {fileID: 11400000, guid: f3c8fe9e21ce8e245a6b2a8266b4fa9d, type: 2}
-  rootTransform: {fileID: 7054218617575256859}
-  fallbackMoveSpeed: 2
-  vehicleName: Combine
 --- !u!1 &3597977358655805286
 GameObject:
   m_ObjectHideFlags: 0
@@ -697,6 +649,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7054218617575256859}
+  - component: {fileID: 4753735931889351495}
+  - component: {fileID: 191843839554357983}
+  - component: {fileID: 339768144188815970}
+  - component: {fileID: 1977094280609986880}
   m_Layer: 0
   m_Name: Combine
   m_TagString: Untagged
@@ -718,10 +674,65 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 112028097771927095}
-  - {fileID: 4877458738638331507}
   - {fileID: 70083635113911181}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4753735931889351495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3986250216646725534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c819bae5e921c364bb5f604b880c1c4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &191843839554357983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3986250216646725534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 856c34870b4f447489784683d338eb53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &339768144188815970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3986250216646725534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 115fb6fc9505db94eb7577543333794b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rootTransform: {fileID: 7054218617575256859}
+--- !u!114 &1977094280609986880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3986250216646725534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aba3a06824112214891a5fa4e2aef375, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  definition: {fileID: 11400000, guid: f3c8fe9e21ce8e245a6b2a8266b4fa9d, type: 2}
+  vehicleName: Vehicle
+  moveSpeed: 2
+  fuel: 100
+  durability: 100
+  price: 100
+  capacity: 100
 --- !u!1 &4624775708906571121
 GameObject:
   m_ObjectHideFlags: 0
