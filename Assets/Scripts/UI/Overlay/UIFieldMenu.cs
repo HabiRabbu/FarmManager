@@ -8,12 +8,11 @@ using UnityEngine.UI;
 using Harvey.Farm.VehicleScripts;
 using System.Collections.Generic;
 using System.Linq;
+using Harvey.Farm.Implements;
+using Harvey.Farm.Buildings;
 
 public class UIFieldMenu : MonoBehaviour
 {
-
-    [SerializeField] private CropRegistry cropRegistry;
-
     [Header("UI refs")]
     [SerializeField] private Button btnPlow;
     [SerializeField] private Button btnSeed;
@@ -41,13 +40,20 @@ public class UIFieldMenu : MonoBehaviour
     [SerializeField] private TMP_Text textTractorSelectHarvest;
 
 
+    [SerializeField] private CropRegistry cropRegistry;
     Field field;
     JobType selectedTask;
     List<Vehicle> idleTractors = new();
+    List<ImplementBehaviour> implementChoices = new();
 
     void Awake()
     {
         gameObject.SetActive(false);
+        btnPlow.onClick.AddListener(() => SetTask(JobType.Plow, plowMenu));
+        btnSeed.onClick.AddListener(() => SetTask(JobType.Seed, seedMenu));
+        btnHarvest.onClick.AddListener(() => SetTask(JobType.Harvest, harvestMenu));
+        btnGo.onClick.AddListener(OnStartClicked);
+        btnClose.onClick.AddListener(Hide);
     }
 
     public void Show(Field f)
@@ -55,59 +61,34 @@ public class UIFieldMenu : MonoBehaviour
         field = f;
         gameObject.SetActive(true);
 
-        if (f.Needs(JobType.Plow)) OnClickPlow();
-        else if (f.Needs(JobType.Seed)) OnClickSeed();
-        else OnClickHarvest();
+        if (f.Needs(JobType.Plow)) SetTask(JobType.Plow, plowMenu);
+        else if (f.Needs(JobType.Seed)) SetTask(JobType.Seed, seedMenu);
+        else SetTask(JobType.Harvest, harvestMenu);
     }
-    public void Hide()
-    {
-        gameObject.SetActive(false);
-    }
+    public void Hide() => gameObject.SetActive(false);
 
     /* ---------- task buttons ---------- */
-    public void OnClickPlow() => SetTask(JobType.Plow, plowMenu);
-    public void OnClickSeed() => SetTask(JobType.Seed, seedMenu);
-    public void OnClickHarvest() => SetTask(JobType.Harvest, harvestMenu);
-    void SetTask(JobType t, GameObject active)
+    void SetTask(JobType job, GameObject menu)
     {
-        selectedTask = t;
-        plowMenu.SetActive(active == plowMenu);
-        seedMenu.SetActive(active == seedMenu);
-        harvestMenu.SetActive(active == harvestMenu);
+        selectedTask = job;
+        plowMenu.SetActive(menu == plowMenu);
+        seedMenu.SetActive(menu == seedMenu);
+        harvestMenu.SetActive(menu == harvestMenu);
 
-        PopulateTractors(t);
+        PopulateTractors();
         PopulateImplements();
-        PopulateCrops();
+        if (job == JobType.Seed) PopulateCrops();
+
+        ValidateReady();
     }
 
-    public void OnStartClicked()
+    void PopulateTractors()
     {
-        Vehicle tractor = selectedTask switch
-        {
-            JobType.Plow => idleTractors[dpnTractorSelectPlow.value],
-            JobType.Seed => idleTractors[dpnTractorSelectSeed.value],
-            JobType.Harvest => idleTractors[dpnTractorSelectHarvest.value],
-            _ => null
-        };
+        idleTractors = VehicleManager.Instance.IdleVehicles
+            .Where(v => v.CanDo(selectedTask)).ToList();
+        var names = idleTractors.Select(t => t.vehicleName).ToList();
 
-        CropDefinition crop = (selectedTask == JobType.Seed)
-            ? cropRegistry.crops[dpnCropSelectSeed.value]
-            : null;
-
-        var job = new FieldJob(field, selectedTask, crop);
-        GameEvents.JobButtonPressed(job, tractor);
-        Hide();
-    }
-
-    void PopulateTractors(JobType task)
-    {
-        idleTractors = VehicleManager.Instance
-                   .IdleVehicles
-                   .Where(v => v.CanDo(task))
-                   .ToList();
-        var names = idleTractors.ConvertAll(t => t.vehicleName);
-
-        switch (task)
+        switch (selectedTask)
         {
             case JobType.Plow:
                 dpnTractorSelectPlow.ClearOptions();
@@ -123,16 +104,90 @@ public class UIFieldMenu : MonoBehaviour
                 break;
         }
     }
-    private void PopulateImplements()
-    {
 
+    void PopulateImplements()
+    {
+        implementChoices.Clear();
+        var shed = BuildingManager.Instance.GetNearestShed(field.transform.position);
+        if (!shed) return;
+
+        implementChoices = shed.Query(i => i.Job == selectedTask).ToList();
+        var labels = implementChoices.Select(i => $"{i.name} ({i.Durability:P0})").ToList();
+
+        TMP_Dropdown dd = selectedTask switch
+        {
+            JobType.Plow => dpnImplementSelectPlow,
+            JobType.Seed => dpnImplementSelectSeed,
+            _ => null
+        };
+
+        if (dd != null)
+        {
+            dd.ClearOptions();
+            dd.AddOptions(labels);
+        }
     }
-    private void PopulateCrops()
+
+    void PopulateCrops()
     {
         dpnCropSelectSeed.ClearOptions();
-        var names = cropRegistry.crops.ConvertAll(c => c.cropName);
-        dpnCropSelectSeed.AddOptions(names);
-
-        dpnCropSelectSeed.value = 0;
+        var cropNames = cropRegistry.crops.Select(c => c.cropName).ToList();
+        dpnCropSelectSeed.AddOptions(cropNames);
     }
+
+    int CurrentTractorIndex() => selectedTask switch
+    {
+        JobType.Plow => dpnTractorSelectPlow.value,
+        JobType.Seed => dpnTractorSelectSeed.value,
+        JobType.Harvest => dpnTractorSelectHarvest.value,
+        _ => -1
+    };
+
+    int CurrentImplementIndex() => selectedTask switch
+    {
+        //TODO: Could be the second one, sure - But that's not MFPlow which is in position 3?
+        JobType.Plow => dpnImplementSelectPlow.value,
+        JobType.Seed => dpnImplementSelectSeed.value,
+        _ => -1
+    };
+
+    public void OnStartClicked()
+    {
+        if (idleTractors.Count == 0 || CurrentTractorIndex() < 0) return;
+        var tractor = idleTractors[CurrentTractorIndex()];
+
+        var shed = BuildingManager.Instance.GetNearestShed(field.transform.position);
+        string implementId = null;
+
+        if (selectedTask is JobType.Plow or JobType.Seed)
+        {
+            if (implementChoices.Count == 0 || CurrentImplementIndex() < 0) return;
+            implementId = implementChoices[CurrentImplementIndex()].id;
+            shed?.Reserve(implementId);
+        }
+
+        CropDefinition crop = selectedTask == JobType.Seed
+            ? cropRegistry.crops[dpnCropSelectSeed.value]
+            : null;
+
+        var job = new FieldJob(field, selectedTask, crop, implementId);
+        GameEvents.JobButtonPressed(job, tractor);
+        Hide();
+    }
+
+    public void OnDropdownChanged(int _) => ValidateReady();
+
+    void ValidateReady()
+    {
+        bool hasTractor = idleTractors.Count > 0 && CurrentTractorIndex() >= 0;
+        bool hasTool = selectedTask switch
+        {
+            JobType.Plow or JobType.Seed => implementChoices.Count > 0 && CurrentImplementIndex() >= 0,
+            _ => true
+        };
+        bool hasCrop = selectedTask != JobType.Seed || dpnCropSelectSeed.value >= 0;
+
+        btnGo.interactable = hasTractor && hasTool && hasCrop;
+    }
+
 }

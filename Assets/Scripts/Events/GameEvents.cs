@@ -32,8 +32,8 @@ namespace Harvey.Farm.Events
         public static void FieldHarvested(Field field) => OnFieldHarvested?.Invoke(field);
 
         // *------------------- Jobs -------------------*
-        public static event Action<Vehicle, Field, JobType> OnJobStarted;
-        public static void JobStarted(Vehicle v, Field f, JobType j) => OnJobStarted?.Invoke(v, f, j);
+        public static event Action<Vehicle, FieldJob> OnJobStarted;
+        public static void JobStarted(Vehicle v, FieldJob fieldJob) => OnJobStarted?.Invoke(v, fieldJob);
 
         // *------------------- Debug -------------------*
         public static event Action<bool> OnDebugModeToggled;

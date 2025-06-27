@@ -9,18 +9,18 @@ namespace Harvey.Farm.JobScripts
 {
     public class JobManager : Singleton<JobManager>
     {
-        public void EnqueueJob(Field field, Vehicle v, JobType type, CropDefinition crop = null)
+        public void EnqueueJob(FieldJob j, Vehicle v)
         {
-            if (v == null || !v.CanDo(type)) return;
-            if (!field.Needs(type)) return;
+            if (v == null || !v.CanDo(j.Type)) return;
+            if (!j.Field.Needs(j.Type)) return;
 
             v.JobQueue.Clear();
-            v.JobQueue.Enqueue(new FieldJob(field, type, crop));
+            v.JobQueue.Enqueue(j);
 
             // --- inline DispatchIfIdle ---
             if (!v.IsBusy && v.JobQueue.TryDequeue(out var job))
             {
-                GameEvents.JobStarted(v, job.Field, job.Type);
+                GameEvents.JobStarted(v, job);
                 v.StartTask(job);
             }
         }

@@ -7,13 +7,18 @@ namespace Harvey.Farm.JobScripts
     {
         public readonly Field Field;
         public readonly JobType Type;
-        public readonly CropDefinition Crop; // null unless seeding (Or harvesting?)
+        public readonly CropDefinition Crop;
+        public readonly string ToolId;
 
-        public FieldJob(Field field, JobType type, CropDefinition crop = null)
+        public FieldJob(Field field,
+                   JobType type,
+                   CropDefinition crop = null,
+                    string toolId = null)
         {
             Field = field;
             Type = type;
             Crop = crop;
+            ToolId = toolId;
         }
     }
 }

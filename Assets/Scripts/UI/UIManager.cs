@@ -92,15 +92,15 @@ namespace Harvey.Farm.UI
 
         void HandleJobBtn(FieldJob j, Vehicle v)
         {
-            JobManager.Instance.EnqueueJob(j.Field, v, j.Type, j.Crop);
+            JobManager.Instance.EnqueueJob(j, v);
         }
 
-        private void HandleJobStarted(Vehicle v, Field f, JobType j)
+        private void HandleJobStarted(Vehicle v, FieldJob j)
         {
 
             var n = new NotificationData
             (
-                $"{v.vehicleName} started to {j} on {f.fieldName}",
+                $"{v.vehicleName} started to {j.Type} on {j.Field.fieldName}",
                 textColor: Color.white,
                 backgroundColor: new Color(0.15f, 0.6f, 0.1f),
                 fadeDuration: 4f

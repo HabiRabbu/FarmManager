@@ -15,6 +15,6 @@ MonoBehaviour:
   <DisplayName>k__BackingField: Mazie Fergieson
   <Type>k__BackingField: 0
   <ModelPrefab>k__BackingField: {fileID: 919132149155446097, guid: 0c8a8c61bfac4ee48ac32ff246d7e2c2, type: 3}
-  <MoveSpeed>k__BackingField: 500
+  <MoveSpeed>k__BackingField: 5
   <Capacity>k__BackingField: 0
   <Price>k__BackingField: 0

@@ -166,9 +166,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56aeef7db6ea8b940b4800686a7d2158, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  definition: {fileID: 0}
   rootTransform: {fileID: 7672555974253450862}
-  moveSpeed: 2
+  fallbackMoveSpeed: 2
   vehicleName: Mazie Fergieson
+  hitchPoint: {fileID: 5700977899952194359}
+  implementLibrary: {fileID: 11400000, guid: 712feede2a0fa4d479d32970d8dca184, type: 2}
 --- !u!1 &3569308923155089431
 GameObject:
   m_ObjectHideFlags: 0

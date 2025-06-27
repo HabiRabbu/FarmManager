@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8ca883d136799947b1fbc01d2667681, type: 3}
+  m_Name: MFPlowSO
+  m_EditorClassIdentifier: 
+  <DisplayName>k__BackingField: MF Plow
+  <Type>k__BackingField: 0
+  <Job>k__BackingField: 0
+  <ModelPrefab>k__BackingField: {fileID: 6094069679538789448, guid: 606d19b0dd94b4345b157b6337483e6f, type: 3}
+  <Price>k__BackingField: 15000
