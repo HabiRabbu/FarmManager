@@ -8,19 +8,12 @@ using UnityEngine;
 /// </summary>
 namespace Harvey.Farm.Utilities
 {
-    public class PoolManager : MonoBehaviour
+    public class PoolManager : Singleton<PoolManager>
     {
-        public static PoolManager Instance { get; private set; }
-
-        void Awake()
-        {
-            if (Instance != null) { Destroy(gameObject); return; }
-            Instance = this;
-        }
 
         private readonly Dictionary<GameObject, Queue<GameObject>> pools = new();
 
-        public GameObject Get(GameObject prefab, Transform parent = null)
+        public GameObject GetOrInstantiate(GameObject prefab, Transform parent = null)
         {
             if (!pools.TryGetValue(prefab, out var q))
             {

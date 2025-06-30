@@ -6,10 +6,14 @@ namespace Harvey.Farm.CameraScripts
 {
     public class CameraInput : MonoBehaviour
     {
+        [SerializeField] private bool enablePan = false;
         [SerializeField] private Transform cameraTarget;
         [SerializeField] private CinemachineCamera cinemachineCamera;
         [SerializeField] private new Camera camera;
         [SerializeField] private CameraConfig cameraConfig;
+
+        [SerializeField] private float normalPanMultiplier = 1f;
+        [SerializeField] private float shiftPanMultiplier = 2f;
 
         private CinemachineFollow cinemachineFollow;
         private float currentYaw = 0f;
@@ -32,9 +36,10 @@ namespace Harvey.Farm.CameraScripts
 
         private void HandlePan()
         {
-            Vector2 moveAmount = Vector2.zero;
-            moveAmount = GetKeyboardMoveAmount();
-            moveAmount += GetMouseMoveAmount();
+            float speedMultiplier = Keyboard.current.leftShiftKey.isPressed || Keyboard.current.rightShiftKey.isPressed ? shiftPanMultiplier : normalPanMultiplier;
+
+            Vector2 moveAmount = GetKeyboardMoveAmount(speedMultiplier);
+            if (enablePan) { moveAmount += GetMouseMoveAmount(speedMultiplier); }
 
             Vector3 forward = cameraTarget.forward;
             Vector3 right = cameraTarget.right;
@@ -45,7 +50,6 @@ namespace Harvey.Farm.CameraScripts
             right.Normalize();
 
             Vector3 move = forward * moveAmount.y + right * moveAmount.x;
-
             cameraTarget.position += move;
 
             Vector3 clampedPosition = cameraTarget.position;
@@ -54,61 +58,42 @@ namespace Harvey.Farm.CameraScripts
             cameraTarget.position = clampedPosition;
         }
 
-        private Vector2 GetMouseMoveAmount()
+
+        private Vector2 GetKeyboardMoveAmount(float speedMultiplier)
+        {
+            Vector2 moveAmount = Vector2.zero;
+            if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed)
+                moveAmount.y += 1f;
+            if (Keyboard.current.downArrowKey.isPressed || Keyboard.current.sKey.isPressed)
+                moveAmount.y -= 1f;
+            if (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.aKey.isPressed)
+                moveAmount.x -= 1f;
+            if (Keyboard.current.rightArrowKey.isPressed || Keyboard.current.dKey.isPressed)
+                moveAmount.x += 1f;
+
+            return moveAmount.normalized * cameraConfig.KeyboardPanSpeed * speedMultiplier * Time.deltaTime;
+        }
+
+        private Vector2 GetMouseMoveAmount(float speedMultiplier)
         {
             Vector2 moveAmount = Vector2.zero;
 
-            if (!cameraConfig.EnableEdgePan) { return moveAmount; }
+            if (!cameraConfig.EnableEdgePan)
+                return moveAmount;
 
             Vector2 mousePosition = Mouse.current.position.ReadValue();
             int screenWidth = Screen.width;
             int screenHeight = Screen.height;
 
-            if (mousePosition.x <= cameraConfig.EdgePanSize)
-            {
-                moveAmount.x -= 1f;
-            }
-            else if (mousePosition.x >= screenWidth - cameraConfig.EdgePanSize)
-            {
-                moveAmount.x += 1f;
-            }
+            if (mousePosition.x <= cameraConfig.EdgePanSize) moveAmount.x -= 1f;
+            else if (mousePosition.x >= screenWidth - cameraConfig.EdgePanSize) moveAmount.x += 1f;
 
-            if (mousePosition.y >= screenHeight - cameraConfig.EdgePanSize)
-            {
-                moveAmount.y += 1f;
-            }
-            else if (mousePosition.y <= cameraConfig.EdgePanSize)
-            {
-                moveAmount.y -= 1f;
-            }
+            if (mousePosition.y >= screenHeight - cameraConfig.EdgePanSize) moveAmount.y += 1f;
+            else if (mousePosition.y <= cameraConfig.EdgePanSize) moveAmount.y -= 1f;
 
-            moveAmount = moveAmount.normalized * cameraConfig.MousePanSpeed * Time.deltaTime;
-            return moveAmount;
+            return moveAmount.normalized * cameraConfig.MousePanSpeed * speedMultiplier * Time.deltaTime;
         }
 
-        private Vector2 GetKeyboardMoveAmount()
-        {
-            Vector2 moveAmount = Vector2.zero;
-            if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed)
-            {
-                moveAmount.y += 1f;
-            }
-            if (Keyboard.current.downArrowKey.isPressed || Keyboard.current.sKey.isPressed)
-            {
-                moveAmount.y -= 1f;
-            }
-            if (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.aKey.isPressed)
-            {
-                moveAmount.x -= 1f;
-            }
-            if (Keyboard.current.rightArrowKey.isPressed || Keyboard.current.dKey.isPressed)
-            {
-                moveAmount.x += 1f;
-            }
-
-            moveAmount = moveAmount.normalized * cameraConfig.KeyboardPanSpeed * Time.deltaTime;
-            return moveAmount;
-        }
 
         private void HandleRotation()
         {

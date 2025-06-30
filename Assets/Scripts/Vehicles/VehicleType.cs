@@ -1,0 +1,1 @@
+public enum VehicleType { Tractor, Car, Truck, CombineHarvester }
