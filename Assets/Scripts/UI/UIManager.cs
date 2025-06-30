@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using Harvey.Farm.Events;
-using Harvey.Farm.FieldScripts;
 using Harvey.Farm.JobScripts;
 using Harvey.Farm.VehicleScripts;
 using UnityEngine;
 using Harvey.Farm.Utilities;
 using UnityEngine.Playables;
 using UnityEngine.UI;
+using Harvey.Farm.Fields;
 
 namespace Harvey.Farm.UI
 {
@@ -79,7 +79,7 @@ namespace Harvey.Farm.UI
             if (fieldMenu) fieldMenu.gameObject.SetActive(false);
         }
 
-        void HandleFieldSelected(Field f)
+        void HandleFieldSelected(FieldController f)
         {
             if (f)
             {
@@ -110,7 +110,7 @@ namespace Harvey.Farm.UI
 
             var n = new NotificationData
             (
-                $"{v.Stats.vehicleName} started to {j.Type} on {j.Field.fieldName}",
+                $"{v.Stats.vehicleName} started to {j.Type} on {j.Field.Definition.fieldName}",
                 textColor: Color.white,
                 backgroundColor: new Color(0.15f, 0.6f, 0.1f),
                 fadeDuration: 4f
@@ -119,11 +119,11 @@ namespace Harvey.Farm.UI
             ShowNotification(n);
         }
 
-        private void HandleFieldCompleted(Field field)
+        private void HandleFieldCompleted(FieldController field)
         {
             var n = new FadingPopupData
             (
-                text: $"Work completed on field {field.fieldName}",
+                text: $"Work completed on field {field.Definition.fieldName}",
                 color: Color.white,
                 fadeDuration: 2f
             );
@@ -131,11 +131,11 @@ namespace Harvey.Farm.UI
             ShowCentrePopup(n);
         }
 
-        private void HandleFieldGrown(Field field)
+        private void HandleFieldGrown(FieldController field)
         {
             var n = new NotificationData
             (
-                $"Crops on {field.fieldName} are ready to harvest!",
+                $"Crops on {field.Definition.fieldName} are ready to harvest!",
                 textColor: Color.white,
                 backgroundColor: Colors.COLOR_YELLOW,
                 fadeDuration: 6f
@@ -144,11 +144,11 @@ namespace Harvey.Farm.UI
             ShowNotification(n);
         }
 
-        private void HandleFieldHarvested(Field field)
+        private void HandleFieldHarvested(FieldController field)
         {
             var n = new NotificationData
             (
-                $"{field.currentCrop.cropName} on {field.fieldName} has been harvested.",
+                $"{field.currentCrop.cropName} on {field.Definition.fieldName} has been harvested.",
                 textColor: Color.white,
                 backgroundColor: Colors.COLOR_TEAL,
                 fadeDuration: 6f
@@ -157,7 +157,7 @@ namespace Harvey.Farm.UI
             ShowNotification(n);
         }
 
-        public void OpenFieldInfo(Field f)
+        public void OpenFieldInfo(FieldController f)
         {
             if (!fieldInfo)
             {
@@ -171,7 +171,7 @@ namespace Harvey.Farm.UI
             if (fieldMenu) fieldMenu.gameObject.SetActive(false);
         }
 
-        public void OpenFieldMenu(Field f)
+        public void OpenFieldMenu(FieldController f)
         {
             if (!fieldMenu)
             {

@@ -32,7 +32,7 @@ public class TractorJobRunner : MonoBehaviour
 
             /* 2. field prep */
             var field = job.Field;
-            field.Begin(job.Type, job.Crop);
+            field.BeginJob(job.Type, job.Crop);
 
             /* 3. serpentine drive */
             var serp = field.GetSerpentineTiles();

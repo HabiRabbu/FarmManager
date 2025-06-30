@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Harvey.Farm.Events;
-using Harvey.Farm.FieldScripts;
+using Harvey.Farm.Fields;
 using Harvey.Farm.VehicleScripts;
 using Harvey.Farm.Utilities;
 using TMPro;
@@ -20,11 +20,11 @@ namespace Harvey.Farm.UI
         [SerializeField] private Button plowButton;
         [SerializeField] private TMP_Text statusLabel;
 
-        private Field field;
+        private FieldController field;
         private List<Vehicle> idleCache;
 
         /* ------------------------- PUBLIC API ------------------------- */
-        public void Init(Field owner)
+        public void Init(FieldController owner)
         {
             field = owner;
             Hide();
@@ -98,14 +98,14 @@ namespace Harvey.Farm.UI
 
         void UpdateVisualState()
         {
-            if (field.Is(Field.State.Plowed))
+            if (field.Is(FieldController.State.Plowed))
             {
                 plowButton.gameObject.SetActive(false);
                 dropdown.gameObject.SetActive(false);
                 statusLabel.gameObject.SetActive(true);
                 statusLabel.text = "Field plowed";
             }
-            else if (field.Is(Field.State.Plowing))
+            else if (field.Is(FieldController.State.Plowing))
             {
                 plowButton.gameObject.SetActive(false);
                 dropdown.gameObject.SetActive(false);

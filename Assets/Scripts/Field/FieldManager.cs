@@ -3,23 +3,25 @@ using UnityEngine;
 using Harvey.Farm.Utilities;
 using Harvey.Farm.Events;
 
-namespace Harvey.Farm.FieldScripts
+namespace Harvey.Farm.Fields
 {
     public class FieldManager : Singleton<FieldManager>
     {
         [Header("Field Settings")]
         [SerializeField] public float tileSize;
 
-        private Field current = null;
-        readonly List<Field> fields = new();
+        private FieldController current = null;
+        readonly List<FieldController> fields = new();
 
-        public void RegisterField(Field f) => fields.Add(f);
-        public void UnregisterField(Field f) => fields.Remove(f);
+        public void RegisterField(FieldController f) => fields.Add(f);
+        public void UnregisterField(FieldController f) => fields.Remove(f);
 
-        public Field GetFieldAtPoint(Vector3 worldPos)
-           => fields.Find(f => f.ContainsPoint(worldPos));
+        public FieldController GetFieldAtPoint(Vector3 worldPos)
+        {
+            return fields.Find(f => f.GetComponent<FieldBuilder>().ContainsPoint(worldPos));
+        }
 
-        public void SelectField(Field f)
+        public void SelectField(FieldController f)
         {
             if (current == f) return;
 

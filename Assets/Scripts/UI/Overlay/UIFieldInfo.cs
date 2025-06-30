@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using Harvey.Farm.FieldScripts;
+using Harvey.Farm.Fields;
 using System.Collections.Generic;
 using Harvey.Farm.VehicleScripts;
 using Harvey.Farm.Events;
@@ -17,11 +17,11 @@ public class UIFieldInfo : MonoBehaviour
     [SerializeField] private Button btnJob;
     [SerializeField] private Image progressBar;
 
-    Field boundField;
+    FieldController boundField;
 
     System.Action<FieldTile> onPlowed, onHarvested;
     System.Action<FieldTile, CropDefinition> onSeeded;
-    System.Action<Field> onGrown, onComplete;
+    System.Action<FieldController> onGrown, onComplete;
 
     void Awake()
     {
@@ -51,10 +51,10 @@ public class UIFieldInfo : MonoBehaviour
         GameEvents.OnFieldCompleted -= onComplete;
     }
 
-    public void Bind(Field f)
+    public void Bind(FieldController f)
     {
         boundField = f;
-        txtFieldName.text = f.fieldName;
+        txtFieldName.text = f.Definition.fieldName;
         Refresh();
     }
 

@@ -1,5 +1,5 @@
 using UnityEngine;
-using Harvey.Farm.FieldScripts;
+using Harvey.Farm.Fields;
 using System.Collections;
 using System.Collections.Generic;
 using Harvey.Farm.JobScripts;

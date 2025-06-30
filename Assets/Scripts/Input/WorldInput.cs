@@ -1,5 +1,5 @@
 using UnityEngine;
-using Harvey.Farm.FieldScripts;
+using Harvey.Farm.Fields;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using Harvey.Farm.UI;
@@ -47,7 +47,7 @@ namespace Harvey.Farm.InputScripts
                 return;
             }
 
-            Field clickedField = FieldManager.Instance.GetFieldAtPoint(hit.point);
+            FieldController clickedField = FieldManager.Instance.GetFieldAtPoint(hit.point);
             FieldManager.Instance.SelectField(clickedField);
         }
     }

@@ -1,16 +1,16 @@
 using Harvey.Farm.Crops;
-using Harvey.Farm.FieldScripts;
+using Harvey.Farm.Fields;
 
 namespace Harvey.Farm.JobScripts
 {
     public readonly struct FieldJob
     {
-        public readonly Field Field;
+        public readonly FieldController Field;
         public readonly JobType Type;
         public readonly CropDefinition Crop;
         public readonly string ToolId;
 
-        public FieldJob(Field field,
+        public FieldJob(FieldController field,
                    JobType type,
                    CropDefinition crop = null,
                     string toolId = null)

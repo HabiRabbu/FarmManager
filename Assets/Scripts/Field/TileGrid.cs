@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Harvey.Farm.FieldScripts
+namespace Harvey.Farm.Fields
 {
     public class TileGrid
     {

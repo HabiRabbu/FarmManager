@@ -25,7 +25,7 @@ public class HarvesterRunner : MonoBehaviour
         do
         {
             var field = job.Field;
-            field.Begin(job.Type, job.Crop);
+            field.BeginJob(job.Type, job.Crop);
 
             var serp = field.GetSerpentineTiles();
                 var waypoints = new List<Vector3>(serp.Length);

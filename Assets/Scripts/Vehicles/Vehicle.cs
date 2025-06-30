@@ -1,5 +1,5 @@
 using UnityEngine;
-using Harvey.Farm.FieldScripts;
+using Harvey.Farm.Fields;
 using System.Collections;
 using System.Collections.Generic;
 using Harvey.Farm.Events;
@@ -10,7 +10,7 @@ namespace Harvey.Farm.VehicleScripts
 {
     public abstract class Vehicle : MonoBehaviour
     {
-        public Field CurrentField { get; protected set; }
+        public FieldController CurrentField { get; protected set; }
         public Queue<FieldJob> JobQueue { get; } = new();
 
         public abstract bool CanDo(JobType type);

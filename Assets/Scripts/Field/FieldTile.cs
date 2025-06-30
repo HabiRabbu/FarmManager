@@ -4,7 +4,7 @@ using Harvey.Farm.Events;
 using Harvey.Farm.Crops;
 using Harvey.Farm.Factory;
 
-namespace Harvey.Farm.FieldScripts
+namespace Harvey.Farm.Fields
 {
     [RequireComponent(typeof(MeshRenderer))]
     public class FieldTile : MonoBehaviour

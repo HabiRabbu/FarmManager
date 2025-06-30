@@ -1,5 +1,5 @@
 using Harvey.Farm.Events;
-using Harvey.Farm.FieldScripts;
+using Harvey.Farm.Fields;
 using Harvey.Farm.JobScripts;
 using Harvey.Farm.Crops;
 using TMPro;
@@ -41,7 +41,7 @@ public class UIFieldMenu : MonoBehaviour
 
 
     [SerializeField] private CropRegistry cropRegistry;
-    Field field;
+    FieldController field;
     JobType selectedTask;
     List<Vehicle> idleTractors = new();
     List<ImplementBehaviour> implementChoices = new();
@@ -56,7 +56,7 @@ public class UIFieldMenu : MonoBehaviour
         btnClose.onClick.AddListener(Hide);
     }
 
-    public void Show(Field f)
+    public void Show(FieldController f)
     {
         field = f;
         gameObject.SetActive(true);

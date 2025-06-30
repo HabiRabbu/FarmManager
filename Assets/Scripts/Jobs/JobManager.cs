@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Harvey.Farm.Events;
-using Harvey.Farm.FieldScripts;
+using Harvey.Farm.Fields;
 using Harvey.Farm.VehicleScripts;
 using Harvey.Farm.Crops;
 
