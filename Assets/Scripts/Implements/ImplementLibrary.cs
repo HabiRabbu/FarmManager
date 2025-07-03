@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Harvey.Farm.Implements
 {
-    [CreateAssetMenu(fileName = "ImplementLibrary", menuName = "Farm/Implement Library")]
+    [CreateAssetMenu(fileName = "ImplementLibrary", menuName = "Roast/Implements/Implement Library")]
     public class ImplementLibrary : ScriptableObject
     {
         [SerializeField] private List<ImplementDefinition> all = new();

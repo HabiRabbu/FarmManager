@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "VehicleDefinition", menuName = "Scriptable Objects/VehicleDefinition")]
+[CreateAssetMenu(fileName = "VehicleDefinition", menuName = "Farm/Vehicles/VehicleDefinition")]
 public class VehicleDefinition : ScriptableObject
 {
     [field: Header("Vehicle Definition")]

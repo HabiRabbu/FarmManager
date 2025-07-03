@@ -11,9 +11,13 @@ namespace Harvey.Farm.Implements
         [SerializeField] float currentDurability;
 
         public ImplementDefinition Def { get; private set; }
-        public float Durability => currentDurability;
         public ShedBuilding home;
         public JobType Job; 
+        
+        //Definition Getters
+        public float Durability => currentDurability;
+        public string DisplayName => Def != null ? Def.DisplayName : string.Empty;
+        public Sprite Icon => Def != null ? Def.Icon : null;
 
         void Awake()
         {

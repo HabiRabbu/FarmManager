@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Farm/Field Definition")]
+[CreateAssetMenu(menuName = "Roast/Fields/Field Definition")]
 public class FieldDefinition : ScriptableObject
 {
     public string fieldName;

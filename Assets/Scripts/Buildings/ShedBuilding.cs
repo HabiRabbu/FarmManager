@@ -11,15 +11,36 @@ namespace Harvey.Farm.Buildings
 {
     public class ShedBuilding : Building
     {
+
+        [Header("Definition")]
+        [SerializeField] private ShedDefinition shedDefinition;
+
+        public override BuildingDefinition Definition => shedDefinition;
+        public ShedDefinition ShedDef => shedDefinition;
+
         [Header("Implement spawn anchors")]
         [SerializeField] Transform[] implantAnchors;
-        [SerializeField] ImplementDefinition[] preload;
 
         [Header("Inventory")]
         [SerializeField] readonly Dictionary<string, ImplementBehaviour> stock = new();
         [SerializeField] readonly HashSet<string> reserved = new();
 
-        void Start() => SpawnInitialImplements();
+        ImplementDefinition[] preload;
+
+
+        protected override void Awake()
+        {
+            base.Awake();
+            preload = ShedDef.Preload;
+        }
+
+
+        void Start()
+        {
+            if (shedDefinition != null)
+                Debug.Log($"Shed initialized: {shedDefinition.DisplayName}");
+            SpawnInitialImplements();
+        }
 
 
         // ---------- Public API ----------

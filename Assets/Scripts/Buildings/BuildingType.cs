@@ -1,0 +1,1 @@
+public enum BuildingType { ImplementStorage, TractorStorage, RawCropStorage }

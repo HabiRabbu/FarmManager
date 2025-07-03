@@ -4,15 +4,13 @@ namespace Harvey.Farm.Buildings
 {
     public abstract class Building : MonoBehaviour
     {
-        [field: SerializeField] public string DisplayName { get; private set; }
+        /// <summary>The data object that drives this building.</summary>
+        public abstract BuildingDefinition Definition { get; }
+        public string DisplayName => Definition?.DisplayName ?? name;
 
-        protected virtual void Awake()
-        {
-            BuildingManager.Instance.Register(this);
-        }
-        protected virtual void OnDestroy()
-        {
-            BuildingManager.Instance.Unregister(this);
-        }
+        #region Auto-registration
+        protected virtual void Awake() => BuildingManager.Instance.Register(this);
+        protected virtual void OnDestroy() => BuildingManager.Instance.Unregister(this);
+        #endregion
     }
 }

@@ -25,6 +25,8 @@ public class UIFieldInfo : MonoBehaviour
 
     void Awake()
     {
+        btnClose.onClick.AddListener(() => gameObject.SetActive(false));
+
         onPlowed = _ => Refresh();
         onSeeded = (_, __) => Refresh();
         onHarvested = _ => Refresh();
@@ -58,7 +60,7 @@ public class UIFieldInfo : MonoBehaviour
         Refresh();
     }
 
-    void Refresh()
+    public void Refresh()
     {
         if (!boundField) return;
 
@@ -74,5 +76,4 @@ public class UIFieldInfo : MonoBehaviour
     {
         UIManager.Instance.OpenFieldMenu(boundField);
     }
-
 }

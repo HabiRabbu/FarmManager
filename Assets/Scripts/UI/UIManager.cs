@@ -7,6 +7,8 @@ using Harvey.Farm.Utilities;
 using UnityEngine.Playables;
 using UnityEngine.UI;
 using Harvey.Farm.Fields;
+using Harvey.Farm.Buildings;
+using UnityEditor.IMGUI.Controls;
 
 namespace Harvey.Farm.UI
 {
@@ -26,6 +28,10 @@ namespace Harvey.Farm.UI
         [SerializeField] private GameObject fieldInfoPrefab;
         [SerializeField] private GameObject fieldMenuPrefab;
 
+        [Header("Building Info Config")]
+        [SerializeField] private GameObject buildingInfoPrefab;
+
+
         //Pools
         private UIPrefabPool fadingPopupPool;
         private UIPrefabPool notificationPopupPool;
@@ -33,6 +39,7 @@ namespace Harvey.Farm.UI
         //Current UI
         private UIFieldInfo fieldInfo;
         private UIFieldMenu fieldMenu;
+        private UIBuildingInfo buildingInfo;
 
         protected override void Awake()
         {
@@ -46,6 +53,10 @@ namespace Harvey.Farm.UI
 
             fieldMenu = Instantiate(fieldMenuPrefab, canvasTransform).GetComponent<UIFieldMenu>();
             fieldMenu.gameObject.SetActive(false);
+
+            buildingInfo = Instantiate(buildingInfoPrefab, canvasTransform).GetComponent<UIBuildingInfo>();
+            buildingInfo.gameObject.SetActive(false);
+
         }
 
         void OnEnable()
@@ -77,8 +88,26 @@ namespace Harvey.Farm.UI
         {
             if (fieldInfo) fieldInfo.gameObject.SetActive(false);
             if (fieldMenu) fieldMenu.gameObject.SetActive(false);
+            if (buildingInfo) buildingInfo.gameObject.SetActive(false);
         }
 
+        void RefreshUI()
+        {
+            if (fieldMenu && fieldMenu.gameObject.activeSelf)
+            {
+                fieldMenu.Refresh();
+            }
+            if (fieldInfo && fieldInfo.gameObject.activeSelf)
+            {
+                fieldInfo.Refresh();
+            }
+            if (buildingInfo && buildingInfo.gameObject.activeSelf)
+            {
+                buildingInfo.Refresh();
+            }
+        }
+
+        // -------- Handle UI Events Methods --------
         void HandleFieldSelected(FieldController f)
         {
             if (f)
@@ -90,14 +119,6 @@ namespace Harvey.Farm.UI
                 CloseAll();
             }
 
-        }
-
-        void RefreshUI()
-        {
-            if (fieldMenu && fieldMenu.gameObject.activeSelf)
-            {
-                fieldMenu.Refresh();
-            }
         }
 
         void HandleJobBtn(FieldJob j, Vehicle v)
@@ -157,6 +178,7 @@ namespace Harvey.Farm.UI
             ShowNotification(n);
         }
 
+        // -------- Show/Open UI Methods --------
         public void OpenFieldInfo(FieldController f)
         {
             if (!fieldInfo)
@@ -181,6 +203,22 @@ namespace Harvey.Farm.UI
 
             fieldMenu.gameObject.SetActive(true);
             fieldMenu.Show(f);
+        }
+
+        public void OpenBuildingInfo(Building b)
+        {
+            if (b == null)
+            {
+                if (buildingInfo)
+                {
+                    buildingInfo.Close();
+                }
+                return;
+            }
+            if (buildingInfo)
+            {
+                buildingInfo.Show(b);
+            }
         }
 
         public void ShowCentrePopup(in FadingPopupData data)

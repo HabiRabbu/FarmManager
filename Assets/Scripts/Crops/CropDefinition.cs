@@ -5,7 +5,7 @@ namespace Harvey.Farm.Crops
     /// <summary>
     /// Represents a crop definition with its properties and growth stages.
     /// </summary>
-    [CreateAssetMenu(fileName = "CropDefinition", menuName = "Scriptable Objects/CropDefinition")]
+    [CreateAssetMenu(fileName = "CropDefinition", menuName = "Roast/Crops/CropDefinition")]
     public class CropDefinition : ScriptableObject
     {
         [field: Header("Crop Definition")]

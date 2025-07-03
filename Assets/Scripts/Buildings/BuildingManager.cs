@@ -5,7 +5,7 @@ namespace Harvey.Farm.Buildings
 {
     public class BuildingManager : Singleton<BuildingManager>
     {
-        readonly List<ShedBuilding> sheds = new();
+        [SerializeField] readonly List<ShedBuilding> sheds = new();
 
         public void Register(Building b)
         {

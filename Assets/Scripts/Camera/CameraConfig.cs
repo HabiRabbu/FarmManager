@@ -3,7 +3,7 @@ using UnityEngine.Animations;
 
 namespace Harvey.Farm.CameraScripts
 {
-    [CreateAssetMenu(fileName = "CameraConfigSO", menuName = "CameraScripts/CameraConfigSO")]
+    [CreateAssetMenu(fileName = "CameraConfigSO", menuName = "Roast/Camera/CameraConfigSO")]
     public class CameraConfig : ScriptableObject
     {
 

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b9acc4db38f64445adcfb9c5a430c3a, type: 3}
+  m_Name: ToolShedSO_PrePopulated
+  m_EditorClassIdentifier: 
+  <DisplayName>k__BackingField: PrePop Tool Shed
+  <Icon>k__BackingField: {fileID: 21300000, guid: 5315b29bcb5d5ce45b1bb19e1edfdccb, type: 3}
+  <Price>k__BackingField: 100000
+  <Type>k__BackingField: 0
+  <ModelPrefab>k__BackingField: {fileID: 3984796620337732777, guid: 0037aca3bdf5407408101d37a082f3ee, type: 3}
+  <ImplementSlots>k__BackingField: 3
+  <Preload>k__BackingField:
+  - {fileID: 11400000, guid: f3c9addce8cd387469b78267b71174db, type: 2}
+  - {fileID: 11400000, guid: f608b9c95b5aafe40be3a4cb02ac08f3, type: 2}
+  - {fileID: 11400000, guid: 1b95adc9af9698e419a21105d7ae9dd8, type: 2}
