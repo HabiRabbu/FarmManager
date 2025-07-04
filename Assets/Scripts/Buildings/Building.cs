@@ -9,7 +9,7 @@ namespace Harvey.Farm.Buildings
         public string DisplayName => Definition?.DisplayName ?? name;
 
         #region Auto-registration
-        protected virtual void Awake() => BuildingManager.Instance.Register(this);
+        protected virtual void Start() => BuildingManager.Instance.Register(this);
         protected virtual void OnDestroy() => BuildingManager.Instance.Unregister(this);
         #endregion
     }

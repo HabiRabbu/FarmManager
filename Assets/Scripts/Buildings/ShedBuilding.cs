@@ -28,15 +28,16 @@ namespace Harvey.Farm.Buildings
         ImplementDefinition[] preload;
 
 
-        protected override void Awake()
+        void Awake()
         {
-            base.Awake();
             preload = ShedDef.Preload;
         }
 
 
-        void Start()
+        protected override void Start()
         {
+            base.Start();
+            
             if (shedDefinition != null)
                 Debug.Log($"Shed initialized: {shedDefinition.DisplayName}");
             SpawnInitialImplements();
