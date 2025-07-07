@@ -6,7 +6,6 @@ using Harvey.Farm.Factory;
 
 namespace Harvey.Farm.Fields
 {
-    [RequireComponent(typeof(MeshRenderer))]
     public class FieldTile : MonoBehaviour
     {
         [Header("Debug")]
@@ -26,20 +25,30 @@ namespace Harvey.Farm.Fields
         public bool IsSeeded { get; private set; } = false;
         public bool IsHarvested { get; private set; } = false;
 
+        public bool IsReserved { get; private set; } = false;
+
         private MeshRenderer rndr;
 
         public Vector3 WorldPosition => transform.position;
 
-        void Awake() => rndr = GetComponent<MeshRenderer>();
+        void Awake() => rndr = GetComponentInChildren<MeshRenderer>();
 
         public void Init(int x, int z)
         {
             GridX = x;
             GridZ = z;
-            rndr = GetComponent<MeshRenderer>();
+            rndr = GetComponentInChildren<MeshRenderer>();
             rndr.sharedMaterial = earthMat;
             IsPlowed = false;
         }
+        
+        public bool TryReserve()
+        {
+            if (IsReserved) return false;
+            IsReserved = true;
+            return true;
+        }
+        public void ClearReservation() => IsReserved = false;
 
         public void Plow()
         {
@@ -47,7 +56,7 @@ namespace Harvey.Farm.Fields
             IsPlowed = true;
             IsHarvested = false;
             IsSeeded = false;
-            
+
             rndr.sharedMaterial = plowedMat;
 
             GameEvents.TilePlowed(this);

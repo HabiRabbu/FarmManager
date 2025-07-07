@@ -120,6 +120,32 @@ namespace Harvey.Farm.Fields
                 return builder.Grid.BuildSerpentineColumns(tiles);
         }
 
+        public FieldTile GetNearestAvailableTile(JobType type, Vector3 fromPos)
+        {
+            float best = float.MaxValue;
+            FieldTile bestTile = null;
+
+            foreach (var t in builder.Tiles)
+            {
+                if (t.IsReserved) continue;
+                if (type == JobType.Plow && t.IsPlowed) continue;
+                if (type == JobType.Seed && t.IsSeeded) continue;
+                if (type == JobType.Harvest && t.IsHarvested) continue;
+
+                float d = Vector3.SqrMagnitude(t.WorldPosition - fromPos);
+                if (d < best)
+                {
+                    best = d;
+                    bestTile = t;
+                }
+            }
+
+            if (bestTile != null && bestTile.TryReserve())
+                return bestTile;
+
+            return null;
+        }
+
         IEnumerator GrowRoutine()
         {
             currentState = State.Growing;
@@ -133,6 +159,12 @@ namespace Harvey.Farm.Fields
             currentState = State.ReadyToHarvest;
             GameEvents.FieldGrown(this);
         }
+
+        // ---------- Radiaul Menu Support ----------
+        public void RadialOpenFieldInfo() => GameEvents.RadialFieldInfoOpened(this);
+        public void RadialOpenFieldTractor() => GameEvents.RadialFieldTractorOpened(this);
+        public void RadialOpenFieldWorkers() => GameEvents.RadialFieldWorkersOpened(this);
+        // -------------------------------------------
 
         public enum State { Idle, Plowing, Plowed, Seeding, Seeded, Growing, ReadyToHarvest, Harvesting, Harvested }
     }

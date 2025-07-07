@@ -2,7 +2,6 @@ using UnityEngine;
 using Harvey.Farm.Fields;
 using System.Collections;
 using System.Collections.Generic;
-using Harvey.Farm.JobScripts;
 using Harvey.Farm.Events;
 using Harvey.Farm.Implements;
 using Harvey.Farm.Buildings;
@@ -10,6 +9,7 @@ using System;
 using Unity.VisualScripting;
 using System.Linq;
 using NUnit.Framework;
+using Harvey.Farm.Jobs;
 
 namespace Harvey.Farm.VehicleScripts
 {

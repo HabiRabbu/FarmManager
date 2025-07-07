@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 using Harvey.Farm.UI;
 using Harvey.Farm.Events;
 using Harvey.Farm.Buildings;
+using Harvey.Farm.UI.Radial;
 
 namespace Harvey.Farm.InputScripts
 {
@@ -41,35 +42,32 @@ namespace Harvey.Farm.InputScripts
 
             Vector2 screenPos = input.World.Pointer.ReadValue<Vector2>();
             Ray ray = cam.ScreenPointToRay(screenPos);
-
             if (!Physics.Raycast(ray, out RaycastHit hit, maxRayDist, clickableLayerMask))
             {
-                // Missed everything on the ground layer: deselect field
-                FieldManager.Instance.SelectField(null);
+                // Missed everything
+                UIManager.Instance.CloseAll();
                 return;
             }
 
-            // ---------- Building ----------
-            var building = hit.collider.GetComponent<Building>();
-            if (building != null)
+            // Radial on generic launcher - Building, Vehicle, etc.
+            if (hit.collider.TryGetComponent<RadialLauncher>(out var launcher))
             {
-                Debug.Log($"Clicked building: {building.DisplayName}");
-                UIManager.Instance.OpenBuildingInfo(building);
+                UIManager.Instance.ShowRadial(launcher, screenPos);
                 return;
             }
 
-            // ---------- Field ----------
-            FieldController clickedField = FieldManager.Instance.GetFieldAtPoint(hit.point);
-            if (clickedField != null)
+            // Field hit? (Handled differently - GetFieldAtPoint)
+            FieldController field = FieldManager.Instance.GetFieldAtPoint(hit.point);
+            if (field != null)
             {
-                FieldManager.Instance.SelectField(clickedField);
+                if (field.TryGetComponent<RadialLauncher>(out var fieldLauncher))
+                    UIManager.Instance.ShowRadial(fieldLauncher, screenPos);
+
                 return;
             }
 
-            // ---------- Missed everything ----------
-            FieldManager.Instance.SelectField(null);
-            UIManager.Instance.OpenBuildingInfo(null);
+            // Nothing hit?
+            UIManager.Instance.CloseAll();
         }
-
     }
 }

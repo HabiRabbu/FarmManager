@@ -4,25 +4,31 @@ using Harvey.Farm.Events;
 using Harvey.Farm.Fields;
 using Harvey.Farm.VehicleScripts;
 using Harvey.Farm.Crops;
+using Harvey.Farm.Workers;
 
-namespace Harvey.Farm.JobScripts
+namespace Harvey.Farm.Jobs
 {
     public class JobManager : Singleton<JobManager>
     {
-        public void EnqueueJob(FieldJob j, Vehicle v)
+        public void EnqueueJob(FieldJob j, IJobAgent agent)
         {
-            if (v == null || !v.CanDo(j.Type)) return;
-            if (!j.Field.Needs(j.Type)) return;
+            if (agent == null || !agent.CanDo(j.Type)) return;
 
-            v.JobQueue.Clear();
-            v.JobQueue.Enqueue(j);
+            bool fieldAlreadyBusy = !j.Field.Needs(j.Type);
+            bool agentIsWorker = agent is Worker;
 
-            // --- inline DispatchIfIdle ---
-            if (!v.Stats.IsBusy && v.JobQueue.TryDequeue(out var job))
+            if (fieldAlreadyBusy && !agentIsWorker)
+                return;                                   // tractors get rejected
+
+            agent.JobQueue.Clear();
+            agent.JobQueue.Enqueue(j);
+
+            if (!agent.IsBusy && agent.JobQueue.TryDequeue(out var job))
             {
-                GameEvents.JobStarted(v, job);
-                v.StartTask(job);
+                GameEvents.JobStarted(agent, job);
+                agent.StartTask(job);
             }
         }
+
     }
 }

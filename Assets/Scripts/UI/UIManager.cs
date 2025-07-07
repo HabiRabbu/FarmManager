@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Harvey.Farm.Events;
-using Harvey.Farm.JobScripts;
+using Harvey.Farm.Jobs;
 using Harvey.Farm.VehicleScripts;
 using UnityEngine;
 using Harvey.Farm.Utilities;
@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using Harvey.Farm.Fields;
 using Harvey.Farm.Buildings;
 using UnityEditor.IMGUI.Controls;
+using Harvey.Farm.UI.Radial;
 
 namespace Harvey.Farm.UI
 {
@@ -26,10 +27,18 @@ namespace Harvey.Farm.UI
 
         [Header("Field UI Config")]
         [SerializeField] private GameObject fieldInfoPrefab;
-        [SerializeField] private GameObject fieldMenuPrefab;
+        [SerializeField] private GameObject fieldTractorMenuPrefab;
+        [SerializeField] private GameObject fieldWorkerMenuPrefab;
 
         [Header("Building Info Config")]
         [SerializeField] private GameObject buildingInfoPrefab;
+
+        [Header("Radial Menu Config")]
+        [SerializeField] GameObject radialPrefab;
+
+
+        //Public Getters
+        public Transform CanvasTransform => canvasTransform;
 
 
         //Pools
@@ -37,8 +46,10 @@ namespace Harvey.Farm.UI
         private UIPrefabPool notificationPopupPool;
 
         //Current UI
+        private RadialMenuController radialMenu;
         private UIFieldInfo fieldInfo;
-        private UIFieldMenu fieldMenu;
+        private UITractorMenu fieldTractorMenu;
+        private UIWorkerMenu fieldWorkerMenu;
         private UIBuildingInfo buildingInfo;
 
         protected override void Awake()
@@ -48,54 +59,78 @@ namespace Harvey.Farm.UI
             fadingPopupPool = new UIPrefabPool(fadingTextPopupPrefab, canvasTransform);
             notificationPopupPool = new UIPrefabPool(notificationPopupPrefab, notificationContainer);
 
+            radialMenu = Instantiate(radialPrefab, canvasTransform).GetComponent<RadialMenuController>();
+            radialMenu.gameObject.SetActive(false);
+
             fieldInfo = Instantiate(fieldInfoPrefab, canvasTransform).GetComponent<UIFieldInfo>();
             fieldInfo.gameObject.SetActive(false);
 
-            fieldMenu = Instantiate(fieldMenuPrefab, canvasTransform).GetComponent<UIFieldMenu>();
-            fieldMenu.gameObject.SetActive(false);
+            fieldTractorMenu = Instantiate(fieldTractorMenuPrefab, canvasTransform).GetComponent<UITractorMenu>();
+
+            fieldWorkerMenu = Instantiate(fieldWorkerMenuPrefab, canvasTransform).GetComponent<UIWorkerMenu>();
 
             buildingInfo = Instantiate(buildingInfoPrefab, canvasTransform).GetComponent<UIBuildingInfo>();
             buildingInfo.gameObject.SetActive(false);
 
         }
 
+        #region Event Handlers
         void OnEnable()
         {
+            GameEvents.OnCloseAllUI += CloseAll;
+
             GameEvents.OnShedInventoryChanged += RefreshUI;
-            GameEvents.OnFieldSelected += HandleFieldSelected;
-            GameEvents.OnCloseUI += CloseAll;
 
             GameEvents.OnJobButtonPressed += HandleJobBtn;
             GameEvents.OnJobStarted += HandleJobStarted;
+
             GameEvents.OnFieldCompleted += HandleFieldCompleted;
             GameEvents.OnFieldGrown += HandleFieldGrown;
             GameEvents.OnFieldHarvested += HandleFieldHarvested;
+
+            GameEvents.OnRadialFieldInfoOpened += OpenFieldInfo;
+            GameEvents.OnRadialFieldTractorOpened += OpenTractorJobMenu;
+            GameEvents.OnRadialFieldWorkersOpened += OpenWorkerJobMenu;
+
+            GameEvents.OnRadialBuildingInfoOpened += OpenBuildingInfo;
         }
         void OnDisable()
         {
+            GameEvents.OnCloseAllUI -= CloseAll;
+
             GameEvents.OnShedInventoryChanged -= RefreshUI;
-            GameEvents.OnFieldSelected -= HandleFieldSelected;
-            GameEvents.OnCloseUI -= CloseAll;
 
             GameEvents.OnJobButtonPressed -= HandleJobBtn;
             GameEvents.OnJobStarted -= HandleJobStarted;
+
             GameEvents.OnFieldCompleted -= HandleFieldCompleted;
             GameEvents.OnFieldGrown -= HandleFieldGrown;
             GameEvents.OnFieldHarvested += HandleFieldHarvested;
+
+            GameEvents.OnRadialFieldInfoOpened -= OpenFieldInfo;
+            GameEvents.OnRadialFieldTractorOpened -= OpenTractorJobMenu;
+            GameEvents.OnRadialFieldWorkersOpened -= OpenWorkerJobMenu;
+
+            GameEvents.OnRadialBuildingInfoOpened -= OpenBuildingInfo;
         }
+        #endregion
 
         public void CloseAll()
         {
+            if (radialMenu) radialMenu.gameObject.SetActive(false);
             if (fieldInfo) fieldInfo.gameObject.SetActive(false);
-            if (fieldMenu) fieldMenu.gameObject.SetActive(false);
+            if (fieldTractorMenu) fieldTractorMenu.gameObject.SetActive(false);
+            if (fieldWorkerMenu) fieldWorkerMenu.gameObject.SetActive(false);
             if (buildingInfo) buildingInfo.gameObject.SetActive(false);
+
+            Debug.Log("Hide by CloseAll");
         }
 
         void RefreshUI()
         {
-            if (fieldMenu && fieldMenu.gameObject.activeSelf)
+            if (fieldTractorMenu && fieldTractorMenu.gameObject.activeSelf)
             {
-                fieldMenu.Refresh();
+                fieldTractorMenu.Refresh();
             }
             if (fieldInfo && fieldInfo.gameObject.activeSelf)
             {
@@ -105,33 +140,25 @@ namespace Harvey.Farm.UI
             {
                 buildingInfo.Refresh();
             }
+            if (fieldWorkerMenu && fieldWorkerMenu.gameObject.activeSelf)
+            {
+                fieldWorkerMenu.Refresh();
+                Debug.Log("UIManager.RefreshUI called, fieldWorkerMenu refreshed");
+            }
         }
 
         // -------- Handle UI Events Methods --------
-        void HandleFieldSelected(FieldController f)
-        {
-            if (f)
-            {
-                OpenFieldInfo(f);
-            }
-            else
-            {
-                CloseAll();
-            }
-
-        }
-
         void HandleJobBtn(FieldJob j, Vehicle v)
         {
             JobManager.Instance.EnqueueJob(j, v);
         }
 
-        private void HandleJobStarted(Vehicle v, FieldJob j)
+        private void HandleJobStarted(IJobAgent agent, FieldJob j)
         {
 
             var n = new NotificationData
             (
-                $"{v.Stats.vehicleName} started to {j.Type} on {j.Field.Definition.fieldName}",
+                $"{agent.DisplayName} started to {j.Type} on {j.Field.Definition.fieldName}",
                 textColor: Color.white,
                 backgroundColor: new Color(0.15f, 0.6f, 0.1f),
                 fadeDuration: 4f
@@ -179,6 +206,18 @@ namespace Harvey.Farm.UI
         }
 
         // -------- Show/Open UI Methods --------
+
+        public void ShowRadial(IRadialProvider provider, Vector2 screenPos)
+        {
+            if (provider == null)
+            {
+                CloseAll();
+                return;
+            }
+
+            radialMenu.Show(screenPos, provider.BuildRadialItems());
+        }
+
         public void OpenFieldInfo(FieldController f)
         {
             if (!fieldInfo)
@@ -190,19 +229,32 @@ namespace Harvey.Farm.UI
             fieldInfo.gameObject.SetActive(true);
             fieldInfo.Bind(f);
 
-            if (fieldMenu) fieldMenu.gameObject.SetActive(false);
+            if (fieldTractorMenu) fieldTractorMenu.gameObject.SetActive(false);
+            if (fieldWorkerMenu) fieldWorkerMenu.gameObject.SetActive(false);
         }
 
-        public void OpenFieldMenu(FieldController f)
+        public void OpenTractorJobMenu(FieldController f)
         {
-            if (!fieldMenu)
+            if (!fieldTractorMenu)
             {
                 Debug.LogError("Field Menu UI is not initialized.");
                 return;
             }
 
-            fieldMenu.gameObject.SetActive(true);
-            fieldMenu.Show(f);
+            Debug.Log("UIManager.OpenFieldMenu fired for " + f?.name);
+            fieldTractorMenu.gameObject.SetActive(true);
+            fieldTractorMenu.Show(f);
+        }
+
+        public void OpenWorkerJobMenu(FieldController field)
+        {
+            if (!fieldWorkerMenu)
+            {
+                Debug.LogError("Worker menu not set up"); return;
+            }
+            fieldWorkerMenu.Show(field);
+
+            if (fieldTractorMenu) fieldTractorMenu.gameObject.SetActive(false);
         }
 
         public void OpenBuildingInfo(Building b)

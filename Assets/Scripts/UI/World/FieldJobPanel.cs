@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using DG.Tweening;
-using Harvey.Farm.JobScripts;
+using Harvey.Farm.Jobs;
 
 namespace Harvey.Farm.UI
 {

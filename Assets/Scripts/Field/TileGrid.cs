@@ -117,7 +117,7 @@ namespace Harvey.Farm.Fields
 
                 Vector3 pos = new Vector3(
                     centers[i].x,
-                    groundY - 0.4f, // offset to avoid floating
+                    groundY + 0.1f, // offset
                     centers[i].y);
 
                 var go = Object.Instantiate(tilePrefab, pos, Quaternion.identity, parent);

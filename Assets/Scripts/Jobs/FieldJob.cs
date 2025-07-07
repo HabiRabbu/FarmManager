@@ -1,7 +1,7 @@
 using Harvey.Farm.Crops;
 using Harvey.Farm.Fields;
 
-namespace Harvey.Farm.JobScripts
+namespace Harvey.Farm.Jobs
 {
     public readonly struct FieldJob
     {

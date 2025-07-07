@@ -37,9 +37,9 @@ namespace Harvey.Farm.Buildings
         protected override void Start()
         {
             base.Start();
-            
+
             if (shedDefinition != null)
-                Debug.Log($"Shed initialized: {shedDefinition.DisplayName}");
+                Debug.Log($"Shed initialised: {shedDefinition.DisplayName}");
             SpawnInitialImplements();
         }
 
@@ -100,5 +100,9 @@ namespace Harvey.Farm.Buildings
                     return anchor;
             return transform;
         }
+
+        // ---------- Radial Menu Support ----------
+        public void RadialOpenBuildingInfo() => GameEvents.RadialBuildingInfoOpened(this);
+        // -------------------------------------------
     }
 }

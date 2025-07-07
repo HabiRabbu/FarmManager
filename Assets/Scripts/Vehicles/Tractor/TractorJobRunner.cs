@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Harvey.Farm.Buildings;
 using Harvey.Farm.Implements;
-using Harvey.Farm.JobScripts;
+using Harvey.Farm.Jobs;
+using Harvey.Farm.Movement;
 using Harvey.Farm.VehicleScripts;
 using UnityEngine;
 
@@ -11,13 +12,13 @@ public class TractorJobRunner : MonoBehaviour
 {
     ImplementHandler _tools;
     Vehicle _vehicle;
-    Mover _mover;
+    TractorMover _mover;
 
     void Awake()
     {
         _tools = GetComponent<ImplementHandler>();
         _vehicle = GetComponent<Vehicle>();
-        _mover = GetComponent<Mover>();
+        _mover = GetComponent<TractorMover>();
     }
 
     public void Run(FieldJob job) => StartCoroutine(RunJobs(job));

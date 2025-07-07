@@ -1,6 +1,7 @@
 using System.Collections;
 using Harvey.Farm.Buildings;
 using Harvey.Farm.Implements;
+using Harvey.Farm.Movement;
 using Harvey.Farm.VehicleScripts;
 using UnityEngine;
 
@@ -18,7 +19,7 @@ public class ImplementHandler : MonoBehaviour
         var shed = BuildingManager.Instance.GetNearestShed(transform.position);
         if (!shed) yield break;
 
-        var mover = GetComponent<Mover>();
+        var mover = GetComponent<TractorMover>();
         yield return mover.MoveTo(shed.transform.position);
 
         ImplementBehaviour implement;
@@ -37,7 +38,7 @@ public class ImplementHandler : MonoBehaviour
     {
         if (!_currentImplement) yield break;
         var shed = BuildingManager.Instance.GetNearestShed(transform.position);
-        yield return GetComponent<Mover>().MoveTo(shed.transform.position);
+        yield return GetComponent<TractorMover>().MoveTo(shed.transform.position);
         shed.ReturnImplement(_currentImplement);
         _currentImplement = null;
     }

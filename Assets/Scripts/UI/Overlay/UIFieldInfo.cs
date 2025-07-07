@@ -74,6 +74,6 @@ public class UIFieldInfo : MonoBehaviour
     /* ---------- Button ---------- */
     public void OnJobMenuClicked()
     {
-        UIManager.Instance.OpenFieldMenu(boundField);
+        UIManager.Instance.OpenTractorJobMenu(boundField);
     }
 }

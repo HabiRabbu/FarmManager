@@ -3,12 +3,12 @@ using Harvey.Farm.Fields;
 using System.Collections;
 using System.Collections.Generic;
 using Harvey.Farm.Events;
-using Harvey.Farm.JobScripts;
+using Harvey.Farm.Jobs;
 using DG.Tweening;
 
 namespace Harvey.Farm.VehicleScripts
 {
-    public abstract class Vehicle : MonoBehaviour
+    public abstract class Vehicle : MonoBehaviour, IJobAgent
     {
         public FieldController CurrentField { get; protected set; }
         public Queue<FieldJob> JobQueue { get; } = new();
@@ -38,5 +38,6 @@ namespace Harvey.Farm.VehicleScripts
             GameEvents.VehicleBusyChanged(this, value);
         }
 
+        public void Enqueue(FieldJob job) => JobQueue.Enqueue(job);
     }
 }

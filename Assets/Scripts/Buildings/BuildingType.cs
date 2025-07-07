@@ -1,1 +1,1 @@
-public enum BuildingType { ImplementStorage, TractorStorage, RawCropStorage }
+public enum BuildingType { ImplementStorage, TractorStorage, RawCropStorage, WorkerHousing }
