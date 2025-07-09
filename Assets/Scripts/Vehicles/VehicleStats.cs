@@ -1,32 +1,65 @@
+using System;
+using Harvey.Farm.Buildings;
 using UnityEngine;
 
 [DisallowMultipleComponent]
 public class VehicleStats : MonoBehaviour
 {
     [SerializeField] VehicleDefinition definition;
-
-    // ------------- Immutable “read-only” -------------
     public VehicleDefinition Def => definition;
 
-    // ------------- Mutable per-instance --------------
-    public string vehicleName = "Vehicle";
-    public bool IsBusy { get; protected set; }
-    public float moveSpeed = 2f;
-    public float fuel = 100f;
-    public float durability = 100f;
-    public float price = 100f;
-    public float capacity = 100f;
+    string id = string.Empty;
+    public string Id => id;
+
+    private GarageBuilding Home;
+
+    public GarageBuilding GetHome() => Home;
+    public void SetHome(GarageBuilding house) => Home = house;
+
+    private bool isInitialised = false;
+
+
+    /* ---------- Tunable stats ---------- */
+    [field: SerializeField] public string DisplayName { get; private set; } = "Vehicle";
+    [field: SerializeField] public Sprite Icon { get; private set; } = null;
+    [field: SerializeField] public float MoveSpeed { get; private set; } = 2f;
+    [field: SerializeField] public float Fuel { get; private set; } = 100f;
+    [field: SerializeField] public float Durability { get; private set; } = 100f;
+    [field: SerializeField] public float Price { get; private set; } = 100f;
+    [field: SerializeField] public float Capacity { get; private set; } = 100f;
+
+    public bool IsBusy { get; private set; }
 
     void Awake()
     {
-        vehicleName = definition.DisplayName;
-        moveSpeed = definition.MoveSpeed;
-        capacity = definition.Capacity;
-        price = definition.Price;
+        if (string.IsNullOrEmpty(id))
+            id = Guid.NewGuid().ToString("N");
+
+        if (definition == null)
+        {
+            return;
+        }
+        DisplayName = definition.DisplayName;
+        MoveSpeed = definition.MoveSpeed;
+        Capacity = definition.Capacity;
+        Price = definition.Price;
+
+        isInitialised = true;
     }
 
-    public void SetBusy(bool value)
+    public void Init(VehicleDefinition def, GarageBuilding origin)
     {
-        IsBusy = value;
+        if (isInitialised)
+        {
+            Debug.LogWarning("VehicleStats is already initialised. Reinitialisation may cause issues.");
+            return;
+        }
+
+        definition = def ?? throw new ArgumentNullException(nameof(def), "VehicleDefinition cannot be null.");
+        Awake();
+
+        Home = origin;
     }
+
+    public void SetBusy(bool value) => IsBusy = value;
 }

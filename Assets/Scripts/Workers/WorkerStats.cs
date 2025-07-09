@@ -1,3 +1,5 @@
+using System;
+using Harvey.Farm.Buildings;
 using UnityEngine;
 
 namespace Harvey.Farm.Workers
@@ -6,12 +8,24 @@ namespace Harvey.Farm.Workers
     public class WorkerStats : MonoBehaviour
     {
         [SerializeField] WorkerDefinition definition;
-
         public WorkerDefinition Def => definition;
+        string id = string.Empty;
+        public string Id => id;
 
+        private HouseBuilding Home;
+        public HouseBuilding GetHome() => Home;
+        public void SetHome(HouseBuilding house) => Home = house;
+
+        /* ---------- Tunable stats ---------- */
         public string WorkerName { get; private set; }
         public float WalkSpeed { get; private set; }
         public bool IsBusy { get; private set; }
+
+        void Awake()
+        {
+            if (string.IsNullOrEmpty(id))
+                id = Guid.NewGuid().ToString("N");
+        }
 
         public void SetBusy(bool value) => IsBusy = value;
 
@@ -20,7 +34,7 @@ namespace Harvey.Farm.Workers
             this.definition = def;
             WorkerName = def.DisplayName;
             //WalkSpeed = def.WalkSpeed;
-            WalkSpeed = Random.Range(1f, 3f); // Temporary random speed for testing TODO: Change this to use the definition's speed
+            WalkSpeed = UnityEngine.Random.Range(1f, 3f); // Temporary random speed for testing TODO: Change this to use the definition's speed
         }
 
         public float GetActionDuration(JobType type)

@@ -18,11 +18,11 @@ namespace Harvey.Farm.VehicleScripts
         }
 
         public override bool CanDo(JobType type) =>
-            (type is JobType.Harvest) && !Stats.IsBusy && Stats.Def.Type == VehicleType.CombineHarvester;
+            (type is JobType.Harvest) && !_stats.IsBusy && _stats.Def.Type == VehicleType.CombineHarvester;
 
         public override void StartTask(FieldJob job)
         {
-            if (Stats.IsBusy || !CanDo(job.Type)) return;
+            if (_stats.IsBusy || !CanDo(job.Type)) return;
 
             SetBusy(true);
             CurrentField = job.Field;

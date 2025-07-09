@@ -8,6 +8,7 @@ namespace Harvey.Farm.Movement
     {
         IEnumerator MoveTo   (Vector3 worldPos);
         IEnumerator MoveAlong(List<Vector3> waypoints, System.Action<int> onArrive);
+        IEnumerator ReturnToHome ();
         void        TeleportTo(Vector3 worldPos);
     }
 }

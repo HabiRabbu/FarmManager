@@ -524,7 +524,9 @@ MonoBehaviour:
   txtBody: {fileID: 2715145243504107}
   btnClose: {fileID: 6481997133213915985}
   slotContainer: {fileID: 3916934441614894026}
-  slotPrefab: {fileID: 6238197208808405126, guid: 9b2ee84955aa6d64db4a6f5291e8e70e, type: 3}
+  ImplementSlotPrefab: {fileID: 6238197208808405126, guid: 9b2ee84955aa6d64db4a6f5291e8e70e, type: 3}
+  VehicleSlotPrefab: {fileID: 5098592383985026384, guid: 890af99398568294f9471592067526f0, type: 3}
+  WorkerSlotPrefab: {fileID: 6052888780155013726, guid: 338433a91e61acf4eb0568186314aaa8, type: 3}
   defaultMaxSlots: 6
 --- !u!1 &7082298569481551869
 GameObject:
@@ -539,7 +541,7 @@ GameObject:
   - component: {fileID: 3080838949271899282}
   - component: {fileID: 4860164985376041859}
   m_Layer: 5
-  m_Name: ImplementSection
+  m_Name: ContentSection
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -619,7 +621,7 @@ MonoBehaviour:
     m_Right: 5
     m_Top: 7
     m_Bottom: 0
-  m_ChildAlignment: 2
+  m_ChildAlignment: 1
   m_Spacing: 18
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0

@@ -60,7 +60,7 @@ namespace Harvey.Farm.Buildings
                 reserved.Remove(id);
                 stock.Remove(id);
 
-                GameEvents.ShedInventoryChanged();
+                GameEvents.BuildingStatsChanged();
                 return true;
             }
             implement = null;
@@ -76,7 +76,7 @@ namespace Harvey.Farm.Buildings
             var anchor = GetFreeAnchor();
             implement.AttachTo(anchor);
 
-            GameEvents.ShedInventoryChanged();
+            GameEvents.BuildingStatsChanged();
         }
 
         // ---------- Internal ----------

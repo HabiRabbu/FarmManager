@@ -21,8 +21,8 @@ namespace Harvey.Farm.Movement
         {
             for (int i = 0; i < wps.Count; i++)
             {
-                float dist  = Vector3.Distance(rootTransform.position, wps[i]);
-                float time  = dist / stats.moveSpeed;
+                float dist = Vector3.Distance(rootTransform.position, wps[i]);
+                float time = dist / stats.MoveSpeed;
 
                 var seq = DOTween.Sequence()
                     .Join(YawLookAt(wps[i], time * 0.3f))
@@ -31,6 +31,20 @@ namespace Harvey.Farm.Movement
                 yield return seq.WaitForCompletion();
                 onArrive?.Invoke(i);
             }
+        }
+
+        public override IEnumerator ReturnToHome()
+        {
+            var homePos = stats.GetHome().transform.position;
+
+            float dist = Vector3.Distance(rootTransform.position, homePos);
+            float time = dist / stats.MoveSpeed;
+
+            var seq = DOTween.Sequence()
+                .Join(YawLookAt(homePos, time * 0.3f))
+                .Join(TranslateTo(homePos, time));
+
+            yield return seq.WaitForCompletion();
         }
     }
 }

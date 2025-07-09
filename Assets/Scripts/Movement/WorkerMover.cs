@@ -39,4 +39,17 @@ public class WorkerMover : BaseMover
         anim.SetBool(isMovingHash, false);
         anim.speed = originalSpeed;
     }
+
+    public override IEnumerator ReturnToHome()
+    {
+        anim.SetBool(isMovingHash, true);
+
+        var homePos = stats.GetHome().transform.position;
+        float dist = Vector3.Distance(rootTransform.position, homePos);
+        float time = dist / stats.WalkSpeed;
+
+        yield return TranslateTo(homePos, time).WaitForCompletion();
+
+        anim.SetBool(isMovingHash, false);
+    }
 }

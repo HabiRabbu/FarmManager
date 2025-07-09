@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Harvey.Farm.Events;
 using Harvey.Farm.Factory;
 using Harvey.Farm.Workers;
@@ -11,13 +12,17 @@ namespace Harvey.Farm.Buildings
     {
         [SerializeField] HouseDefinition houseDefinition;
         public override BuildingDefinition Definition => houseDefinition;
+        public HouseDefinition HouseDefinition => houseDefinition;
 
         [SerializeField, Min(0f)] float spawnRadius = 1f;
 
         readonly List<Worker> occupants = new();
-        readonly Queue<Worker> idlePool = new();
+        readonly HashSet<Worker> idlePool = new();
 
         [SerializeField] Transform spawnPoint; // Anchor for worker spawning
+
+        //Getters for UI and other systems
+        public int Capacity => houseDefinition.Capacity;
 
         protected override void Start()
         {
@@ -36,7 +41,7 @@ namespace Harvey.Farm.Buildings
         {
             if (!HasVacancy) return false;
             occupants.Add(w);
-            idlePool.Enqueue(w);
+            idlePool.Add(w);
             w.gameObject.SetActive(false);
             return true;
         }
@@ -45,7 +50,9 @@ namespace Harvey.Farm.Buildings
         {
             if (idlePool.Count > 0)
             {
-                worker = idlePool.Dequeue();
+                worker = idlePool.FirstOrDefault();
+
+                idlePool.Remove(worker);
                 DeployWorker(worker);
                 return true;
             }
@@ -55,11 +62,12 @@ namespace Harvey.Farm.Buildings
 
         public IEnumerable<Worker> GetIdleWorkers() => idlePool;
 
-        public void Reclaim(Worker w)
+        public void ReturnWorker(Worker w)
         {
-            w.transform.SetParent(transform);
+            if (!idlePool.Add(w)) return;
             w.gameObject.SetActive(false);
-            idlePool.Enqueue(w);
+            w.transform.SetParent(transform);
+            GameEvents.BuildingStatsChanged();
         }
 
         // ---------- Internal ----------------------------------------------
@@ -79,6 +87,9 @@ namespace Harvey.Farm.Buildings
 
         public void DeployWorker(Worker w)
         {
+            if (idlePool.Contains(w))
+                idlePool.Remove(w);
+
             Vector2 offset = Random.insideUnitCircle * spawnRadius;
             Vector3 pos = (spawnPoint ? spawnPoint.position : transform.position) +
                           new Vector3(offset.x, 0f, offset.y);

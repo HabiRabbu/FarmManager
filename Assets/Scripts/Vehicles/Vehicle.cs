@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Harvey.Farm.Events;
 using Harvey.Farm.Jobs;
 using DG.Tweening;
+using Harvey.Farm.Buildings;
 
 namespace Harvey.Farm.VehicleScripts
 {
@@ -17,14 +18,18 @@ namespace Harvey.Farm.VehicleScripts
         public abstract void StartTask(FieldJob job);
 
         // Cache
-        public VehicleStats Stats { get; private set; }
+        public VehicleStats _stats { get; private set; }
 
-        public bool IsBusy => Stats.IsBusy;
-        public string DisplayName => Stats.vehicleName;
+        public bool IsBusy => _stats.IsBusy;
+        public string Id => _stats.Id;
+        public string DisplayName => _stats.DisplayName;
+
+        public GarageBuilding Home => _stats.GetHome();
+        public void SetHome(GarageBuilding home) => _stats.SetHome(home);
 
         protected virtual void Awake()
         {
-            Stats = GetComponent<VehicleStats>();
+            _stats = GetComponent<VehicleStats>();
         }
 
         protected virtual void Start()
@@ -34,10 +39,25 @@ namespace Harvey.Farm.VehicleScripts
 
         public void SetBusy(bool value)
         {
-            Stats.SetBusy(value);
+            _stats.SetBusy(value);
             GameEvents.VehicleBusyChanged(this, value);
         }
 
         public void Enqueue(FieldJob job) => JobQueue.Enqueue(job);
+
+        public void AttachTo(Transform anchor)
+        {
+            transform.SetParent(anchor, false);
+            transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
+        }
+
+        public void Detach() => transform.SetParent(null, true);
+
+        public void ReturnHome()
+        {
+            Home.ReturnVehicle(this);
+        }
+
     }
 }

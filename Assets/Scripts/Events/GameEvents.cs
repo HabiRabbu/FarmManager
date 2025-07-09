@@ -34,8 +34,8 @@ namespace Harvey.Farm.Events
         public static void JobStarted(IJobAgent jobAgent, FieldJob fieldJob) => OnJobStarted?.Invoke(jobAgent, fieldJob);
 
         // *------------------- Buildings -------------------*
-        public static event Action OnShedInventoryChanged;
-        public static void ShedInventoryChanged() => OnShedInventoryChanged?.Invoke();
+        public static event Action OnBuildingStatsChanged;
+        public static void BuildingStatsChanged() => OnBuildingStatsChanged?.Invoke();
 
         // *------------------- Debug -------------------*
         public static event Action<bool> OnDebugModeToggled;

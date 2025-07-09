@@ -34,12 +34,12 @@ namespace Harvey.Farm.VehicleScripts
 
         public Vehicle GetAvailableVehicle()
         {
-            return vehicles.Find(v => !v.Stats.IsBusy);
+            return vehicles.Find(v => !v._stats.IsBusy);
         }
 
         public T GetAvailableVehicle<T>() where T : Vehicle
         {
-            return vehicles.Find(v => v is T && !v.Stats.IsBusy) as T;
+            return vehicles.Find(v => v is T && !v._stats.IsBusy) as T;
         }
     }
 }

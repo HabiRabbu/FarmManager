@@ -37,8 +37,8 @@ public class TractorJobRunner : MonoBehaviour
 
             /* 3. serpentine drive */
             var serp = field.GetSerpentineTiles();
-                var waypoints = new List<Vector3>(serp.Length);
-                foreach (var t in serp) waypoints.Add(t.WorldPosition);
+            var waypoints = new List<Vector3>(serp.Length);
+            foreach (var t in serp) waypoints.Add(t.WorldPosition);
 
             System.Action<int> perTile = job.Type switch
             {
@@ -53,6 +53,10 @@ public class TractorJobRunner : MonoBehaviour
 
             /* 4. clean-up */
             yield return _tools.Return();
+
+            /* 5. Return Home */
+            yield return _mover.ReturnToHome();
+            _vehicle.ReturnHome();
         }
         while (_vehicle.JobQueue.TryDequeue(out job));
 

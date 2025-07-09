@@ -41,7 +41,6 @@ namespace Harvey.Farm.Implements
         public void ApplyWear(float amount) =>
             currentDurability = Mathf.Max(0, currentDurability - amount);
 
-        /* attach to tractor */
         public void AttachTo(Transform hitch)
         {
             transform.SetParent(hitch, false);
@@ -49,7 +48,6 @@ namespace Harvey.Farm.Implements
             transform.localRotation = Quaternion.identity;
         }
 
-        /* detach & send back */
         public void Detach()
         {
             transform.SetParent(null, true);

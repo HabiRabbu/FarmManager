@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ef1b046429d74e47802f4635168a6a2, type: 3}
+  m_Name: TestGarage
+  m_EditorClassIdentifier: 
+  <DisplayName>k__BackingField: Test Garage
+  <Icon>k__BackingField: {fileID: 0}
+  <Price>k__BackingField: 35000
+  <Type>k__BackingField: 1
+  <ModelPrefab>k__BackingField: {fileID: 527139791160972024, guid: ce767f1c76036fe4086fa4782e4fcf0d, type: 3}
+  <VehicleSlots>k__BackingField: 2
+  <Preload>k__BackingField:
+  - {fileID: 11400000, guid: e1cbd60b558d4594b9cddb23aa5cdf97, type: 2}
+  - {fileID: 11400000, guid: bff58723125c98240b61e02a65336c68, type: 2}

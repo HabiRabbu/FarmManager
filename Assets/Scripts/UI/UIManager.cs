@@ -79,7 +79,7 @@ namespace Harvey.Farm.UI
         {
             GameEvents.OnCloseAllUI += CloseAll;
 
-            GameEvents.OnShedInventoryChanged += RefreshUI;
+            GameEvents.OnBuildingStatsChanged += RefreshUI;
 
             GameEvents.OnJobButtonPressed += HandleJobBtn;
             GameEvents.OnJobStarted += HandleJobStarted;
@@ -98,7 +98,7 @@ namespace Harvey.Farm.UI
         {
             GameEvents.OnCloseAllUI -= CloseAll;
 
-            GameEvents.OnShedInventoryChanged -= RefreshUI;
+            GameEvents.OnBuildingStatsChanged -= RefreshUI;
 
             GameEvents.OnJobButtonPressed -= HandleJobBtn;
             GameEvents.OnJobStarted -= HandleJobStarted;
@@ -143,7 +143,6 @@ namespace Harvey.Farm.UI
             if (fieldWorkerMenu && fieldWorkerMenu.gameObject.activeSelf)
             {
                 fieldWorkerMenu.Refresh();
-                Debug.Log("UIManager.RefreshUI called, fieldWorkerMenu refreshed");
             }
         }
 

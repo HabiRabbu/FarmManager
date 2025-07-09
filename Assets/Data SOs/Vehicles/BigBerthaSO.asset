@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <DisplayName>k__BackingField: Big Bertha
   <Type>k__BackingField: 3
-  <ModelPrefab>k__BackingField: {fileID: 919132149155446097, guid: 0c8a8c61bfac4ee48ac32ff246d7e2c2, type: 3}
+  <ModelPrefab>k__BackingField: {fileID: 3986250216646725534, guid: acfa1f14d9bc370459c67afb9c039ae1, type: 3}
   <MoveSpeed>k__BackingField: 50
   <Capacity>k__BackingField: 1000
   <Price>k__BackingField: 200000

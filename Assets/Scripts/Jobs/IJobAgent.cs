@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,5 +17,7 @@ namespace Harvey.Farm.Jobs
         void StartTask(FieldJob job);
 
         Transform transform { get; }
+
+        void ReturnHome();
     }
 }

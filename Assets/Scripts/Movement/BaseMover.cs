@@ -16,8 +16,9 @@ public abstract class BaseMover : MonoBehaviour, IMover
     public virtual IEnumerator MoveTo(Vector3 wp)
         => MoveAlong(new List<Vector3> { wp }, null);
 
-    public abstract IEnumerator MoveAlong(List<Vector3> waypoints,
-                                          System.Action<int> onArrive);
+    public abstract IEnumerator MoveAlong(List<Vector3> waypoints, System.Action<int> onArrive);
+
+    public abstract IEnumerator ReturnToHome();
 
     public virtual void TeleportTo(Vector3 pos) =>
         rootTransform.position = pos;
