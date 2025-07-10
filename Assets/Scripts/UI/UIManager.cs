@@ -10,6 +10,7 @@ using Harvey.Farm.Fields;
 using Harvey.Farm.Buildings;
 using UnityEditor.IMGUI.Controls;
 using Harvey.Farm.UI.Radial;
+using Harvey.Farm.Factory;
 
 namespace Harvey.Farm.UI
 {
@@ -56,20 +57,17 @@ namespace Harvey.Farm.UI
         {
             base.Awake();
 
-            fadingPopupPool = new UIPrefabPool(fadingTextPopupPrefab, canvasTransform);
-            notificationPopupPool = new UIPrefabPool(notificationPopupPrefab, notificationContainer);
-
-            radialMenu = Instantiate(radialPrefab, canvasTransform).GetComponent<RadialMenuController>();
+            radialMenu = UIFactory.Instance.Spawn(radialPrefab, canvasTransform).GetComponent<RadialMenuController>();
             radialMenu.gameObject.SetActive(false);
 
-            fieldInfo = Instantiate(fieldInfoPrefab, canvasTransform).GetComponent<UIFieldInfo>();
+            fieldInfo = UIFactory.Instance.Spawn(fieldInfoPrefab, canvasTransform).GetComponent<UIFieldInfo>();
             fieldInfo.gameObject.SetActive(false);
 
-            fieldTractorMenu = Instantiate(fieldTractorMenuPrefab, canvasTransform).GetComponent<UITractorMenu>();
+            fieldTractorMenu = UIFactory.Instance.Spawn(fieldTractorMenuPrefab, canvasTransform).GetComponent<UITractorMenu>();
 
-            fieldWorkerMenu = Instantiate(fieldWorkerMenuPrefab, canvasTransform).GetComponent<UIWorkerMenu>();
+            fieldWorkerMenu = UIFactory.Instance.Spawn(fieldWorkerMenuPrefab, canvasTransform).GetComponent<UIWorkerMenu>();
 
-            buildingInfo = Instantiate(buildingInfoPrefab, canvasTransform).GetComponent<UIBuildingInfo>();
+            buildingInfo = UIFactory.Instance.Spawn(buildingInfoPrefab, canvasTransform).GetComponent<UIBuildingInfo>();
             buildingInfo.gameObject.SetActive(false);
 
         }
@@ -195,7 +193,7 @@ namespace Harvey.Farm.UI
         {
             var n = new NotificationData
             (
-                $"{field.currentCrop.cropName} on {field.Definition.fieldName} has been harvested.",
+                $"{field.currentCrop.DisplayName} on {field.Definition.fieldName} has been harvested.",
                 textColor: Color.white,
                 backgroundColor: Colors.COLOR_TEAL,
                 fadeDuration: 6f
@@ -274,16 +272,16 @@ namespace Harvey.Farm.UI
 
         public void ShowCentrePopup(in FadingPopupData data)
         {
-            var go = fadingPopupPool.UIGetOrInstantiate();
+            var go = UIFactory.Instance.Spawn(fadingTextPopupPrefab, canvasTransform);
             var popup = go.GetComponent<FadingPopupText>();
-            popup.Show(data, () => fadingPopupPool.UIRelease(go));
+            popup.Show(data, () => UIFactory.Instance.Despawn(fadingTextPopupPrefab, go));
         }
 
         public void ShowNotification(in NotificationData data)
         {
-            var go = notificationPopupPool.UIGetOrInstantiate();
+            var go = UIFactory.Instance.Spawn(notificationPopupPrefab, notificationContainer);
             var popup = go.GetComponent<NotificationPopup>();
-            popup.Setup(data, () => notificationPopupPool.UIRelease(go));
+            popup.Setup(data, () => UIFactory.Instance.Despawn(notificationPopupPrefab, go));
         }
     }
 }

@@ -1,8 +1,8 @@
 using TMPro;
 using UnityEngine;
 using Harvey.Farm.Events;
-using Harvey.Farm.Crops;
 using Harvey.Farm.Factory;
+using Harvey.Data.Coffee;
 
 namespace Harvey.Farm.Fields
 {
@@ -15,7 +15,7 @@ namespace Harvey.Farm.Fields
         [SerializeField] private Material plowedMat;
         public Transform cropAnchor;
         GameObject cropInstance;
-        CropDefinition currentCrop;
+        CoffeeCropData currentCrop;
         int currentStage = -1;
 
         [SerializeField] public int GridX { get; private set; }
@@ -62,7 +62,7 @@ namespace Harvey.Farm.Fields
             GameEvents.TilePlowed(this);
         }
 
-        public void Seed(CropDefinition crop)
+        public void Seed(CoffeeCropData crop)
         {
             if (IsSeeded) return;
 

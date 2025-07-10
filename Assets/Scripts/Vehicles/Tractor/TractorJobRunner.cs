@@ -53,13 +53,12 @@ public class TractorJobRunner : MonoBehaviour
 
             /* 4. clean-up */
             yield return _tools.Return();
-
-            /* 5. Return Home */
-            yield return _mover.ReturnToHome();
-            _vehicle.ReturnHome();
         }
         while (_vehicle.JobQueue.TryDequeue(out job));
 
+        /* 5. Return Home */
+        yield return _mover.ReturnToHome();
         _vehicle.SetBusy(false);
+        _vehicle.ReturnHome();
     }
 }

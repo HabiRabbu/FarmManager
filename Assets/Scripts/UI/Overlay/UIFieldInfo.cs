@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Harvey.Farm.VehicleScripts;
 using Harvey.Farm.Events;
 using Harvey.Farm.UI;
-using Harvey.Farm.Crops;
+using Harvey.Data.Coffee;
 
 public class UIFieldInfo : MonoBehaviour
 {
@@ -20,7 +20,7 @@ public class UIFieldInfo : MonoBehaviour
     FieldController boundField;
 
     System.Action<FieldTile> onPlowed, onHarvested;
-    System.Action<FieldTile, CropDefinition> onSeeded;
+    System.Action<FieldTile, CoffeeCropData> onSeeded;
     System.Action<FieldController> onGrown, onComplete;
 
     void Awake()

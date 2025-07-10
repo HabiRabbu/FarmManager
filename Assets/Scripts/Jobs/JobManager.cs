@@ -3,7 +3,6 @@ using UnityEngine;
 using Harvey.Farm.Events;
 using Harvey.Farm.Fields;
 using Harvey.Farm.VehicleScripts;
-using Harvey.Farm.Crops;
 using Harvey.Farm.Workers;
 
 namespace Harvey.Farm.Jobs

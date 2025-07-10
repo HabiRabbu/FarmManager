@@ -1,6 +1,5 @@
+using Harvey.Data.Coffee;
 using UnityEngine;
-using Harvey.Farm.Utilities;  // PoolManager
-using Harvey.Farm.Crops;
 
 namespace Harvey.Farm.Factory
 {
@@ -10,35 +9,29 @@ namespace Harvey.Farm.Factory
     /// </summary>
     public class CropFactory : Singleton<CropFactory>, ICropFactory
     {
-        PoolManager pool;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            pool = PoolManager.Instance;
-        }
+        [SerializeField] PrefabRegistry coffeeRegistry;
 
         /* -------- ICropFactory -------- */
-        public GameObject Spawn(CropDefinition crop, Transform parent, Vector3 localOrWorldPos)
+        public GameObject Spawn(CoffeeCropData crop, Transform parent, Vector3 pos)
         {
-            if (pool == null) pool = PoolManager.Instance;
-
-            var go = pool.GetOrInstantiate(crop.cropPrefab, parent);
-
-            if (parent != null)
+            var prefab = coffeeRegistry.Get(crop.PrefabGuid);
+            if (!prefab)
             {
-                go.transform.SetLocalPositionAndRotation(localOrWorldPos, Quaternion.identity); // Local Space
+                Debug.LogError($"CropFactory: prefab GUID '{crop.PrefabGuid}' not found");
+                return null;
             }
-            else
-            {
-                go.transform.SetPositionAndRotation(localOrWorldPos, Quaternion.identity); // World Space
-            }
-
-            go.transform.localScale = Vector3.one;
-            return go;
+            return FactoryHelpers.SpawnInternal(prefab, parent, pos);
         }
 
-        public void Despawn(CropDefinition crop, GameObject instance)
-            => pool.Release(crop.cropPrefab, instance);
+        public void Despawn(CoffeeCropData crop, GameObject inst)
+        {
+            var prefab = coffeeRegistry.Get(crop.PrefabGuid);
+            FactoryHelpers.DespawnInternal(prefab, inst);
+        }
+
+        public GameObject Spawn(GameObject prefab, Transform parent, Vector3 pos) =>
+            FactoryHelpers.SpawnInternal(prefab, parent, pos);
+        public void Despawn(GameObject prefab, GameObject inst) =>
+            FactoryHelpers.DespawnInternal(prefab, inst);
     }
 }

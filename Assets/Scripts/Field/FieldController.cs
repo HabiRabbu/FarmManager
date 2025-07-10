@@ -1,5 +1,5 @@
 using System.Collections;
-using Harvey.Farm.Crops;
+using Harvey.Data.Coffee;
 using Harvey.Farm.Events;
 using UnityEngine;
 
@@ -8,7 +8,7 @@ namespace Harvey.Farm.Fields
     public class FieldController : MonoBehaviour
     {
         public FieldDefinition definition;
-        public CropDefinition currentCrop;
+        public CoffeeCropData currentCrop;
         public State currentState = State.Idle;
 
         FieldBuilder builder;
@@ -55,7 +55,7 @@ namespace Harvey.Farm.Fields
             HandleTileCompleted();
         }
 
-        void HandleTileSeeded(FieldTile tile, CropDefinition crop)
+        void HandleTileSeeded(FieldTile tile, CoffeeCropData crop)
         {
             if (tile.transform.parent != transform) return;
             HandleTileCompleted();
@@ -75,7 +75,7 @@ namespace Harvey.Farm.Fields
             _ => false
         };
 
-        public void BeginJob(JobType job, CropDefinition crop = null)
+        public void BeginJob(JobType job, CoffeeCropData crop = null)
         {
             currentState = job switch
             {
@@ -150,7 +150,7 @@ namespace Harvey.Farm.Fields
         {
             currentState = State.Growing;
 
-            float step = currentCrop.growSeconds / 2f;
+            float step = currentCrop.GrowSeconds / 2f;
             yield return new WaitForSeconds(step);
             foreach (var t in builder.Tiles) t.SetStage(1);
             yield return new WaitForSeconds(step);

@@ -7,7 +7,7 @@ using Harvey.Farm.Fields;
 using Harvey.Farm.Jobs;
 using Harvey.Farm.Events;
 using Harvey.Farm.Workers;
-using Harvey.Farm.Crops;
+using Harvey.Data.Coffee;
 
 public class UIWorkerMenu : MonoBehaviour
 {
@@ -30,7 +30,6 @@ public class UIWorkerMenu : MonoBehaviour
     [SerializeField] TMP_Dropdown dpnCropSelectSeed;
     [SerializeField] TMP_Text txtCropSelectSeed;
     [SerializeField] GameObject seedMenu;
-    [SerializeField] private CropRegistry cropRegistry;
 
     FieldController field;
     JobType currentTask;
@@ -39,6 +38,7 @@ public class UIWorkerMenu : MonoBehaviour
     readonly List<Worker> selectedWorkers = new();
     readonly List<GameObject> idleIcons = new();
     readonly List<GameObject> selIcons = new();
+    List<CoffeeCropData> cropChoices = new();
 
     void Start()
     {
@@ -97,8 +97,10 @@ public class UIWorkerMenu : MonoBehaviour
     void PopulateCrops()
     {
         dpnCropSelectSeed.ClearOptions();
-        var cropNames = cropRegistry.crops
-                         .Select(c => c.cropName).ToList();
+
+        cropChoices = CoffeeManager.Instance.GetAllCoffeeCrops().ToList();
+        var cropNames = cropChoices.Select(c => c.DisplayName).ToList();
+
         dpnCropSelectSeed.AddOptions(cropNames);
         dpnCropSelectSeed.value = 0;
     }
@@ -168,13 +170,14 @@ public class UIWorkerMenu : MonoBehaviour
 
     void OnGoClicked()
     {
-        CropDefinition crop = currentTask == JobType.Seed
-            ? cropRegistry.crops[dpnCropSelectSeed.value]
+        CoffeeCropData selectedCrop =
+            currentTask == JobType.Seed && dpnCropSelectSeed.value >= 0
+            ? cropChoices[dpnCropSelectSeed.value]
             : null;
 
         foreach (var w in selectedWorkers)
         {
-            var job = new FieldJob(field, currentTask, crop: crop);
+            var job = new FieldJob(field, currentTask, selectedCrop);
             JobManager.Instance.EnqueueJob(job, w);
         }
         Hide();

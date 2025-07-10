@@ -1,7 +1,6 @@
 using Harvey.Farm.Events;
 using Harvey.Farm.Fields;
 using Harvey.Farm.Jobs;
-using Harvey.Farm.Crops;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Harvey.Farm.Implements;
 using Harvey.Farm.Buildings;
+using Harvey.Data.Coffee;
 
 public class UITractorMenu : MonoBehaviour
 {
@@ -39,12 +39,11 @@ public class UITractorMenu : MonoBehaviour
     [SerializeField] private TMP_Dropdown dpnTractorSelectHarvest;
     [SerializeField] private TMP_Text textTractorSelectHarvest;
 
-
-    [SerializeField] private CropRegistry cropRegistry;
     FieldController field;
     JobType selectedTask;
     List<Vehicle> idleTractors = new();
     List<ImplementBehaviour> implementChoices = new();
+    List<CoffeeCropData> cropChoices = new();
 
     void Start()
     {
@@ -70,6 +69,7 @@ public class UITractorMenu : MonoBehaviour
     public void Refresh()
     {
         if (!field) return;
+
 
         switch (selectedTask)
         {
@@ -154,8 +154,12 @@ public class UITractorMenu : MonoBehaviour
     void PopulateCrops()
     {
         dpnCropSelectSeed.ClearOptions();
-        var cropNames = cropRegistry.crops.Select(c => c.cropName).ToList();
+
+        cropChoices = CoffeeManager.Instance.GetAllCoffeeCrops().ToList();
+        var cropNames = cropChoices.Select(c => c.DisplayName).ToList();
+
         dpnCropSelectSeed.AddOptions(cropNames);
+        dpnCropSelectSeed.value = 0;
     }
 
     int CurrentTractorIndex() => selectedTask switch
@@ -188,11 +192,12 @@ public class UITractorMenu : MonoBehaviour
             shed?.Reserve(implementId);
         }
 
-        CropDefinition crop = selectedTask == JobType.Seed
-            ? cropRegistry.crops[dpnCropSelectSeed.value]
+        CoffeeCropData selectedCrop =
+            selectedTask == JobType.Seed && dpnCropSelectSeed.value >= 0
+            ? cropChoices[dpnCropSelectSeed.value]
             : null;
 
-        var job = new FieldJob(field, selectedTask, crop, implementId);
+        var job = new FieldJob(field, selectedTask, selectedCrop, implementId);
         GameEvents.JobButtonPressed(job, tractor);
         Hide();
     }

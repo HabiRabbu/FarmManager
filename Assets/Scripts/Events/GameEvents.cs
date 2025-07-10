@@ -1,6 +1,6 @@
 using System;
+using Harvey.Data.Coffee;
 using Harvey.Farm.Buildings;
-using Harvey.Farm.Crops;
 using Harvey.Farm.Fields;
 using Harvey.Farm.Jobs;
 using Harvey.Farm.VehicleScripts;
@@ -16,14 +16,14 @@ namespace Harvey.Farm.Events
 
         // *------------------- Fields -------------------*
         public static event Action<FieldTile> OnTilePlowed;
-        public static event Action<FieldTile, CropDefinition> OnTileSeeded;
+        public static event Action<FieldTile, CoffeeCropData> OnTileSeeded;
         public static event Action<FieldTile> OnTileHarvested;
         public static event Action<FieldController> OnFieldCompleted;
         public static event Action<FieldController> OnFieldGrown;
         public static event Action<FieldController> OnFieldHarvested;
 
         public static void TilePlowed(FieldTile tile) => OnTilePlowed?.Invoke(tile);
-        public static void TileSeeded(FieldTile tile, CropDefinition crop) => OnTileSeeded?.Invoke(tile, crop);
+        public static void TileSeeded(FieldTile tile, CoffeeCropData crop) => OnTileSeeded?.Invoke(tile, crop);
         public static void TileHarvested(FieldTile tile) => OnTileHarvested?.Invoke(tile);
         public static void FieldCompleted(FieldController field) => OnFieldCompleted?.Invoke(field);
         public static void FieldGrown(FieldController field) => OnFieldGrown?.Invoke(field);

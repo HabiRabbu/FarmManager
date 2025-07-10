@@ -5,35 +5,17 @@ namespace Harvey.Farm.Factory
 {
     public class VehicleFactory : Singleton<VehicleFactory>, IVehicleFactory
     {
-        PoolManager pool;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            pool = PoolManager.Instance;
-        }
-
         /* -------- IVehicleFactory -------- */
-        public GameObject Spawn(VehicleDefinition vehicle, Transform parent, Vector3 localOrWorldPos)
-        {
-            if (pool == null) pool = PoolManager.Instance;
+        public GameObject Spawn(VehicleDefinition def, Transform parent, Vector3 localOrWorldPos)
+            => FactoryHelpers.SpawnInternal(def.ModelPrefab, parent, localOrWorldPos);
 
-            var go = pool.GetOrInstantiate(vehicle.ModelPrefab, parent);
+        public GameObject Spawn(GameObject prefab, Transform parent, Vector3 localOrWorldPos)
+            => FactoryHelpers.SpawnInternal(prefab, parent, localOrWorldPos);
 
-            if (parent != null)
-            {
-                go.transform.SetLocalPositionAndRotation(localOrWorldPos, Quaternion.identity);
-            }
-            else
-            {
-                go.transform.SetPositionAndRotation(localOrWorldPos, Quaternion.identity);
-            }
+        public void Despawn(VehicleDefinition def, GameObject instance)
+            => FactoryHelpers.DespawnInternal(def.ModelPrefab, instance);
 
-            go.transform.localScale = Vector3.one;
-            return go;
-        }
-
-        public void Despawn(VehicleDefinition vehicle, GameObject instance)
-            => pool.Release(vehicle.ModelPrefab, instance);
+        public void Despawn(GameObject prefab, GameObject instance)
+            => FactoryHelpers.DespawnInternal(prefab, instance);
     }
 }

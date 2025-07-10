@@ -5,6 +5,8 @@ namespace Harvey.Farm.Factory
     public interface IImplementFactory
     {
         GameObject Spawn(ImplementDefinition tool, Transform parent, Vector3 worldPos);
-        void       Despawn(ImplementDefinition tool, GameObject instance);
+        GameObject Spawn(GameObject prefab, Transform parent, Vector3 worldPos);
+        void Despawn(ImplementDefinition tool, GameObject instance);
+        void Despawn(GameObject prefab, GameObject instance);
     }
 }

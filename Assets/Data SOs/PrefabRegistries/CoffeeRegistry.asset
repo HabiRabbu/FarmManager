@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 860dde0e7e42b06458824c1df89e6acb, type: 3}
-  m_Name: WheatSO
+  m_Script: {fileID: 11500000, guid: eecd1eb4c66ca9f46a71ba9c5de02b66, type: 3}
+  m_Name: CoffeeRegistry
   m_EditorClassIdentifier: 
-  cropName: Wheat
-  growSeconds: 10
-  cropPrefab: {fileID: 672455741178990936, guid: db049b6ce47e07b409a9ad99bb10c6fe, type: 3}
+  entries:
+  - guid: basic-coffee
+    prefab: {fileID: 672455741178990936, guid: db049b6ce47e07b409a9ad99bb10c6fe, type: 3}
