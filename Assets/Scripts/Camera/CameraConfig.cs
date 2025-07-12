@@ -20,7 +20,7 @@ namespace Harvey.Farm.CameraScripts
         [field: SerializeField] public float MaxPanZ { get; set; } = 100f;
 
         [field: Header("Zoom Settings")]
-        [field: SerializeField] public float ZoomSpeed { get; private set; } = 15f;
+        [field: SerializeField] public float ZoomSpeed { get; private set; } = 80f;
         [field: SerializeField] public float ScrollWheelMultiplier { get; private set; } = 15f;
         [field: SerializeField] public float MinZoomDistance { get; private set; } = 1f;
         [field: SerializeField] public float MaxZoomDistance { get; private set; } = 20f;

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Harvey.Farm.Factory;
 using UnityEngine;
 
 namespace Harvey.Farm.Fields
@@ -100,7 +101,7 @@ namespace Harvey.Farm.Fields
             return bestI;
         }
 
-        public FieldTile[] Generate(GameObject tilePrefab, Transform parent,
+        public FieldTile[] Generate(string tilePrefabGuid, Transform parent,
                             float yScale = 1f)
         {
             FieldTile[] tiles = new FieldTile[centers.Length];
@@ -120,9 +121,9 @@ namespace Harvey.Farm.Fields
                     groundY + 0.1f, // offset
                     centers[i].y);
 
-                var go = Object.Instantiate(tilePrefab, pos, Quaternion.identity, parent);
+                var go = FieldTileFactory.Instance.Spawn(tilePrefabGuid, null, pos);
+                go.transform.SetParent(parent, true);
 
-                // full-height tile (no vertical squash)
                 go.transform.localScale = new Vector3(TileSize, yScale, TileSize);
 
                 FieldTile tile = go.GetComponent<FieldTile>();

@@ -16,10 +16,8 @@ public class CoffeeManager : Singleton<CoffeeManager>, ISaveSection
 
     readonly List<CoffeeCropData> coffeeCrops = new();
 
-    protected override void Awake()
+    void Start()
     {
-        base.Awake();
-
         LoadStarterFile();
         SaveService.Instance.Register(this);
     }
@@ -27,12 +25,13 @@ public class CoffeeManager : Singleton<CoffeeManager>, ISaveSection
     /* ----------------  public API  -------------- */
     public IReadOnlyList<CoffeeCropData> GetAllCoffeeCrops() => coffeeCrops;
 
-    public CoffeeCropData Create(string name, float aroma, float acid, float body, string prefabGuid = "basic-coffee")
+    public CoffeeCropData Create(string name, float growSeconds, float aroma, float acid, float body, string prefabGuid = "basic-coffee")
     {
         var crop = new CoffeeCropData
         {
             Id = Guid.NewGuid().ToString("N"),
             DisplayName = name,
+            GrowSeconds = growSeconds,
             Aroma = aroma,
             Acidity = acid,
             Body = body,
@@ -40,7 +39,6 @@ public class CoffeeManager : Singleton<CoffeeManager>, ISaveSection
         };
 
         coffeeCrops.Add(crop);
-        SaveService.Instance.SaveGame();
         return crop;
     }
 
@@ -56,26 +54,26 @@ public class CoffeeManager : Singleton<CoffeeManager>, ISaveSection
         public List<CoffeeCropData> crops;
     }
 
-    public object CaptureState() => new CoffeeState
+    public string CaptureJson()
     {
-        crops = new List<CoffeeCropData>(coffeeCrops)
-    };
-
-    public void RestoreState(object obj)
-    {
-        var state = obj as CoffeeState;
-        if (state == null) return;
-
-        UseLoadedState(state);
+        var state = new CoffeeState
+        {
+            crops = coffeeCrops
+        };
+        return JsonUtility.ToJson(state);
     }
 
-    void UseLoadedState(CoffeeState state)
+    public void RestoreJson(string json)
     {
-        if (state == null || state.crops == null || state.crops.Count == 0) return;
+        if (string.IsNullOrWhiteSpace(json)) return;
+
+        var state = JsonUtility.FromJson<CoffeeState>(json);
+        if (state?.crops == null) return;
 
         coffeeCrops.Clear();
         coffeeCrops.AddRange(state.crops);
-        Debug.Log($"CoffeeManager loaded {coffeeCrops.Count} crops from save.");
+
+        Debug.Log($"CoffeeManager restored {coffeeCrops.Count} crops");
     }
 
     /* ---------------- internal --------------- */

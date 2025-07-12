@@ -21,7 +21,7 @@ namespace Harvey.Farm.InputScripts
         void Awake()
         {
             cam = Camera.main;
-            input = new FarmInput();
+            input = InputService.Instance.Actions;
         }
 
         void OnEnable()

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Harvey.Data.Coffee;
 using Harvey.Farm.Events;
@@ -7,6 +8,8 @@ namespace Harvey.Farm.Fields
 {
     public class FieldController : MonoBehaviour
     {
+        public string id;
+
         public FieldDefinition definition;
         public CoffeeCropData currentCrop;
         public State currentState = State.Idle;
@@ -19,6 +22,7 @@ namespace Harvey.Farm.Fields
         public bool Is(State s) => currentState == s;
         public State Current => currentState;
         public FieldDefinition Definition => definition;
+        public string Id => id;
 
 
         void Awake()
@@ -32,6 +36,10 @@ namespace Harvey.Farm.Fields
             builder.Build();
             runtime.Initialize(builder.Tiles);
             gameObject.name = $"Field - {definition.fieldName}";
+
+            if (string.IsNullOrEmpty(id))
+                id = Guid.NewGuid().ToString("N");
+
             FieldManager.Instance.RegisterField(this);
         }
 

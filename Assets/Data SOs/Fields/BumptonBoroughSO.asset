@@ -16,4 +16,4 @@ MonoBehaviour:
   width: 8
   height: 18
   tileSize: 1
-  tilePrefab: {fileID: 1194650040818354598, guid: 0263484fa6e1e574d9d3cf80f5f58107, type: 3}
+  tilePrefabGuid: basic-field-tile

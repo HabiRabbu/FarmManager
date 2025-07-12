@@ -7,5 +7,5 @@ public class FieldDefinition : ScriptableObject
     public int width;
     public int height;
     public float tileSize = 1f;
-    public GameObject tilePrefab;
+    public string tilePrefabGuid = "basic-field-tile"; // TODO: Avoid hardcoding by using definition data
 }

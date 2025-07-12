@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -16,56 +17,53 @@ namespace Harvey.SaveSystem
         /* ------------- public API ------------- */
         public void SaveGame(string slot = "autosave")
         {
-            var dict = new Dictionary<string, object>();
+            var wrapper = new Wrapper();
             foreach (var s in sections)
-                dict[s.SectionName] = s.CaptureState();
+                wrapper.Sections.Add(new Wrapper.Section
+                {
+                    key = s.SectionName,
+                    json = s.CaptureJson()
+                });
 
-            var json = JsonUtility.ToJson(new Wrapper(dict), true);
-            File.WriteAllText(PathFor(slot), json);
-            Debug.Log($"Saved {sections.Count} sections → {PathFor(slot)}");
+            File.WriteAllText(PathFor(slot),
+                              JsonUtility.ToJson(wrapper, true));
         }
 
         public void LoadGame(string slot = "autosave")
         {
             string path = PathFor(slot);
-            if (!File.Exists(path)) { Debug.LogWarning("Save not found"); return; }
+            if (!File.Exists(path))
+            {
+                Debug.LogWarning($"Save file not found: {path}");
+                return;
+            }
 
-            var json = File.ReadAllText(path);
-            var wrapper = JsonUtility.FromJson<Wrapper>(json);
+            var wrapper = JsonUtility.FromJson<Wrapper>(File.ReadAllText(path));
 
             foreach (var s in sections)
-                if (wrapper.TryGet(s.SectionName, out var data))
-                    s.RestoreState(data);
+            {
+                if (wrapper.TryGet(s.SectionName, out string json))
+                    s.RestoreJson(json);
+            }
         }
 
         /* ------------- helpers --------------- */
         string PathFor(string slot) =>
             Path.Combine(Application.persistentDataPath, slot + EXT);
 
-        [System.Serializable]
+        [Serializable]
         class Wrapper
         {
             public List<Section> Sections = new();
 
-            public Wrapper() { }
-            public Wrapper(Dictionary<string, object> dict)
-            {
-                foreach (var kv in dict)
-                    Sections.Add(new Section { key = kv.Key, json = JsonUtility.ToJson(kv.Value) });
-            }
-
-            public bool TryGet(string key, out object obj)
+            public bool TryGet(string key, out string json)
             {
                 var sec = Sections.Find(s => s.key == key);
-                if (sec != null)
-                {
-                    obj = JsonUtility.FromJson(sec.json, typeof(object));
-                    return true;
-                }
-                obj = null; return false;
+                json = sec?.json;
+                return sec != null;
             }
 
-            [System.Serializable]
+            [Serializable]
             public class Section
             {
                 public string key;

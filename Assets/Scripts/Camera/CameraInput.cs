@@ -1,3 +1,4 @@
+using Harvey.Farm.Utilities;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,134 +7,118 @@ namespace Harvey.Farm.CameraScripts
 {
     public class CameraInput : MonoBehaviour
     {
-        [SerializeField] private bool enablePan = false;
-        [SerializeField] private Transform cameraTarget;
-        [SerializeField] private CinemachineCamera cinemachineCamera;
-        [SerializeField] private new Camera camera;
-        [SerializeField] private CameraConfig cameraConfig;
+        [Header("Scene refs")]
+        [SerializeField] Transform cameraTarget;
+        [SerializeField] CameraConfig cameraConfig;
+        [SerializeField] bool enableEdgePan = true;
+        [SerializeField] CinemachineCamera cam;
+        [SerializeField] CinemachineFollow follow;
 
-        [SerializeField] private float normalPanMultiplier = 1f;
-        [SerializeField] private float shiftPanMultiplier = 2f;
+        [Header("Speed multipliers")]
+        [SerializeField] float normalPanMultiplier = 1f;
+        [SerializeField] float shiftPanMultiplier = 2f;
 
-        private CinemachineFollow cinemachineFollow;
-        private float currentYaw = 0f;
-        private float currentPitch = 20f;
+        /* ─────────────────────────────────────────────── */
+
+        FarmInput actions;
+
+        float yaw = 0f;
+        float pitch = 20f;
 
         void Awake()
         {
-            if (!cinemachineCamera.TryGetComponent(out cinemachineFollow))
-            {
-                Debug.LogError("Cinemachine Camera did not have CinemachineFollow! Zoom is broken...");
-            }
+            actions = InputService.Instance.Actions;
         }
 
-        private void Update()
+        void OnEnable() => actions.Camera.Enable();
+        void OnDisable() => actions.Camera.Disable();
+
+        void Update()
         {
+            if (DebugManager.DebugOn) return;
+
             HandlePan();
             HandleZoom();
             HandleRotation();
         }
 
-        private void HandlePan()
+        /* ───────────────────────────── Pan ───────────── */
+        void HandlePan()
         {
-            float speedMultiplier = Keyboard.current.leftShiftKey.isPressed || Keyboard.current.rightShiftKey.isPressed ? shiftPanMultiplier : normalPanMultiplier;
+            Vector2 move = actions.Camera.Move.ReadValue<Vector2>();
+            if (enableEdgePan) move += GetEdgePan();
 
-            Vector2 moveAmount = GetKeyboardMoveAmount(speedMultiplier);
-            if (enablePan) { moveAmount += GetMouseMoveAmount(speedMultiplier); }
+            float speedMul = actions.Camera.Fast.IsPressed()
+                           ? shiftPanMultiplier : normalPanMultiplier;
 
-            Vector3 forward = cameraTarget.forward;
-            Vector3 right = cameraTarget.right;
+            move = move.normalized * cameraConfig.KeyboardPanSpeed
+                                 * speedMul * Time.deltaTime;
 
-            forward.y = 0;
-            right.y = 0;
-            forward.Normalize();
-            right.Normalize();
+            Vector3 fwd = cameraTarget.forward; fwd.y = 0; fwd.Normalize();
+            Vector3 right = cameraTarget.right; right.y = 0; right.Normalize();
 
-            Vector3 move = forward * moveAmount.y + right * moveAmount.x;
-            cameraTarget.position += move;
-
-            Vector3 clampedPosition = cameraTarget.position;
-            clampedPosition.x = Mathf.Clamp(clampedPosition.x, cameraConfig.MinPanX, cameraConfig.MaxPanX);
-            clampedPosition.z = Mathf.Clamp(clampedPosition.z, cameraConfig.MinPanZ, cameraConfig.MaxPanZ);
-            cameraTarget.position = clampedPosition;
+            cameraTarget.position += fwd * move.y + right * move.x;
+            ClampPan();
         }
 
-
-        private Vector2 GetKeyboardMoveAmount(float speedMultiplier)
+        Vector2 GetEdgePan()
         {
-            Vector2 moveAmount = Vector2.zero;
-            if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed)
-                moveAmount.y += 1f;
-            if (Keyboard.current.downArrowKey.isPressed || Keyboard.current.sKey.isPressed)
-                moveAmount.y -= 1f;
-            if (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.aKey.isPressed)
-                moveAmount.x -= 1f;
-            if (Keyboard.current.rightArrowKey.isPressed || Keyboard.current.dKey.isPressed)
-                moveAmount.x += 1f;
+            if (!cameraConfig.EnableEdgePan) return Vector2.zero;
 
-            return moveAmount.normalized * cameraConfig.KeyboardPanSpeed * speedMultiplier * Time.deltaTime;
+            Vector2 pos = Mouse.current.position.ReadValue();
+            Vector2 pan = Vector2.zero;
+
+            if (pos.x <= cameraConfig.EdgePanSize) pan.x -= 1;
+            else if (pos.x >= Screen.width - cameraConfig.EdgePanSize) pan.x += 1;
+            if (pos.y >= Screen.height - cameraConfig.EdgePanSize) pan.y += 1;
+            else if (pos.y <= cameraConfig.EdgePanSize) pan.y -= 1;
+
+            return pan * cameraConfig.MousePanSpeed * Time.deltaTime;
         }
 
-        private Vector2 GetMouseMoveAmount(float speedMultiplier)
+        void ClampPan()
         {
-            Vector2 moveAmount = Vector2.zero;
-
-            if (!cameraConfig.EnableEdgePan)
-                return moveAmount;
-
-            Vector2 mousePosition = Mouse.current.position.ReadValue();
-            int screenWidth = Screen.width;
-            int screenHeight = Screen.height;
-
-            if (mousePosition.x <= cameraConfig.EdgePanSize) moveAmount.x -= 1f;
-            else if (mousePosition.x >= screenWidth - cameraConfig.EdgePanSize) moveAmount.x += 1f;
-
-            if (mousePosition.y >= screenHeight - cameraConfig.EdgePanSize) moveAmount.y += 1f;
-            else if (mousePosition.y <= cameraConfig.EdgePanSize) moveAmount.y -= 1f;
-
-            return moveAmount.normalized * cameraConfig.MousePanSpeed * speedMultiplier * Time.deltaTime;
+            Vector3 p = cameraTarget.position;
+            p.x = Mathf.Clamp(p.x, cameraConfig.MinPanX, cameraConfig.MaxPanX);
+            p.z = Mathf.Clamp(p.z, cameraConfig.MinPanZ, cameraConfig.MaxPanZ);
+            cameraTarget.position = p;
         }
 
-
-        private void HandleRotation()
+        /* ─────────────────────────── Zoom ────────────── */
+        void HandleZoom()
         {
-            if (Mouse.current.rightButton.isPressed)
-            {
-                Vector2 mouseDelta = Mouse.current.delta.ReadValue();
-                currentYaw += mouseDelta.x * cameraConfig.RotationSpeed * Time.deltaTime;
-                currentPitch -= mouseDelta.y * cameraConfig.RotationSpeed * Time.deltaTime;
-                currentPitch = Mathf.Clamp(currentPitch, cameraConfig.RotationClamp.x, cameraConfig.RotationClamp.y);
+            float zoomInput = actions.Camera.Zoom.ReadValue<float>();
+            if (Mathf.Abs(zoomInput) < 0.01f) return;
 
-                Quaternion rotation = Quaternion.Euler(currentPitch, currentYaw, 0f);
-                cameraTarget.rotation = rotation;
-            }
+            if (actions.Camera.Fast.IsPressed())
+                zoomInput *= 3f;
+
+            Vector3 off = follow.FollowOffset;
+            Vector3 dir = off.normalized;
+
+            off -= dir * zoomInput * cameraConfig.ZoomSpeed * Time.deltaTime;
+
+            float dist = Mathf.Clamp(off.magnitude,
+                                     cameraConfig.MinZoomDistance,
+                                     cameraConfig.MaxZoomDistance);
+            follow.FollowOffset = dir * dist;
         }
 
-        private void HandleZoom()
+        /* ───────────────────────── Rotation ──────────── */
+        void HandleRotation()
         {
-            float zoomInput = 0f;
+            if (!actions.Camera.RotateHeld.IsPressed()) return;
 
-            zoomInput += Mouse.current.scroll.ReadValue().y * cameraConfig.ScrollWheelMultiplier;
-            if (Keyboard.current.qKey.isPressed)
-                zoomInput -= 1f;
-            if (Keyboard.current.eKey.isPressed)
-                zoomInput += 1f;
+            Vector2 delta = actions.Camera.Rotate.ReadValue<Vector2>();
+            if (delta.sqrMagnitude < 0.001f) return;
 
-            if (Mathf.Abs(zoomInput) > 0.01f)
-            {
-                Vector3 followOffset = cinemachineFollow.FollowOffset;
+            yaw += delta.x * cameraConfig.RotationSpeed * Time.deltaTime;
+            pitch -= delta.y * cameraConfig.RotationSpeed * Time.deltaTime;
+            pitch = Mathf.Clamp(pitch,
+                                 cameraConfig.RotationClamp.x,
+                                 cameraConfig.RotationClamp.y);
 
-                Vector3 zoomDirection = followOffset.normalized;
-                float zoomAmount = zoomInput * cameraConfig.ZoomSpeed * Time.deltaTime;
-
-                followOffset -= zoomDirection * zoomAmount;
-
-                float distance = followOffset.magnitude;
-                distance = Mathf.Clamp(distance, cameraConfig.MinZoomDistance, cameraConfig.MaxZoomDistance);
-                followOffset = zoomDirection * distance;
-
-                cinemachineFollow.FollowOffset = followOffset;
-            }
+            cameraTarget.rotation = Quaternion.Euler(pitch, yaw, 0f);
         }
     }
 }

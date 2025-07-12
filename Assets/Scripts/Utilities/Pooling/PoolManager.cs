@@ -32,8 +32,14 @@ namespace Harvey.Farm.Utilities
 
         public void Release(GameObject prefab, GameObject instance)
         {
+            if (!pools.TryGetValue(prefab, out var q))
+            {
+                q = new Queue<GameObject>();
+                pools[prefab] = q;
+            }
+
             instance.SetActive(false);
-            pools[prefab].Enqueue(instance);
+            q.Enqueue(instance);
         }
     }
 }

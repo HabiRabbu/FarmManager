@@ -9,8 +9,6 @@ namespace Harvey.Farm.Fields
     public class FieldTile : MonoBehaviour
     {
         [Header("Debug")]
-        [SerializeField] private TMP_Text debugTextLabel;
-
         [SerializeField] private Material earthMat;
         [SerializeField] private Material plowedMat;
         public Transform cropAnchor;
@@ -41,7 +39,7 @@ namespace Harvey.Farm.Fields
             rndr.sharedMaterial = earthMat;
             IsPlowed = false;
         }
-        
+
         public bool TryReserve()
         {
             if (IsReserved) return false;
@@ -86,7 +84,7 @@ namespace Harvey.Farm.Fields
 
         public void Harvest()
         {
-            if (!IsSeeded || IsHarvested) return;
+            if (IsHarvested) return;
 
             rndr.sharedMaterial = earthMat;
             IsHarvested = true;
@@ -99,6 +97,25 @@ namespace Harvey.Farm.Fields
             currentStage = -1;
 
             GameEvents.TileHarvested(this);
+        }
+
+        public void ResetTile()
+        {
+            if (cropInstance != null)
+            {
+                CropFactory.Instance.Despawn(currentCrop, cropInstance);
+                cropInstance = null;
+            }
+
+            IsPlowed = false;
+            IsSeeded = false;
+            IsHarvested = false;
+            IsReserved = false;
+            
+            currentCrop = null;
+            currentStage = -1;
+
+            rndr.sharedMaterial = earthMat;
         }
 
         void SpawnOrGetCrop()
