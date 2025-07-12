@@ -8,16 +8,17 @@ public class VehicleStats : MonoBehaviour
     [SerializeField] VehicleDefinition definition;
     public VehicleDefinition Def => definition;
 
-    string id = string.Empty;
-    public string Id => id;
-
+    // Garage Building
     private GarageBuilding Home;
-
     public GarageBuilding GetHome() => Home;
     public void SetHome(GarageBuilding house) => Home = house;
 
-    private bool isInitialised = false;
+    // GuidBehaviour
+    GuidBehaviour guidBehaviour;
+    public string GetId() => guidBehaviour.GetId();
+    public void SetId(string newId) => guidBehaviour.SetId(newId);
 
+    private bool isInitialised = false;
 
     /* ---------- Tunable stats ---------- */
     [field: SerializeField] public string DisplayName { get; private set; } = "Vehicle";
@@ -32,8 +33,7 @@ public class VehicleStats : MonoBehaviour
 
     void Awake()
     {
-        if (string.IsNullOrEmpty(id))
-            id = Guid.NewGuid().ToString("N");
+        guidBehaviour = GetComponent<GuidBehaviour>();
 
         if (definition == null)
         {

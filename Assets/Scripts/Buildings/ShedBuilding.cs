@@ -50,7 +50,7 @@ namespace Harvey.Farm.Buildings
         public bool IsReserved(string id) => reserved.Contains(id);
 
         public IEnumerable<ImplementBehaviour> Query(System.Func<ImplementBehaviour, bool> predicate) =>
-            stock.Values.Where(b => !reserved.Contains(b.id) && predicate(b));
+            stock.Values.Where(b => !reserved.Contains(b.GetId()) && predicate(b));
 
         public bool TryCheckoutByID(string id, out ImplementBehaviour implement)
         {
@@ -68,8 +68,8 @@ namespace Harvey.Farm.Buildings
 
         public void ReturnImplement(ImplementBehaviour implement)
         {
-            reserved.Remove(implement.id);
-            stock[implement.id] = implement;
+            reserved.Remove(implement.GetId());
+            stock[implement.GetId()] = implement;
 
             implement.Detach();
             var anchor = GetFreeAnchor();

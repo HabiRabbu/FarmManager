@@ -21,7 +21,7 @@ namespace Harvey.Farm.VehicleScripts
         public VehicleStats _stats { get; private set; }
 
         public bool IsBusy => _stats.IsBusy;
-        public string Id => _stats.Id;
+        public string Id => _stats.GetId();
         public string DisplayName => _stats.DisplayName;
 
         public GarageBuilding Home => _stats.GetHome();

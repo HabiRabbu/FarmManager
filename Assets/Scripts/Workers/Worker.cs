@@ -21,7 +21,7 @@ namespace Harvey.Farm.Workers
         public bool IsBusy => _stats.IsBusy;
         public string DisplayName => _stats.WorkerName;
         public Sprite Portrait => _stats.Def.Portrait;
-        public string Id => _stats.Id;
+        public string Id => _stats.GetId();
         public bool IsInitialised { get; private set; }
 
         public HouseBuilding Home => _stats.GetHome();

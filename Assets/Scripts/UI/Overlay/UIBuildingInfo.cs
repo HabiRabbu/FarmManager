@@ -57,7 +57,7 @@ public class UIBuildingInfo : MonoBehaviour
                 SpawnImplementSlots(shed);
 
                 int implTotal = shed.Query(_ => true).Count();
-                int implReserved = shed.Query(i => shed.IsReserved(i.id)).Count();
+                int implReserved = shed.Query(i => shed.IsReserved(i.GetId())).Count();
                 txtBody.text = $"Implements: {implTotal}\nReserved:   {implReserved}";
                 break;
 

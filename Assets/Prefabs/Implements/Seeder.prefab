@@ -42,6 +42,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3028695377832337324}
+  - component: {fileID: 5989451443905652715}
+  - component: {fileID: -5362383764827391427}
   m_Layer: 0
   m_Name: Seeder
   m_TagString: Untagged
@@ -65,6 +67,34 @@ Transform:
   - {fileID: 1656144353678233327}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5989451443905652715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3842723845421910057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 990aa81e49055004ba80610656b9ddde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 
+--- !u!114 &-5362383764827391427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3842723845421910057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe828569b39aaf14297d40765129cd7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentDurability: 0
+  home: {fileID: 0}
+  Job: 1
 --- !u!1 &6294099379132949922
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,29 +6,27 @@ namespace Harvey.Farm.Implements
 {
     public class ImplementBehaviour : MonoBehaviour
     {
-        [SerializeField] public string id { get; private set; } = string.Empty;
-
         [SerializeField] float currentDurability;
 
         public ImplementDefinition Def { get; private set; }
         public ShedBuilding home;
-        public JobType Job; 
-        
-        //Definition Getters
+        public GuidBehaviour guidBehaviour;
+        public JobType Job;
+
+        //Getters/Setters
         public float Durability => currentDurability;
         public string DisplayName => Def != null ? Def.DisplayName : string.Empty;
         public Sprite Icon => Def != null ? Def.Icon : null;
+        public string GetId() => guidBehaviour.GetId();
+        public void SetId(string newId) => guidBehaviour.SetId(newId);
 
         void Awake()
         {
-            if (string.IsNullOrEmpty(id))
-                id = Guid.NewGuid().ToString("N");
+            guidBehaviour = GetComponent<GuidBehaviour>();
         }
 
         public void Init(ImplementDefinition def, ShedBuilding origin)
         {
-            if (string.IsNullOrEmpty(id))
-                id = Guid.NewGuid().ToString("N");
 
             Def = def;
             home = origin;

@@ -303,6 +303,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7672555974253450862}
+  - component: {fileID: -2308053398509278816}
   - component: {fileID: 590937975617128335}
   - component: {fileID: 4459476664721384991}
   - component: {fileID: 645615731125746934}
@@ -332,6 +333,19 @@ Transform:
   - {fileID: 5700977899952194359}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-2308053398509278816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5252949776778261906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 990aa81e49055004ba80610656b9ddde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 
 --- !u!114 &590937975617128335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -396,12 +410,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   definition: {fileID: 0}
-  vehicleName: Vehicle
-  moveSpeed: 2
-  fuel: 100
-  durability: 100
-  price: 100
-  capacity: 100
+  <DisplayName>k__BackingField: Vehicle
+  <Icon>k__BackingField: {fileID: 0}
+  <MoveSpeed>k__BackingField: 2
+  <Fuel>k__BackingField: 100
+  <Durability>k__BackingField: 100
+  <Price>k__BackingField: 100
+  <Capacity>k__BackingField: 100
 --- !u!1 &7550567541712448358
 GameObject:
   m_ObjectHideFlags: 0

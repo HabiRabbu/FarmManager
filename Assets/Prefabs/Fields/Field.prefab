@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4756021738188461957}
+  - component: {fileID: -6758321720139440540}
   - component: {fileID: 198479958953078146}
   - component: {fileID: 3560410736494212223}
   - component: {fileID: 7321520999775201838}
@@ -37,6 +38,19 @@ Transform:
   - {fileID: 4314429793691538882}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-6758321720139440540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7465880965385477927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 990aa81e49055004ba80610656b9ddde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 
 --- !u!114 &198479958953078146
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49,8 +63,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fab1c9dd28127f48924a20d481ed1e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 
   definition: {fileID: 11400000, guid: f2d3851b23c331946b6f6801f57fc43f, type: 2}
-  currentCrop: {fileID: 0}
+  currentCrop:
+    Id: 
+    DisplayName: 
+    GrowSeconds: 0
+    Aroma: 0
+    Acidity: 0
+    Body: 0
+    PrefabGuid: 
   currentState: 0
   runtime: {fileID: 0}
 --- !u!114 &3560410736494212223

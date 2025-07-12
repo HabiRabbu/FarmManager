@@ -9,12 +9,15 @@ namespace Harvey.Farm.Workers
     {
         [SerializeField] WorkerDefinition definition;
         public WorkerDefinition Def => definition;
-        string id = string.Empty;
-        public string Id => id;
 
         private HouseBuilding Home;
         public HouseBuilding GetHome() => Home;
         public void SetHome(HouseBuilding house) => Home = house;
+
+        // GuidBehaviour
+        GuidBehaviour guidBehaviour;
+        public string GetId() => guidBehaviour.GetId();
+        public void SetId(string newId) => guidBehaviour.SetId(newId);
 
         /* ---------- Tunable stats ---------- */
         public string WorkerName { get; private set; }
@@ -23,8 +26,7 @@ namespace Harvey.Farm.Workers
 
         void Awake()
         {
-            if (string.IsNullOrEmpty(id))
-                id = Guid.NewGuid().ToString("N");
+            guidBehaviour = GetComponent<GuidBehaviour>();
         }
 
         public void SetBusy(bool value) => IsBusy = value;

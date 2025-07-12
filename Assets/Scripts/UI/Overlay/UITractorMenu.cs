@@ -188,7 +188,7 @@ public class UITractorMenu : MonoBehaviour
         if (selectedTask is JobType.Plow or JobType.Seed)
         {
             if (implementChoices.Count == 0 || CurrentImplementIndex() < 0) return;
-            implementId = implementChoices[CurrentImplementIndex()].id;
+            implementId = implementChoices[CurrentImplementIndex()].GetId();
             shed?.Reserve(implementId);
         }
 

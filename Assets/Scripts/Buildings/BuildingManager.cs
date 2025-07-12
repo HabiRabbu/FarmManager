@@ -8,6 +8,7 @@ namespace Harvey.Farm.Buildings
     {
         [SerializeField] readonly List<ShedBuilding> sheds = new();
         [SerializeField] readonly List<HouseBuilding> houses = new();
+        [SerializeField] readonly List<GarageBuilding> garages = new();
 
         public void Register(Building b)
         {
@@ -15,6 +16,8 @@ namespace Harvey.Farm.Buildings
                 sheds.Add(shed);
             if (b is HouseBuilding house && !houses.Contains(house))
                 houses.Add(house);
+            if (b is GarageBuilding garage && !garages.Contains(garage))
+                garages.Add(garage);
         }
         public void Unregister(Building b)
         {

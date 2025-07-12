@@ -8,8 +8,6 @@ namespace Harvey.Farm.Fields
 {
     public class FieldController : MonoBehaviour
     {
-        public string id;
-
         public FieldDefinition definition;
         public CoffeeCropData currentCrop;
         public State currentState = State.Idle;
@@ -22,13 +20,19 @@ namespace Harvey.Farm.Fields
         public bool Is(State s) => currentState == s;
         public State Current => currentState;
         public FieldDefinition Definition => definition;
-        public string Id => id;
+
+        // GuidBehaviour
+        GuidBehaviour guidBehaviour;
+        public string GetId() => guidBehaviour.GetId();
+        public void SetId(string newId) => guidBehaviour.SetId(newId);
+
 
 
         void Awake()
         {
             builder = GetComponent<FieldBuilder>();
             runtime = GetComponent<FieldRuntimeState>();
+            guidBehaviour = GetComponent<GuidBehaviour>();
         }
 
         void Start()
@@ -36,9 +40,6 @@ namespace Harvey.Farm.Fields
             builder.Build();
             runtime.Initialize(builder.Tiles);
             gameObject.name = $"Field - {definition.fieldName}";
-
-            if (string.IsNullOrEmpty(id))
-                id = Guid.NewGuid().ToString("N");
 
             FieldManager.Instance.RegisterField(this);
         }

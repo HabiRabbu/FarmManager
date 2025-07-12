@@ -32,12 +32,12 @@ namespace Harvey.Farm.Fields
         public void RegisterField(FieldController f)
         {
             if (!fields.Contains(f)) fields.Add(f);
-            if (!string.IsNullOrEmpty(f.Id)) byId[f.Id] = f;
+            if (!string.IsNullOrEmpty(f.GetId())) byId[f.GetId()] = f;
         }
         public void UnregisterField(FieldController f)
         {
             fields.Remove(f);
-            if (!string.IsNullOrEmpty(f.Id)) byId.Remove(f.Id);
+            if (!string.IsNullOrEmpty(f.GetId())) byId.Remove(f.GetId());
         }
 
         public FieldController GetFieldAtPoint(Vector3 worldPos)
@@ -105,7 +105,7 @@ namespace Harvey.Farm.Fields
 
             return new FieldSaveData
             {
-                Id = f.Id,
+                Id = f.GetId(),
                 Width = grid.Width,
                 Height = grid.Height,
                 TileSize = grid.TileSize,
@@ -128,7 +128,7 @@ namespace Harvey.Farm.Fields
             {
                 var go = FieldFactory.Instance.Spawn(d, null, d.Position);
                 field = go.GetComponent<FieldController>();
-                field.id = d.Id;
+                field.SetId(d.Id);
                 Instance.RegisterField(field);
             }
             else field.transform.position = d.Position;

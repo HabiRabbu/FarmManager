@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6446667027319112226}
+  - component: {fileID: 7332598522126521789}
   - component: {fileID: 1108215414613419230}
   m_Layer: 0
   m_Name: FieldTile
@@ -34,6 +35,19 @@ Transform:
   - {fileID: 1773613992804921685}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7332598522126521789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1194650040818354598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 990aa81e49055004ba80610656b9ddde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 
 --- !u!114 &1108215414613419230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -46,7 +60,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4df39bbae9c795f4992c220e52e291f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugTextLabel: {fileID: 0}
   earthMat: {fileID: 2100000, guid: 0d37103de3eda6a47b7c36dfd0c02c56, type: 2}
   plowedMat: {fileID: 2100000, guid: 97ed2e7e98abfa2449a06ca82ee632d7, type: 2}
   cropAnchor: {fileID: 7667271194171774312}
