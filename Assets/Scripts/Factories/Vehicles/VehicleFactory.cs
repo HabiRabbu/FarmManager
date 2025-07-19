@@ -1,21 +1,24 @@
 using UnityEngine;
-using Harvey.Farm.Utilities;
+using System.Threading.Tasks;
 
 namespace Harvey.Farm.Factory
 {
     public class VehicleFactory : Singleton<VehicleFactory>, IVehicleFactory
     {
         /* -------- IVehicleFactory -------- */
-        public GameObject Spawn(VehicleDefinition def, Transform parent, Vector3 localOrWorldPos)
-            => FactoryHelpers.SpawnInternal(def.ModelPrefab, parent, localOrWorldPos);
+        public GameObject Spawn(string guid, Transform parent, Vector3 pos)
+        {
+            return AddressableFactoryHelpers.SpawnInternal(guid, parent, pos);
+        }
 
-        public GameObject Spawn(GameObject prefab, Transform parent, Vector3 localOrWorldPos)
-            => FactoryHelpers.SpawnInternal(prefab, parent, localOrWorldPos);
+        public async Task<GameObject> SpawnAsync(string guid, Transform parent, Vector3 pos)
+        {
+            return await AddressableFactoryHelpers.SpawnInternalAsync(guid, parent, pos);
+        }
 
-        public void Despawn(VehicleDefinition def, GameObject instance)
-            => FactoryHelpers.DespawnInternal(def.ModelPrefab, instance);
-
-        public void Despawn(GameObject prefab, GameObject instance)
-            => FactoryHelpers.DespawnInternal(prefab, instance);
+        public void Despawn(string guid, GameObject inst)
+        {
+            AddressableFactoryHelpers.DespawnInternal(guid, inst);
+        }
     }
 }

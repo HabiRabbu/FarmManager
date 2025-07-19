@@ -162,7 +162,7 @@ public class UIWorkerMenu : MonoBehaviour
         var portrait = go.transform.Find("WorkerPortrait")?.GetComponent<Image>();
         var label = go.GetComponentInChildren<TMP_Text>(true);
 
-        if (portrait) portrait.sprite = w.Portrait;
+        //FIXME: if (portrait) portrait.sprite = w.Model.Portrait;
         if (label) label.text = w.DisplayName;
 
         return go;
@@ -170,16 +170,36 @@ public class UIWorkerMenu : MonoBehaviour
 
     void OnGoClicked()
     {
+
         CoffeeCropData selectedCrop =
             currentTask == JobType.Seed && dpnCropSelectSeed.value >= 0
             ? cropChoices[dpnCropSelectSeed.value]
             : null;
 
+        if (field == null)
+        {
+            Debug.LogError("Field is null in OnGoClicked");
+            return;
+        }
+
+        int workerIndex = 0;
         foreach (var w in selectedWorkers)
         {
+
+            if (w == null)
+            {
+                Debug.LogError($"Worker at index {workerIndex} is null!");
+                workerIndex++;
+                continue;
+            }
+
             var job = new FieldJob(field, currentTask, selectedCrop);
+
             JobManager.Instance.EnqueueJob(job, w);
+
+            workerIndex++;
         }
+
         Hide();
     }
 

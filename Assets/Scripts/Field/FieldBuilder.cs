@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Harvey.Data.Fields;
 using Harvey.Farm.Factory;
 using UnityEngine;
@@ -35,39 +36,41 @@ namespace Harvey.Farm.Fields
 
         private void InitializeBuildData()
         {
-            width = definition?.width ?? 0;
-            height = definition?.height ?? 0;
-            tileSize = definition?.tileSize ?? 1f;
-            tilePrefabGuid = definition?.tilePrefabGuid ?? "basic-field-tile"; //TODO: Stop hardcoding this
+            width = definition?.Width ?? 0;
+            height = definition?.Height ?? 0;
+            tileSize = definition?.TileSize ?? 1f;
+            tilePrefabGuid = definition?.TilePrefabGuid ?? "basic-field-tile"; //TODO: Stop hardcoding this
 
             buildDataPresent = definition != null;
         }
 
-        public void BuildFromData(FieldSaveData data)
+        public async Task BuildFromModelAsync(FieldModel model)
         {
-            if (data == null) return;
+            if (model == null) return;
 
             definition = null;
-            width = data.Width;
-            height = data.Height;
-            tileSize = data.TileSize;
-            tilePrefabGuid = data.TilePrefabGuid;
+            width = model.Width;
+            height = model.Height;
+            tileSize = model.TileSize;
+            tilePrefabGuid = "basic-field-tile"; //TODO: Stop hardcoding this
 
             buildDataPresent = true;
 
-            Build();
+            await BuildAsync();
         }
 
-        public void Build()
+        public async Task BuildAsync()
         {
             if (!buildDataPresent) return;
 
             if (Tiles != null)
                 foreach (var t in Tiles)
-                    FieldTileFactory.Instance.Despawn(tilePrefabGuid?? "basic-field-tile", t.gameObject);
+                    FieldTileFactory.Instance.Despawn(tilePrefabGuid ?? "basic-field-tile", t.gameObject);
 
             Grid = new TileGrid(width, height, tileSize, transform.position);
-            Tiles = Grid.Generate(tilePrefabGuid, transform);
+            Tiles = await Grid.GenerateAsync(tilePrefabGuid, transform);
+
+            Debug.Log($"✅ FieldBuilder: Built field with {Tiles?.Length ?? 0} tiles");
         }
 
 

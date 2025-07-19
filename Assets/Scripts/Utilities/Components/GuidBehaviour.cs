@@ -20,6 +20,11 @@ public class GuidBehaviour : MonoBehaviour
         return id;
     }
 
+    public void GenerateNewGuid()
+    {
+        id = System.Guid.NewGuid().ToString("N");
+    }
+
     void Awake()
     {
         if (string.IsNullOrEmpty(id))

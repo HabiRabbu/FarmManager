@@ -17,5 +17,5 @@ MonoBehaviour:
   plowSeconds: 6
   seedSeconds: 2
   harvestSeconds: 4
-  ModelPrefab: {fileID: 3652829380966641632, guid: f8ce0bf543459964b898e56e9c1bcd41, type: 3}
-  Portrait: {fileID: 21300000, guid: 3e3298d2f79755f4ebae95e7486580b2, type: 3}
+  PrefabGuid: basic-worker
+  PortraitGuid: 

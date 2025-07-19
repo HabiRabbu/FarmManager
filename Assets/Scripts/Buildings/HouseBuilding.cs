@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Harvey.Farm.Events;
 using Harvey.Farm.Factory;
 using Harvey.Farm.Workers;
@@ -12,37 +13,44 @@ namespace Harvey.Farm.Buildings
     {
         [SerializeField] HouseDefinition houseDefinition;
         public override BuildingDefinition Definition => houseDefinition;
-        public HouseDefinition HouseDefinition => houseDefinition;
-
-        [SerializeField, Min(0f)] float spawnRadius = 1f;
 
         readonly List<Worker> occupants = new();
         readonly HashSet<Worker> idlePool = new();
 
-        [SerializeField] Transform spawnPoint; // Anchor for worker spawning
+        [SerializeField] Transform spawnPoint;
 
-        //Getters for UI and other systems
-        public int Capacity => houseDefinition.Capacity;
+        public HouseModel HouseModel => Model as HouseModel;
 
-        protected override void Start()
+        public void InitFromModel(BuildingModel model)
         {
-            base.Start();
+            occupants.Clear();
+            idlePool.Clear();
+            
+            SetModel(model);
+            SetId(model.Id);
+            BuildingManager.Instance.Register(this);
+        }
 
+        async void Start()
+        {
             if (houseDefinition != null)
+            {
+                SetModel(BuildingMapper.FromDefinition<HouseModel>(houseDefinition, GetId()));
+                BuildingManager.Instance.Register(this);
                 Debug.Log($"House initialised: {houseDefinition.DisplayName}");
-            SpawnInitialWorkers();
+
+                await SpawnInitialWorkers();
+            }
         }
 
         // ------------ public API ----------------------------------------------
 
-        public bool HasVacancy => occupants.Count < houseDefinition.Capacity;
+        public bool HasVacancy => occupants.Count < HouseModel.Capacity;
 
         public bool TryAddOccupant(Worker w)
         {
             if (!HasVacancy) return false;
             occupants.Add(w);
-            idlePool.Add(w);
-            w.gameObject.SetActive(false);
             return true;
         }
 
@@ -65,23 +73,24 @@ namespace Harvey.Farm.Buildings
         public void ReturnWorker(Worker w)
         {
             if (!idlePool.Add(w)) return;
-            w.gameObject.SetActive(false);
             w.transform.SetParent(transform);
+            w.gameObject.SetActive(false);
             GameEvents.BuildingStatsChanged();
         }
 
         // ---------- Internal ----------------------------------------------
 
-        void SpawnInitialWorkers()
+        async Task SpawnInitialWorkers()
         {
             foreach (var def in houseDefinition.Preload)
             {
-                var go = WorkerFactory.Instance.Spawn(def, spawnPoint, Vector3.zero);
+                var go = await WorkerFactory.Instance.SpawnAsync(def.PrefabGuid, spawnPoint, Vector3.zero);
                 var worker = go.GetComponent<Worker>() ?? go.AddComponent<Worker>();
 
-                worker.Init(def, this);
+                worker.Stats.InitFromModel(WorkerMapper.FromDefinition(def, this, worker.GetId()), this);
 
                 TryAddOccupant(worker);
+                ReturnWorker(worker);
             }
         }
 
@@ -90,7 +99,7 @@ namespace Harvey.Farm.Buildings
             if (idlePool.Contains(w))
                 idlePool.Remove(w);
 
-            Vector2 offset = Random.insideUnitCircle * spawnRadius;
+            Vector2 offset = Random.insideUnitCircle * HouseModel.SpawnRadius;
             Vector3 pos = (spawnPoint ? spawnPoint.position : transform.position) +
                           new Vector3(offset.x, 0f, offset.y);
 

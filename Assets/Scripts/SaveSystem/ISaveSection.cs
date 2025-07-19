@@ -1,9 +1,11 @@
+using System.Threading.Tasks;
+
 namespace Harvey.SaveSystem
 {
     public interface ISaveSection
     {
-        string SectionName { get; }        // e.g. "Coffee", "Vehicles"
-        string CaptureJson();
-        void RestoreJson(string json);
+        int LoadPriority { get; }
+        void Capture(GameSaveData root);
+        Task Restore(GameSaveData root);
     }
 }

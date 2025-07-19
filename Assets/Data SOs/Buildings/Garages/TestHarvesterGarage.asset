@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ef1b046429d74e47802f4635168a6a2, type: 3}
+  m_Name: TestHarvesterGarage
+  m_EditorClassIdentifier: 
+  <PrefabGuid>k__BackingField: basic-garage
+  <DisplayName>k__BackingField: Test Harvester Garage
+  <Icon>k__BackingField: {fileID: 0}
+  <Price>k__BackingField: 35000
+  <Type>k__BackingField: 1
+  <Capacity>k__BackingField: 1
+  <Preload>k__BackingField:
+  - {fileID: 11400000, guid: f3c8fe9e21ce8e245a6b2a8266b4fa9d, type: 2}

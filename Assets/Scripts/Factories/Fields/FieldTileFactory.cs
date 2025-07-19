@@ -1,33 +1,25 @@
 using Harvey.Data.Coffee;
 using UnityEngine;
+using System.Threading.Tasks;
 
 namespace Harvey.Farm.Factory
 {
     public class FieldTileFactory : Singleton<FieldTileFactory>, IFieldTileFactory
     {
-        [SerializeField] PrefabRegistry fieldRegistry;
-
         /* -------- IFieldTileFactory -------- */
         public GameObject Spawn(string fieldTileGuid, Transform parent, Vector3 pos)
         {
-            var prefab = fieldRegistry.Get(fieldTileGuid);
-            if (!prefab)
-            {
-                Debug.LogError($"FieldTileFactory: prefab GUID '{fieldTileGuid}' not found");
-                return null;
-            }
-            return FactoryHelpers.SpawnInternal(prefab, parent, pos);
+            return AddressableFactoryHelpers.SpawnInternal(fieldTileGuid, parent, pos);
+        }
+
+        public async Task<GameObject> SpawnAsync(string fieldTileGuid, Transform parent, Vector3 pos)
+        {
+            return await AddressableFactoryHelpers.SpawnInternalAsync(fieldTileGuid, parent, pos);
         }
 
         public void Despawn(string fieldTileGuid, GameObject inst)
         {
-            var prefab = fieldRegistry.Get(fieldTileGuid);
-            FactoryHelpers.DespawnInternal(prefab, inst);
+            AddressableFactoryHelpers.DespawnInternal(fieldTileGuid, inst);
         }
-
-        public GameObject Spawn(GameObject prefab, Transform parent, Vector3 pos) =>
-            FactoryHelpers.SpawnInternal(prefab, parent, pos);
-        public void Despawn(GameObject prefab, GameObject inst) =>
-            FactoryHelpers.DespawnInternal(prefab, inst);
     }
 }

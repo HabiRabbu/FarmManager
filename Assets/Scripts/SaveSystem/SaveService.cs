@@ -1,74 +1,58 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Harvey.SaveSystem
 {
-    // Should save to C:\Users\harve_f1jqi6p\AppData\LocalLow\DefaultCompany\FarmManager
-    // or in the Editor: Assets/StreamingAssets/autosave.json
+    // Should save to ...\AppData\LocalLow\DefaultCompany\FarmManager
     public class SaveService : Singleton<SaveService>
     {
         const string EXT = ".json";
         readonly List<ISaveSection> sections = new();
+        GameSaveData cache = new();
 
-        public void Register(ISaveSection s) => sections.Add(s);
-
-        /* ------------- public API ------------- */
-        public void SaveGame(string slot = "autosave")
+        /* ─────────── registration ─────────── */
+        public void Register(ISaveSection section)
         {
-            var wrapper = new Wrapper();
-            foreach (var s in sections)
-                wrapper.Sections.Add(new Wrapper.Section
-                {
-                    key = s.SectionName,
-                    json = s.CaptureJson()
-                });
-
-            File.WriteAllText(PathFor(slot),
-                              JsonUtility.ToJson(wrapper, true));
+            if (!sections.Contains(section))
+                sections.Add(section);
         }
 
-        public void LoadGame(string slot = "autosave")
+        /* ─────────────  API  ────────────── */
+        public void SaveGame(string slot = "autosave")
         {
-            string path = PathFor(slot);
+            foreach (var s in sections)
+                s.Capture(cache);
+
+            var json = JsonUtility.ToJson(cache, true);
+            File.WriteAllText(PathFor(slot), json);
+            Debug.Log($"SaveService ▸ wrote {sections.Count} sections to {PathFor(slot)}");
+        }
+
+        public async Task LoadGame(string slot = "autosave")
+        {
+            var path = PathFor(slot);
             if (!File.Exists(path))
             {
-                Debug.LogWarning($"Save file not found: {path}");
+                Debug.LogWarning($"SaveService ▸ no save found at {path}");
                 return;
             }
 
-            var wrapper = JsonUtility.FromJson<Wrapper>(File.ReadAllText(path));
+            cache = JsonUtility.FromJson<GameSaveData>(File.ReadAllText(path)) ?? new GameSaveData();
 
-            foreach (var s in sections)
-            {
-                if (wrapper.TryGet(s.SectionName, out string json))
-                    s.RestoreJson(json);
-            }
+            var sortedSections = sections.OrderBy(s => s.LoadPriority).ToList();
+
+            foreach (var s in sortedSections)
+                await s.Restore(cache);
+
+            Debug.Log($"SaveService ▸ loaded {sections.Count} sections from {path}");
         }
 
-        /* ------------- helpers --------------- */
+        /* ─────────── helpers ─────────── */
         string PathFor(string slot) =>
             Path.Combine(Application.persistentDataPath, slot + EXT);
-
-        [Serializable]
-        class Wrapper
-        {
-            public List<Section> Sections = new();
-
-            public bool TryGet(string key, out string json)
-            {
-                var sec = Sections.Find(s => s.key == key);
-                json = sec?.json;
-                return sec != null;
-            }
-
-            [Serializable]
-            public class Section
-            {
-                public string key;
-                public string json;
-            }
-        }
     }
 }

@@ -134,7 +134,7 @@ public class UITractorMenu : MonoBehaviour
         var shed = BuildingManager.Instance.GetNearestShed(field.transform.position);
         if (!shed) return;
 
-        implementChoices = shed.Query(i => i.Job == selectedTask).ToList();
+        implementChoices = shed.Query(i => i.Model.Job == selectedTask).ToList();
         var labels = implementChoices.Select(i => $"{i.name} ({i.Durability:P0})").ToList();
 
         TMP_Dropdown dd = selectedTask switch
@@ -188,7 +188,7 @@ public class UITractorMenu : MonoBehaviour
         if (selectedTask is JobType.Plow or JobType.Seed)
         {
             if (implementChoices.Count == 0 || CurrentImplementIndex() < 0) return;
-            implementId = implementChoices[CurrentImplementIndex()].GetId();
+            implementId = implementChoices[CurrentImplementIndex()].Model.Id;
             shed?.Reserve(implementId);
         }
 

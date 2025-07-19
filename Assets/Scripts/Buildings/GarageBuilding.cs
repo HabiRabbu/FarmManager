@@ -4,6 +4,7 @@ using UnityEngine;
 using Harvey.Farm.Events;
 using Harvey.Farm.Factory;
 using Harvey.Farm.VehicleScripts;
+using System.Threading.Tasks;
 
 namespace Harvey.Farm.Buildings
 {
@@ -12,7 +13,6 @@ namespace Harvey.Farm.Buildings
         [Header("Definition")]
         [SerializeField] GarageDefinition garageDefinition;
         public override BuildingDefinition Definition => garageDefinition;
-        public GarageDefinition GarageDefinition => garageDefinition;
 
         [Header("Vehicle Anchors")]
         [SerializeField] Transform[] parkingAnchors;
@@ -22,16 +22,31 @@ namespace Harvey.Farm.Buildings
 
         VehicleDefinition[] preload;
 
-        //Getters for UI and other systems
-        public int Capacity => garageDefinition.VehicleSlots;
+        public GarageModel GarageModel => Model as GarageModel;
 
-        void Awake() => preload = garageDefinition.Preload;
 
-        protected override void Start()
+        public void InitFromModel(BuildingModel model)
         {
-            base.Start();
-            Debug.Log($"Tractor garage initialised: {DisplayName}");
-            SpawnInitialVehicles();
+            stock.Clear();
+            reservedIds.Clear();
+            
+            SetModel(model);
+            SetId(model.Id);
+            BuildingManager.Instance.Register(this);
+        }
+
+        async void Start()
+        {
+            if (garageDefinition != null)
+            {
+                preload = garageDefinition.Preload;
+
+                SetModel(BuildingMapper.FromDefinition<GarageModel>(garageDefinition, GetId()));
+                BuildingManager.Instance.Register(this);
+                Debug.Log($"Garage initialised: {garageDefinition.DisplayName}");
+
+                await SpawnInitialVehicles();
+            }
         }
 
         /* ---------- public API ---------- */
@@ -41,7 +56,7 @@ namespace Harvey.Farm.Buildings
         public bool IsReserved(string id) => reservedIds.Contains(id);
 
         public IEnumerable<Vehicle> Query(System.Func<Vehicle, bool> predicate) =>
-            stock.Values.Where(v => !reservedIds.Contains(v.Id) && predicate(v));
+            stock.Values.Where(v => !reservedIds.Contains(v._stats.GetId()) && predicate(v));
 
         public bool TryCheckout(string id, out Vehicle vehicle)
         {
@@ -58,8 +73,8 @@ namespace Harvey.Farm.Buildings
 
         public void ReturnVehicle(Vehicle v)
         {
-            reservedIds.Remove(v.Id);
-            stock[v.Id] = v;
+            reservedIds.Remove(v._stats.GetId());
+            stock[v._stats.GetId()] = v;
 
             v.Detach();
             var anchor = GetFreeAnchor();
@@ -69,21 +84,25 @@ namespace Harvey.Farm.Buildings
 
         /* ---------- internal ---------- */
 
-        void SpawnInitialVehicles()
+        async Task SpawnInitialVehicles()
         {
             for (int i = 0; i < Mathf.Min(parkingAnchors.Length, preload.Length); i++)
             {
                 var def = preload[i];
-                var g = VehicleFactory.Instance.Spawn(def, parkingAnchors[i], Vector3.zero);
+                var g = await VehicleFactory.Instance.SpawnAsync(def.PrefabGuid, parkingAnchors[i], Vector3.zero);
                 var v = g.GetComponent<Vehicle>();
 
-                v._stats.Init(def, this);
+                if (v is Tractor)
+                    v._stats.InitFromModel(VehicleMapper.FromDefinition<TractorModel>(def, this, v._stats.GetId()) as TractorModel, this);
+                if (v is CombineHarvester)
+                    v._stats.InitFromModel(VehicleMapper.FromDefinition<HarvesterModel>(def, this, v._stats.GetId()) as HarvesterModel, this);
 
                 ReturnVehicle(v);
+                Debug.Log($"Spawned initial vehicle: {v.name} at anchor {parkingAnchors[i].name}");
             }
         }
 
-        Transform GetFreeAnchor()
+        public Transform GetFreeAnchor()
         {
             foreach (var a in parkingAnchors)
                 if (a.childCount == 0) return a;

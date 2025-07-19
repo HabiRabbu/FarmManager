@@ -78,13 +78,13 @@ namespace Harvey.Farm.Utilities
             Write($"Game saved to slot “{slot}”.", Color.green);
         }
 
-        public static void Cmd_Load(string[] args)
+        public static async void Cmd_Load(string[] args)
         {
             string slot = (args.Length >= 1 && !string.IsNullOrWhiteSpace(args[0]))
                             ? args[0]
                             : "autosave";
 
-            SaveService.Instance.LoadGame(slot);
+            await SaveService.Instance.LoadGame(slot);
             Write($"Attempted load from slot “{slot}”. "
                   + "Check log for section restores.", Color.green);
         }

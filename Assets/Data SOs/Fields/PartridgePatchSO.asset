@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07c4416a530c69a4ab70d272f94c01ec, type: 3}
   m_Name: PartridgePatchSO
   m_EditorClassIdentifier: 
-  fieldName: Partridge Patch
-  width: 50
-  height: 30
-  tileSize: 1
-  tilePrefab: {fileID: 1194650040818354598, guid: 0263484fa6e1e574d9d3cf80f5f58107, type: 3}
+  FieldName: Partridge Patch
+  Width: 24
+  Height: 45
+  TileSize: 1
+  TilePrefabGuid: basic-field-tile
+  PrefabGuid: basic-field

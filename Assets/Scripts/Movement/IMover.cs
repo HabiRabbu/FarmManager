@@ -7,7 +7,7 @@ namespace Harvey.Farm.Movement
     public interface IMover
     {
         IEnumerator MoveTo   (Vector3 worldPos);
-        IEnumerator MoveAlong(List<Vector3> waypoints, System.Action<int> onArrive);
+        IEnumerator MoveAlong(List<Vector3> waypoints, System.Action<int> onArrive, int resumeTile = 0);
         IEnumerator ReturnToHome ();
         void        TeleportTo(Vector3 worldPos);
     }

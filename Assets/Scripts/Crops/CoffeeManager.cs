@@ -4,6 +4,7 @@ using System.IO;
 using UnityEngine;
 using Harvey.SaveSystem;
 using Harvey.Data.Coffee;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Holds every CoffeeCrop in memory and persists them
@@ -11,6 +12,8 @@ using Harvey.Data.Coffee;
 /// </summary>
 public class CoffeeManager : Singleton<CoffeeManager>, ISaveSection
 {
+    [SerializeField] public int LoadPriority { get; } = 1;
+
     const string STARTER_FILE = "starter_coffee_crops.json";
     string StarterPath => Path.Combine(Application.streamingAssetsPath, STARTER_FILE);
 
@@ -46,34 +49,22 @@ public class CoffeeManager : Singleton<CoffeeManager>, ISaveSection
 
     /* ---------------- ISaveSection --------------- */
 
-    public string SectionName => "Coffee";
-
-    [Serializable]
-    class CoffeeState
+    public void Capture(GameSaveData root)
     {
-        public List<CoffeeCropData> crops;
+        if (root.Coffee == null) root.Coffee = new CoffeeSection();
+        root.Coffee.Crops.Clear();
+        root.Coffee.Crops.AddRange(coffeeCrops);
     }
 
-    public string CaptureJson()
+    public Task Restore(GameSaveData root)
     {
-        var state = new CoffeeState
-        {
-            crops = coffeeCrops
-        };
-        return JsonUtility.ToJson(state);
-    }
-
-    public void RestoreJson(string json)
-    {
-        if (string.IsNullOrWhiteSpace(json)) return;
-
-        var state = JsonUtility.FromJson<CoffeeState>(json);
-        if (state?.crops == null) return;
+        if (root.Coffee == null) return Task.FromException(new InvalidOperationException("Coffee section missing in save data"));
 
         coffeeCrops.Clear();
-        coffeeCrops.AddRange(state.crops);
+        coffeeCrops.AddRange(root.Coffee.Crops);
 
-        Debug.Log($"CoffeeManager restored {coffeeCrops.Count} crops");
+        Debug.Log($"CoffeeManager ▸ restored {coffeeCrops.Count} crops");
+        return Task.CompletedTask;
     }
 
     /* ---------------- internal --------------- */
@@ -86,8 +77,8 @@ public class CoffeeManager : Singleton<CoffeeManager>, ISaveSection
         }
 
         var json = File.ReadAllText(StarterPath);
-        var wrap = JsonUtility.FromJson<CoffeeState>(json);
-        if (wrap?.crops != null) coffeeCrops.AddRange(wrap.crops);
+        var wrap = JsonUtility.FromJson<CoffeeSection>(json);
+        if (wrap?.Crops != null) coffeeCrops.AddRange(wrap.Crops);
 
         Debug.Log($"Loaded {coffeeCrops.Count} starter coffee crops from {STARTER_FILE}");
     }

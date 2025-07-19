@@ -67,6 +67,8 @@ namespace Harvey.Farm.Workers
 
                 /* -------- 5. go home -------- */
                 yield return _mover.ReturnToHome();
+                _stats.CurrentField = null;
+                _stats.SetCurrentTileIndex(0);
                 _worker.ReturnHome();          // queues back in the house
 
             } while (_worker.JobQueue.TryDequeue(out job));

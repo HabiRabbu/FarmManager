@@ -56,7 +56,7 @@ public class UIFieldInfo : MonoBehaviour
     public void Bind(FieldController f)
     {
         boundField = f;
-        txtFieldName.text = f.Definition.fieldName;
+        txtFieldName.text = f.Model.DisplayName;
         Refresh();
     }
 

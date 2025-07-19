@@ -5,6 +5,8 @@ using System.Linq;
 using Harvey.Farm.Factory;
 using System;
 using Harvey.Farm.Events;
+using NUnit.Framework.Internal;
+using System.Threading.Tasks;
 
 namespace Harvey.Farm.Buildings
 {
@@ -13,9 +15,7 @@ namespace Harvey.Farm.Buildings
 
         [Header("Definition")]
         [SerializeField] private ShedDefinition shedDefinition;
-
         public override BuildingDefinition Definition => shedDefinition;
-        public ShedDefinition ShedDef => shedDefinition;
 
         [Header("Implement spawn anchors")]
         [SerializeField] Transform[] implantAnchors;
@@ -26,22 +26,31 @@ namespace Harvey.Farm.Buildings
 
         ImplementDefinition[] preload;
 
+        public ShedModel ShedModel => Model as ShedModel;
 
-        void Awake()
+        public void InitFromModel(BuildingModel model)
         {
-            preload = ShedDef.Preload;
+            stock.Clear();
+            reserved.Clear();
+            
+            SetModel(model);
+            SetId(model.Id);
+            BuildingManager.Instance.Register(this);
         }
 
-
-        protected override void Start()
+        async void Start()
         {
-            base.Start();
-
             if (shedDefinition != null)
-                Debug.Log($"Shed initialised: {shedDefinition.DisplayName}");
-            SpawnInitialImplements();
-        }
+            {
+                preload = shedDefinition.Preload;
 
+                SetModel(BuildingMapper.FromDefinition<ShedModel>(shedDefinition, GetId()));
+                BuildingManager.Instance.Register(this);
+                Debug.Log($"Shed initialised: {shedDefinition.DisplayName}");
+
+                await TestingSpawnInitialImplements();
+            }
+        }
 
         // ---------- Public API ----------
 
@@ -50,7 +59,7 @@ namespace Harvey.Farm.Buildings
         public bool IsReserved(string id) => reserved.Contains(id);
 
         public IEnumerable<ImplementBehaviour> Query(System.Func<ImplementBehaviour, bool> predicate) =>
-            stock.Values.Where(b => !reserved.Contains(b.GetId()) && predicate(b));
+            stock.Values.Where(b => !reserved.Contains(b.Model.Id) && predicate(b));
 
         public bool TryCheckoutByID(string id, out ImplementBehaviour implement)
         {
@@ -66,39 +75,68 @@ namespace Harvey.Farm.Buildings
             return false;
         }
 
-        public void ReturnImplement(ImplementBehaviour implement)
+        public void RegisterImplement(ImplementBehaviour implement)
         {
-            reserved.Remove(implement.GetId());
-            stock[implement.GetId()] = implement;
+            if (implement == null || stock.ContainsKey(implement.Model.Id)) return;
+
+            stock[implement.Model.Id] = implement;
+            GameEvents.BuildingStatsChanged();
+        }
+
+        public void ReturnImplement(ImplementBehaviour implement, int index = -1)
+        {
+            if (reserved.Contains(implement.Model.Id))
+            {
+                reserved.Remove(implement.Model.Id);
+            }
+            stock[implement.Model.Id] = implement;
 
             implement.Detach();
             var anchor = GetFreeAnchor();
+            if (index >= 0 && index < implantAnchors.Length)
+                anchor = GetAnchor(index);
             implement.AttachTo(anchor);
 
             GameEvents.BuildingStatsChanged();
         }
 
         // ---------- Internal ----------
-
-        void SpawnInitialImplements()
+        async Task TestingSpawnInitialImplements()
         {
-            for (int i = 0; i < Mathf.Min(implantAnchors.Length, preload.Length); i++)
-            {
-                var def = preload[i];
-                var go = ImplementFactory.Instance.Spawn(def, implantAnchors[i], Vector3.zero);
-                var beh = go.GetComponent<ImplementBehaviour>() ?? go.AddComponent<ImplementBehaviour>();
-                beh.Init(def, this);
-                ReturnImplement(beh);
-            }
+            int i = 0;
+
+            var def = preload[i];
+            var go = await ImplementFactory.Instance.SpawnAsync(def.PrefabGuid, implantAnchors[i], Vector3.zero);
+            var beh = go.GetComponent<ImplementBehaviour>() ?? go.AddComponent<ImplementBehaviour>();
+            beh.InitFromModel(ImplementMappers.FromDefinition(def, this, beh.GetGuid()), this);
+            ReturnImplement(beh);
+            i++;
+
+            def = preload[i];
+            go = await ImplementFactory.Instance.SpawnAsync(def.PrefabGuid, implantAnchors[i], Vector3.zero);
+            beh = go.GetComponent<ImplementBehaviour>() ?? go.AddComponent<ImplementBehaviour>();
+            beh.InitFromModel(ImplementMappers.FromDefinition(def, this, beh.GetGuid()), this);
+            ReturnImplement(beh);
+            i++;
+
+            def = preload[i];
+            go = await ImplementFactory.Instance.SpawnAsync(def.PrefabGuid, implantAnchors[i], Vector3.zero);
+            beh = go.GetComponent<ImplementBehaviour>() ?? go.AddComponent<ImplementBehaviour>();
+            beh.InitFromModel(ImplementMappers.FromDefinition(def, this, beh.GetGuid()), this);
+            ReturnImplement(beh);
         }
 
-        Transform GetFreeAnchor()
+        public Transform GetFreeAnchor()
         {
             foreach (var anchor in implantAnchors)
                 if (anchor.childCount == 0)
                     return anchor;
             return transform;
         }
+
+        public Transform GetAnchor(int index) => (index >= 0 && index < implantAnchors.Length)
+                                         ? implantAnchors[index] : transform;
+        public int IndexOfAnchor(Transform t) => System.Array.IndexOf(implantAnchors, t);
 
         // ---------- Radial Menu Support ----------
         public void RadialOpenBuildingInfo() => GameEvents.RadialBuildingInfoOpened(this);

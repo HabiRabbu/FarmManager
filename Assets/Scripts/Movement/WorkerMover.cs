@@ -4,10 +4,14 @@ using UnityEngine;
 using Harvey.Farm.Movement;
 using DG.Tweening;
 using Harvey.Farm.Workers;
+using Harvey.Farm.Events;
 
 public class WorkerMover : BaseMover
 {
     WorkerStats stats;
+
+    Sequence seq = null;
+
     Animator anim;
     int isMovingHash;
 
@@ -19,7 +23,25 @@ public class WorkerMover : BaseMover
         isMovingHash = Animator.StringToHash("IsMoving");
     }
 
-    public override IEnumerator MoveAlong(List<Vector3> wps, System.Action<int> onArrive)
+    void OnEnable()
+    {
+        GameEvents.OnStopAllTweens += StopAllTweens;
+    }
+    void OnDisable()
+    {
+        GameEvents.OnStopAllTweens -= StopAllTweens;
+    }
+
+    void StopAllTweens()
+    {
+        if (seq != null)  // Add this null check
+        {
+            seq.Kill();
+            seq = null;
+        }
+    }
+
+    public override IEnumerator MoveAlong(List<Vector3> wps, System.Action<int> onArrive, int resumeTile = 0)
     {
         anim.SetBool(isMovingHash, true);
 
@@ -30,7 +52,7 @@ public class WorkerMover : BaseMover
         for (int i = 0; i < wps.Count; i++)
         {
             float dist = Vector3.Distance(rootTransform.position, wps[i]);
-            float time = dist / stats.WalkSpeed;
+            float time = dist / stats.Model.WalkSpeed;
 
             yield return TranslateTo(wps[i], time).WaitForCompletion();
             onArrive?.Invoke(i);
@@ -46,7 +68,7 @@ public class WorkerMover : BaseMover
 
         var homePos = stats.GetHome().transform.position;
         float dist = Vector3.Distance(rootTransform.position, homePos);
-        float time = dist / stats.WalkSpeed;
+        float time = dist / stats.Model.WalkSpeed;
 
         yield return TranslateTo(homePos, time).WaitForCompletion();
 

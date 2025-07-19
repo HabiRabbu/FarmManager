@@ -1,18 +1,18 @@
-// Assets/Scripts/Data/Fields/FieldSaveData.cs
+using UnityEngine;
+
 namespace Harvey.Data.Fields
 {
     [System.Serializable]
-    public class FieldSaveData
+    public struct FieldSaveData
     {
         public string Id;
-        public int Width;
-        public int   Height;
-        public float TileSize;
+        public string DisplayName;
         public string PrefabGuid;
-        public string TilePrefabGuid;
-        public UnityEngine.Vector3 Position;
-        public int    CurrentState;
+        public Vector3 Position;
+        public int Width, Height;
+        public float TileSize;
+        public int CurrentState;
         public string CurrentCropId;
-        public string TileFlags;        // '.' / 'P' / 'S' / 'H'
+        public string TileFlags;
     }
 }

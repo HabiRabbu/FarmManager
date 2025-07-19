@@ -6,9 +6,9 @@ namespace Harvey.Farm.Factory
     {
         /* ------------ IUIFactory ------------ */
         public GameObject Spawn(GameObject prefab, Transform parent)
-            => FactoryHelpers.SpawnUIInternal(prefab, parent);
+            => AddressableFactoryHelpers.SpawnUIInternal(prefab, parent);
 
         public void Despawn(GameObject prefab, GameObject instance)
-            => FactoryHelpers.DespawnUIInternal(prefab, instance);
+            => AddressableFactoryHelpers.DespawnUIInternal(prefab, instance);
     }
 }

@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Crops
+  m_EditorClassIdentifier: 
+  m_GroupName: Crops
+  m_GUID: 4012c87c1d507c547b625e9ef88ea071
+  m_SerializeEntries:
+  - m_GUID: c834414f77e80ab4f9288413572cd96c
+    m_Address: basic-robusta
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Crops
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: db049b6ce47e07b409a9ad99bb10c6fe
+    m_Address: basic-arabica
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Crops
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: ef5808851b55abc4ea938b2c912cc08c, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 824be79cd417a064cada4decf7322ece, type: 2}
+    - {fileID: 11400000, guid: 73f588b34ed9000468df8ef482c5ed73, type: 2}

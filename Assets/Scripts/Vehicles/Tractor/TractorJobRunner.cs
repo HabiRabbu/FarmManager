@@ -21,15 +21,25 @@ public class TractorJobRunner : MonoBehaviour
         _mover = GetComponent<TractorMover>();
     }
 
-    public void Run(FieldJob job) => StartCoroutine(RunJobs(job));
+    public void Run(FieldJob job, int resumeTile) => StartCoroutine(RunJobs(job, resumeTile));
 
-    IEnumerator RunJobs(FieldJob job)
+    IEnumerator RunJobs(FieldJob job, int resumeTile)
     {
         do
         {
             /* 1. tool */
             if (!_tools.Has(job.Type))
-                yield return _tools.Fetch(job.Type, job.ToolId);
+            {
+                var tractor = (Tractor)_vehicle;
+                if (tractor.AttachedToolId != null)
+                {
+                    _tools._currentImplement = ImplementManager.Instance.GetById(tractor.AttachedToolId);
+                }
+                else
+                {
+                    yield return _tools.Fetch(job.Type, job.ToolId);
+                }
+            }
 
             /* 2. field prep */
             var field = job.Field;
@@ -49,16 +59,20 @@ public class TractorJobRunner : MonoBehaviour
                 _ => null
             };
 
-            yield return _mover.MoveAlong(waypoints, perTile);
+            yield return _mover.MoveAlong(waypoints, perTile, resumeTile);
 
             /* 4. clean-up */
+            var Tractor = _vehicle as Tractor;
+            Tractor.TractorModel.AttachedToolId = null;
             yield return _tools.Return();
         }
         while (_vehicle.JobQueue.TryDequeue(out job));
 
         /* 5. Return Home */
         yield return _mover.ReturnToHome();
-        _vehicle.SetBusy(false);
+        _vehicle._stats.SetBusy(false);
+        _vehicle._stats.CurrentField = null;
+        _vehicle._stats.SetCurrentTileIndex(0);
         _vehicle.ReturnHome();
     }
 }

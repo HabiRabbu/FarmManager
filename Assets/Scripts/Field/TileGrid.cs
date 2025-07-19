@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Harvey.Farm.Factory;
+using Harvey.Farm.Utilities;
 using UnityEngine;
 
 namespace Harvey.Farm.Fields
@@ -101,10 +103,13 @@ namespace Harvey.Farm.Fields
             return bestI;
         }
 
-        public FieldTile[] Generate(string tilePrefabGuid, Transform parent,
+        public async Task<FieldTile[]> GenerateAsync(string tilePrefabGuid, Transform parent,
                             float yScale = 1f)
         {
             FieldTile[] tiles = new FieldTile[centers.Length];
+
+            // Preload the prefab once for efficiency
+            await AddressablePoolManager.Instance.PreloadAsync(tilePrefabGuid);
 
             for (int i = 0; i < centers.Length; i++)
             {
@@ -121,7 +126,10 @@ namespace Harvey.Farm.Fields
                     groundY + 0.1f, // offset
                     centers[i].y);
 
+                // Now we can use synchronous spawn since prefab is cached
                 var go = FieldTileFactory.Instance.Spawn(tilePrefabGuid, null, pos);
+                if (go == null) continue; // Skip if spawn failed
+                
                 go.transform.SetParent(parent, true);
 
                 go.transform.localScale = new Vector3(TileSize, yScale, TileSize);

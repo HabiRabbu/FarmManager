@@ -3,6 +3,7 @@ using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using Harvey.Farm.Movement;
+using Harvey.Farm.Events;
 
 public abstract class BaseMover : MonoBehaviour, IMover
 {
@@ -16,7 +17,7 @@ public abstract class BaseMover : MonoBehaviour, IMover
     public virtual IEnumerator MoveTo(Vector3 wp)
         => MoveAlong(new List<Vector3> { wp }, null);
 
-    public abstract IEnumerator MoveAlong(List<Vector3> waypoints, System.Action<int> onArrive);
+    public abstract IEnumerator MoveAlong(List<Vector3> waypoints, System.Action<int> onArrive, int resumeTile = 0);
 
     public abstract IEnumerator ReturnToHome();
 

@@ -62,8 +62,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 023aec70dfa43c943928ccde4aa83a7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  houseDefinition: {fileID: 11400000, guid: 46217132859d1614996afbe84675869f, type: 2}
-  spawnRadius: 1
+  houseDefinition: {fileID: 0}
   spawnPoint: {fileID: 7049213434911671186}
 --- !u!65 &3577586861189348294
 BoxCollider:

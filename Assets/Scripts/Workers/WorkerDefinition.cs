@@ -17,7 +17,7 @@ namespace Harvey.Farm.Workers
         [field: SerializeField] public float harvestSeconds = 4f;
 
         [field: Header("Visual")]
-        [field: SerializeField] public GameObject ModelPrefab;
-        [field: SerializeField] public Sprite Portrait;
+        [field: SerializeField] public string PrefabGuid;
+        [field: SerializeField] public string PortraitGuid;
     }
 }

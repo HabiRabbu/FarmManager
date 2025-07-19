@@ -11,18 +11,26 @@ namespace Harvey.Farm.VehicleScripts
 {
     public abstract class Vehicle : MonoBehaviour, IJobAgent
     {
-        public FieldController CurrentField { get; protected set; }
         public Queue<FieldJob> JobQueue { get; } = new();
+        public FieldController CurrentField => _stats.CurrentField;
+
+        public string GetId() => _stats.GetId();
+        public int CurrentTileIndex => _stats.CurrentTileIndex;
 
         public abstract bool CanDo(JobType type);
-        public abstract void StartTask(FieldJob job);
+        public abstract void StartTask(FieldJob job, int resumeTile = 0);
 
         // Cache
         public VehicleStats _stats { get; private set; }
 
-        public bool IsBusy => _stats.IsBusy;
-        public string Id => _stats.GetId();
-        public string DisplayName => _stats.DisplayName;
+        public bool IsBusy => _stats.Model.IsBusy;
+        public void SetBusy(bool value)
+        {
+            _stats.SetBusy(value);
+            GameEvents.VehicleBusyChanged(this, value);
+        }
+
+        public string DisplayName => _stats.Model.DisplayName;
 
         public GarageBuilding Home => _stats.GetHome();
         public void SetHome(GarageBuilding home) => _stats.SetHome(home);
@@ -30,17 +38,6 @@ namespace Harvey.Farm.VehicleScripts
         protected virtual void Awake()
         {
             _stats = GetComponent<VehicleStats>();
-        }
-
-        protected virtual void Start()
-        {
-            VehicleManager.Instance.RegisterVehicle(this);
-        }
-
-        public void SetBusy(bool value)
-        {
-            _stats.SetBusy(value);
-            GameEvents.VehicleBusyChanged(this, value);
         }
 
         public void Enqueue(FieldJob job) => JobQueue.Enqueue(job);

@@ -4,15 +4,33 @@ using Harvey.Farm.Buildings;
 using Harvey.Farm.Fields;
 using Harvey.Farm.Jobs;
 using Harvey.Farm.VehicleScripts;
+using Harvey.Farm.Workers;
 
 namespace Harvey.Farm.Events
 {
     public static class GameEvents
     {
 
-        // *------------------- Vehicles -------------------*
+        // *------------------- General -------------------*
+        public static event Action OnStopAllTweens;
+        public static void StopAllTweens() => OnStopAllTweens?.Invoke();
+
+        // *------------------- Game Management -------------------*
+        public static event Action OnGameReady;
+        public static event Action<float> OnPreloadProgress;
+        public static event Action OnPreloadComplete;
+        public static event Action<string> OnAssetPreloaded;
+
+        public static void GameReady() => OnGameReady?.Invoke();
+        public static void PreloadProgress(float progress) => OnPreloadProgress?.Invoke(progress);
+        public static void PreloadComplete() => OnPreloadComplete?.Invoke();
+        public static void AssetPreloaded(string assetId) => OnAssetPreloaded?.Invoke(assetId);
+
+        // *------------------- JobAgents -------------------*
         public static event Action<Vehicle, bool> OnVehicleBusyChanged;
+        public static event Action<Worker, bool> OnWorkerBusyChanged;
         public static void VehicleBusyChanged(Vehicle v, bool isBusy) => OnVehicleBusyChanged?.Invoke(v, isBusy);
+        public static void WorkerBusyChanged(Worker w, bool isBusy) => OnWorkerBusyChanged?.Invoke(w, isBusy);
 
         // *------------------- Fields -------------------*
         public static event Action<FieldTile> OnTilePlowed;

@@ -17,27 +17,28 @@ namespace Harvey.Farm.VehicleScripts
     {
         TractorJobRunner _runner;
 
+        public VehicleStats Stats => _stats;
+        public TractorModel TractorModel => _stats.Model as TractorModel;
+
+        public string AttachedToolId => TractorModel.AttachedToolId;
+
         protected override void Awake()
         {
             base.Awake();
             _runner = GetComponent<TractorJobRunner>();
         }
 
-        protected override void Start()
-        {
-            base.Start();
-        }
-
         public override bool CanDo(JobType type) =>
-            (type is JobType.Plow or JobType.Seed) && !_stats.IsBusy && _stats.Def.Type == VehicleType.Tractor;
+            (type is JobType.Plow or JobType.Seed) && _stats.Model.IsBusy == false && TractorModel.Type == VehicleType.Tractor;
 
-        public override void StartTask(FieldJob job)
+        public override void StartTask(FieldJob job, int resumeTile = 0)
         {
             if (_stats.IsBusy || !CanDo(job.Type)) return;
 
             SetBusy(true);
-            CurrentField = job.Field;
-            _runner.Run(job);
+            _stats.CurrentField = job.Field;
+            _runner.Run(job, resumeTile);
+            TractorModel.AttachedToolId = job.ToolId;
         }
     }
 

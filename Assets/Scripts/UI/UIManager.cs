@@ -41,11 +41,6 @@ namespace Harvey.Farm.UI
         //Public Getters
         public Transform CanvasTransform => canvasTransform;
 
-
-        //Pools
-        private UIPrefabPool fadingPopupPool;
-        private UIPrefabPool notificationPopupPool;
-
         //Current UI
         private RadialMenuController radialMenu;
         private UIFieldInfo fieldInfo;
@@ -155,7 +150,7 @@ namespace Harvey.Farm.UI
 
             var n = new NotificationData
             (
-                $"{agent.DisplayName} started to {j.Type} on {j.Field.Definition.fieldName}",
+                $"{agent.DisplayName} started to {j.Type} on {j.Field.Model.DisplayName}",
                 textColor: Color.white,
                 backgroundColor: new Color(0.15f, 0.6f, 0.1f),
                 fadeDuration: 4f
@@ -168,7 +163,7 @@ namespace Harvey.Farm.UI
         {
             var n = new FadingPopupData
             (
-                text: $"Work completed on field {field.Definition.fieldName}",
+                text: $"Work completed on field {field.Model.DisplayName}",
                 color: Color.white,
                 fadeDuration: 2f
             );
@@ -180,7 +175,7 @@ namespace Harvey.Farm.UI
         {
             var n = new NotificationData
             (
-                $"Crops on {field.Definition.fieldName} are ready to harvest!",
+                $"Crops on {field.Model.DisplayName} are ready to harvest!",
                 textColor: Color.white,
                 backgroundColor: Colors.COLOR_YELLOW,
                 fadeDuration: 6f
@@ -193,7 +188,7 @@ namespace Harvey.Farm.UI
         {
             var n = new NotificationData
             (
-                $"{field.currentCrop.DisplayName} on {field.Definition.fieldName} has been harvested.",
+                $"{field.currentCrop.DisplayName} on {field.Model.DisplayName} has been harvested.",
                 textColor: Color.white,
                 backgroundColor: Colors.COLOR_TEAL,
                 fadeDuration: 6f
@@ -251,7 +246,7 @@ namespace Harvey.Farm.UI
             }
             fieldWorkerMenu.Show(field);
 
-            if (fieldTractorMenu) fieldTractorMenu.gameObject.SetActive(false);
+            if (fieldTractorMenu) fieldTractorMenu.gameObject.SetActive(false); 
         }
 
         public void OpenBuildingInfo(Building b)

@@ -12,8 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8ca883d136799947b1fbc01d2667681, type: 3}
   m_Name: TESTSeederSO
   m_EditorClassIdentifier: 
+  Id: 
+  <PrefabGuid>k__BackingField: basic-seeder
   <DisplayName>k__BackingField: Seeder
+  <Icon>k__BackingField: {fileID: 0}
   <Type>k__BackingField: 2
   <Job>k__BackingField: 1
-  <ModelPrefab>k__BackingField: {fileID: 3842723845421910057, guid: f2346ff11ffbc9645b670512622f45a1, type: 3}
+  <Durability>k__BackingField: 0
   <Price>k__BackingField: 40000

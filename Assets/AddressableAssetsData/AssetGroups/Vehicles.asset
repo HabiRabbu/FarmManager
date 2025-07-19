@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Vehicles
+  m_EditorClassIdentifier: 
+  m_GroupName: Vehicles
+  m_GUID: 4f361306276321b4b963f64258b7c479
+  m_SerializeEntries:
+  - m_GUID: acfa1f14d9bc370459c67afb9c039ae1
+    m_Address: basic-harvester
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Vehicles
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f0921dad925e90d48bceba574df291ca
+    m_Address: basic-tractor
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Vehicles
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: ef5808851b55abc4ea938b2c912cc08c, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: c182ac2d088d5de4bbbe3705e91817a5, type: 2}
+    - {fileID: 11400000, guid: 4046824c64fea01408f825e99bb7e684, type: 2}

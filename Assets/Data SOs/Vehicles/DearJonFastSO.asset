@@ -12,9 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0863ee36ccdf024cbac81e42f500358, type: 3}
   m_Name: DearJonFastSO
   m_EditorClassIdentifier: 
+  <PrefabGuid>k__BackingField: basic-tractor
   <DisplayName>k__BackingField: Dear Jon Fast
-  <Type>k__BackingField: 0
-  <ModelPrefab>k__BackingField: {fileID: 5252949776778261906, guid: f0921dad925e90d48bceba574df291ca, type: 3}
+  <Icon>k__BackingField: {fileID: 21300000, guid: ace56f1906d570f4b87ddb52c0e27b13, type: 3}
   <MoveSpeed>k__BackingField: 500
-  <Capacity>k__BackingField: 0
+  <Fuel>k__BackingField: 0
+  <Durability>k__BackingField: 0
   <Price>k__BackingField: 0
+  <Capacity>k__BackingField: 0
+  <Type>k__BackingField: 0

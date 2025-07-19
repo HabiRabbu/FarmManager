@@ -1,5 +1,7 @@
 using System;
 using Harvey.Farm.Buildings;
+using Harvey.Farm.Fields;
+using Harvey.Farm.VehicleScripts;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -7,6 +9,14 @@ public class VehicleStats : MonoBehaviour
 {
     [SerializeField] VehicleDefinition definition;
     public VehicleDefinition Def => definition;
+
+    Vehicle vehicleController;
+    public Vehicle VehicleController => vehicleController;
+
+    // Field Stuff
+    public FieldController CurrentField;
+    public int CurrentTileIndex { get; private set; } = 0;
+    public void SetCurrentTileIndex(int index) => CurrentTileIndex = index;
 
     // Garage Building
     private GarageBuilding Home;
@@ -18,48 +28,52 @@ public class VehicleStats : MonoBehaviour
     public string GetId() => guidBehaviour.GetId();
     public void SetId(string newId) => guidBehaviour.SetId(newId);
 
-    private bool isInitialised = false;
+    /* ---------- Model ---------- */
+    public VehicleModel Model;
+    public void SetModel(VehicleModel model) => Model = model;
 
-    /* ---------- Tunable stats ---------- */
-    [field: SerializeField] public string DisplayName { get; private set; } = "Vehicle";
-    [field: SerializeField] public Sprite Icon { get; private set; } = null;
-    [field: SerializeField] public float MoveSpeed { get; private set; } = 2f;
-    [field: SerializeField] public float Fuel { get; private set; } = 100f;
-    [field: SerializeField] public float Durability { get; private set; } = 100f;
-    [field: SerializeField] public float Price { get; private set; } = 100f;
-    [field: SerializeField] public float Capacity { get; private set; } = 100f;
+    public bool IsBusy => Model.IsBusy;
+    public void SetBusy(bool value) => Model.IsBusy = value;
 
-    public bool IsBusy { get; private set; }
 
     void Awake()
     {
         guidBehaviour = GetComponent<GuidBehaviour>();
-
-        if (definition == null)
-        {
-            return;
-        }
-        DisplayName = definition.DisplayName;
-        MoveSpeed = definition.MoveSpeed;
-        Capacity = definition.Capacity;
-        Price = definition.Price;
-
-        isInitialised = true;
+        vehicleController = GetComponent<Vehicle>();
     }
 
-    public void Init(VehicleDefinition def, GarageBuilding origin)
+    public void InitFromModel(VehicleModel model, GarageBuilding home)
     {
-        if (isInitialised)
-        {
-            Debug.LogWarning("VehicleStats is already initialised. Reinitialisation may cause issues.");
-            return;
-        }
+        if (model == null) return;
+        Debug.Log($"VehicleStats: Initializing from model {model.DisplayName} with Home: {home}");
 
-        definition = def ?? throw new ArgumentNullException(nameof(def), "VehicleDefinition cannot be null.");
-        Awake();
-
-        Home = origin;
+        Model = model;
+        Home = home;
+        guidBehaviour.SetId(model.Id);
+        gameObject.name = model.DisplayName;
+        VehicleManager.Instance.RegisterVehicle(vehicleController);
     }
 
-    public void SetBusy(bool value) => IsBusy = value;
+    void Start()
+    {
+        if (definition != null)
+        {
+            Debug.Log($"VehicleStats: Initializing from definition {definition.DisplayName} with Home: {Home}");
+            switch (definition.Type)
+            {
+                case VehicleType.Tractor:
+                    Model = VehicleMapper.FromDefinition<TractorModel>(definition, Home, guidBehaviour.GetId());
+                    break;
+                case VehicleType.CombineHarvester:
+                    Model = VehicleMapper.FromDefinition<HarvesterModel>(definition, Home, guidBehaviour.GetId());
+                    break;
+                default:
+                    throw new System.ArgumentException($"Unsupported vehicle type: {definition.Type}");
+            }
+
+            Home = BuildingManager.Instance.GetById<GarageBuilding>(Model.HomeId);
+            gameObject.name = Model.DisplayName;
+            VehicleManager.Instance.RegisterVehicle(vehicleController);
+        }
+    }
 }

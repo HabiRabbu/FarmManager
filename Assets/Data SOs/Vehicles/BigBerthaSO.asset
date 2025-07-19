@@ -12,9 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0863ee36ccdf024cbac81e42f500358, type: 3}
   m_Name: BigBerthaSO
   m_EditorClassIdentifier: 
+  <PrefabGuid>k__BackingField: basic-harvester
   <DisplayName>k__BackingField: Big Bertha
-  <Type>k__BackingField: 3
-  <ModelPrefab>k__BackingField: {fileID: 3986250216646725534, guid: acfa1f14d9bc370459c67afb9c039ae1, type: 3}
+  <Icon>k__BackingField: {fileID: 0}
   <MoveSpeed>k__BackingField: 50
-  <Capacity>k__BackingField: 1000
+  <Fuel>k__BackingField: 0
+  <Durability>k__BackingField: 0
   <Price>k__BackingField: 200000
+  <Capacity>k__BackingField: 1000
+  <Type>k__BackingField: 3

@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using Harvey.Data.Coffee;
 using Harvey.Farm.Events;
+using Harvey.Farm.Jobs;
 using UnityEngine;
 
 namespace Harvey.Farm.Fields
@@ -9,6 +11,8 @@ namespace Harvey.Farm.Fields
     public class FieldController : MonoBehaviour
     {
         public FieldDefinition definition;
+        public FieldModel Model { get; private set; }
+
         public CoffeeCropData currentCrop;
         public State currentState = State.Idle;
 
@@ -19,14 +23,11 @@ namespace Harvey.Farm.Fields
         public float TilesCompletedFraction => runtime.Completion;
         public bool Is(State s) => currentState == s;
         public State Current => currentState;
-        public FieldDefinition Definition => definition;
 
         // GuidBehaviour
         GuidBehaviour guidBehaviour;
         public string GetId() => guidBehaviour.GetId();
         public void SetId(string newId) => guidBehaviour.SetId(newId);
-
-
 
         void Awake()
         {
@@ -35,13 +36,91 @@ namespace Harvey.Farm.Fields
             guidBehaviour = GetComponent<GuidBehaviour>();
         }
 
-        void Start()
+        async void Start()
         {
-            builder.Build();
-            runtime.Initialize(builder.Tiles);
-            gameObject.name = $"Field - {definition.fieldName}";
+            if (Model == null && definition != null)
+            {
+                Model = FieldMapper.FromDefinition(definition, guidBehaviour.GetId(), transform.position);
+                FieldManager.Instance.RegisterField(this);
 
+                await BuildField();
+                gameObject.name = $"Field - {definition.FieldName}";
+            }
+        }
+
+        private async Task BuildField()
+        {
+            await builder.BuildAsync(); // Make this async
+            runtime.Initialize(builder.Tiles);
+            Debug.Log($"✅ FieldController: Field built and runtime initialized with {builder.Tiles?.Length ?? 0} tiles");
+        }
+
+        public async void InitFromModel(FieldModel model)
+        {
+            if (model == null) return;
+
+            Model = model;
+            guidBehaviour.SetId(model.Id);
             FieldManager.Instance.RegisterField(this);
+
+            // Wait for build to complete before initializing runtime
+            await builder.BuildFromModelAsync(model);
+            runtime.Initialize(builder.Tiles);
+            FromModelParser(model);
+            gameObject.name = $"Field - {Model.DisplayName}";
+        }
+
+        void FromModelParser(FieldModel model)
+        {
+            //State
+            currentState = (State)Model.CurrentState;
+
+            //Current Crop
+            currentCrop = CoffeeManager.Instance.GetById(Model.CurrentCropId);
+
+            //Completion Amount
+            foreach (var c in Model.TileFlags)
+            {
+                if (c != '.')
+                    runtime.Advance();
+            }
+
+            //Tile Flags
+            var tiles = builder.Tiles;
+            var tileFlags = model.TileFlags;
+            int count = Mathf.Min(tiles.Length, tileFlags.Length);
+
+            for (int i = 0; i < count; i++)
+            {
+                var t = tiles[i];
+                t.ResetTile();
+
+                switch (tileFlags[i])
+                {
+                    case 'P':
+                        t.Plow();
+                        break;
+
+                    case 'S':
+                        t.Plow();
+                        t.Seed(currentCrop);
+                        break;
+
+                    case 'H':
+                        t.Plow();
+                        t.Seed(currentCrop);
+                        t.Harvest();
+                        break;
+                }
+            }
+            // Start GrowRoutine if Seeded
+            if (currentState == State.Seeded || currentState == State.Growing)
+            {
+                StartCoroutine(GrowRoutine());
+            }
+
+
+            //Anything else...?
         }
 
         void OnEnable()
@@ -78,15 +157,15 @@ namespace Harvey.Farm.Fields
 
         public bool Needs(JobType job) => job switch
         {
-            JobType.Plow => currentState is State.Idle or State.Harvested,
-            JobType.Seed => currentState == State.Plowed,
-            JobType.Harvest => currentState == State.ReadyToHarvest,
+            JobType.Plow => currentState is State.Idle or State.Harvested or State.Plowing,
+            JobType.Seed => currentState is State.Plowed or State.Seeding,
+            JobType.Harvest => currentState is State.ReadyToHarvest,
             _ => false
         };
 
         public void BeginJob(JobType job, CoffeeCropData crop = null)
         {
-            currentState = job switch
+            var newState = job switch
             {
                 JobType.Plow => State.Plowing,
                 JobType.Seed => State.Seeding,
@@ -94,8 +173,14 @@ namespace Harvey.Farm.Fields
                 _ => currentState
             };
 
+            // Only reset progress if we're transitioning to a new job type
+            bool shouldResetProgress = currentState != newState;
+
+            currentState = newState;
             if (job == JobType.Seed) currentCrop = crop;
-            runtime.ResetProgress();
+
+            if (shouldResetProgress)
+                runtime.ResetProgress();
         }
 
         public void HandleTileCompleted()
@@ -123,7 +208,7 @@ namespace Harvey.Farm.Fields
         public FieldTile[] GetSerpentineTiles()
         {
             var tiles = builder.Tiles;
-            if (definition.width >= definition.height)
+            if (Model.Width >= Model.Height)
                 return builder.Grid.BuildSerpentineRows(tiles);
             else
                 return builder.Grid.BuildSerpentineColumns(tiles);
@@ -174,6 +259,21 @@ namespace Harvey.Farm.Fields
         public void RadialOpenFieldTractor() => GameEvents.RadialFieldTractorOpened(this);
         public void RadialOpenFieldWorkers() => GameEvents.RadialFieldWorkersOpened(this);
         // -------------------------------------------
+
+        /// <summary>
+        /// Gets the current job type being performed on this field based on its state.
+        /// Returns null if no active job is in progress.
+        /// </summary>
+        public JobType? GetCurrentJobType()
+        {
+            return currentState switch
+            {
+                State.Plowing => JobType.Plow,
+                State.Seeding => JobType.Seed,
+                State.Harvesting => JobType.Harvest,
+                _ => null
+            };
+        }
 
         public enum State { Idle, Plowing, Plowed, Seeding, Seeded, Growing, ReadyToHarvest, Harvesting, Harvested }
     }

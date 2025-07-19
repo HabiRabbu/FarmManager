@@ -25,7 +25,7 @@ public class UIImplementSlot : MonoBehaviour
             return;
         }
         iconImage.sprite = implement.Icon;
-        nameText.text = implement.Def.DisplayName;
+        nameText.text = implement.Model.DisplayName;
         durabilityBar.fillAmount = implement.Durability;
     }
 }

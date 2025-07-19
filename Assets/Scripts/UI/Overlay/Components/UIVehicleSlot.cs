@@ -24,8 +24,8 @@ public class UIVehicleSlot : MonoBehaviour
             ShowEmpty();
             return;
         }
-        iconImage.sprite = vehicle._stats.Def.Icon;
-        nameText.text = vehicle._stats.Def.DisplayName;
-        durabilityBar.fillAmount = vehicle._stats.Durability / 100f;
+        iconImage.sprite = vehicle._stats.Model.Icon;
+        nameText.text = vehicle._stats.Model.DisplayName;
+        durabilityBar.fillAmount = vehicle._stats.Model.Durability / 100f;
     }
 }

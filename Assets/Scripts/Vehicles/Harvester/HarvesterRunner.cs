@@ -19,9 +19,9 @@ public class HarvesterRunner : MonoBehaviour
         _mover = GetComponent<TractorMover>();
     }
 
-    public void Run(FieldJob job) => StartCoroutine(RunJobs(job));
+    public void Run(FieldJob job, int resumeTile) => StartCoroutine(RunJobs(job, resumeTile));
 
-    IEnumerator RunJobs(FieldJob job)
+    IEnumerator RunJobs(FieldJob job, int resumeTile)
     {
         do
         {
@@ -29,8 +29,8 @@ public class HarvesterRunner : MonoBehaviour
             field.BeginJob(job.Type, job.Crop);
 
             var serp = field.GetSerpentineTiles();
-                var waypoints = new List<Vector3>(serp.Length);
-                foreach (var t in serp) waypoints.Add(t.WorldPosition);
+            var waypoints = new List<Vector3>(serp.Length);
+            foreach (var t in serp) waypoints.Add(t.WorldPosition);
 
             System.Action<int> perTile = job.Type switch
             {
@@ -39,10 +39,13 @@ public class HarvesterRunner : MonoBehaviour
                 _ => null
             };
 
-            yield return _mover.MoveAlong(waypoints, perTile);
+            yield return _mover.MoveAlong(waypoints, perTile, resumeTile);
         }
         while (_vehicle.JobQueue.TryDequeue(out job));
 
-        _vehicle.SetBusy(false);
+        yield return _mover.ReturnToHome();
+        _vehicle._stats.SetBusy(false);
+        _vehicle._stats.SetCurrentTileIndex(0);
+        _vehicle.ReturnHome();
     }
 }

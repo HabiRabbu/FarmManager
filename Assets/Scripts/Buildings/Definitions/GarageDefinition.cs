@@ -4,9 +4,6 @@ using UnityEngine;
                  menuName = "Roast/Buildings/GarageDefinition")]
 public class GarageDefinition : BuildingDefinition
 {
-    [field: Header("Garage Capacity")]
-    [field: SerializeField] public int VehicleSlots { get; private set; } = 2;
-
     [field: Header("Optional - Initial Vehicles")]
     [field: SerializeField] public VehicleDefinition[] Preload { get; private set; }
 }

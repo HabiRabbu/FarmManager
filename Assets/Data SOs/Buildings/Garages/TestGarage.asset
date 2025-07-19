@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ef1b046429d74e47802f4635168a6a2, type: 3}
   m_Name: TestGarage
   m_EditorClassIdentifier: 
+  <PrefabGuid>k__BackingField: basic-garage
   <DisplayName>k__BackingField: Test Garage
   <Icon>k__BackingField: {fileID: 0}
   <Price>k__BackingField: 35000
   <Type>k__BackingField: 1
-  <ModelPrefab>k__BackingField: {fileID: 527139791160972024, guid: ce767f1c76036fe4086fa4782e4fcf0d, type: 3}
-  <VehicleSlots>k__BackingField: 2
+  <Capacity>k__BackingField: 2
   <Preload>k__BackingField:
-  - {fileID: 11400000, guid: e1cbd60b558d4594b9cddb23aa5cdf97, type: 2}
-  - {fileID: 11400000, guid: bff58723125c98240b61e02a65336c68, type: 2}
+  - {fileID: 11400000, guid: 4cdaba47ab04bd24ca68d4b6da916956, type: 2}
+  - {fileID: 11400000, guid: 83f348eb44feeda4dadf56a54346af1a, type: 2}

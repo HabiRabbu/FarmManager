@@ -22,7 +22,7 @@ public class UIWorkerSlot : MonoBehaviour
             ShowEmpty();
             return;
         }
-        iconImage.sprite = worker.Portrait;
+        //FIXME: iconImage.sprite = worker.Model.Portrait;
         nameText.text = worker.DisplayName;
     }
 }

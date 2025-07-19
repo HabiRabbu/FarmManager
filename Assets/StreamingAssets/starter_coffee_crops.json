@@ -1,5 +1,5 @@
 {
-  "crops": [
+  "Crops": [
     {
       "Id": "arabica-basic",
       "DisplayName": "Arabica (Basic)",
@@ -7,7 +7,7 @@
       "Aroma": 60.0,
       "Acidity": 50.0,
       "Body": 40.0,
-      "PrefabGuid": "basic-coffee"
+      "PrefabGuid": "basic-arabica"
     },
     {
       "Id": "robusta-basic",
@@ -16,7 +16,7 @@
       "Aroma": 0.3,
       "Acidity": 0.6,
       "Body": 0.7,
-      "PrefabGuid": "basic-coffee"
+      "PrefabGuid": "basic-robusta"
     }
   ]
 }

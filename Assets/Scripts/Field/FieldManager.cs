@@ -8,11 +8,16 @@ using Harvey.Data.Fields;
 using System.Text;
 using Harvey.Farm.Factory;
 using Harvey.Data.Coffee;
+using System.Threading.Tasks;
 
 namespace Harvey.Farm.Fields
 {
     public class FieldManager : Singleton<FieldManager>, ISaveSection
     {
+        [SerializeField] public int LoadPriority { get; } = 2;
+
+        [SerializeField] Transform fieldParent;
+
         [Header("Field Settings")]
         [SerializeField] public float tileSize;
 
@@ -50,138 +55,74 @@ namespace Harvey.Farm.Fields
 
         /* ---------------- ISaveSection --------------- */
 
-        public string SectionName => "Fields";
-
-        [Serializable]
-        class FieldState
+        public void Capture(GameSaveData root)
         {
-            public List<FieldSaveData> savableFields;
-        }
-
-        public string CaptureJson()
-        {
-            List<FieldSaveData> list = new();
+            if (root.Fields == null) root.Fields = new FieldSection();
+            root.Fields.Items.Clear();
 
             foreach (var f in fields)
-                list.Add(SerialiseField(f));
-
-            return JsonUtility.ToJson(new FieldState
-            {
-                savableFields = list
-            });
+                root.Fields.Items.Add(FieldMapper.ToSaveData(SerialiseModel(f)));
         }
 
-        public void RestoreJson(string json)
+        public async Task Restore(GameSaveData root)
         {
-            if (string.IsNullOrWhiteSpace(json)) return;
+            if (root.Fields == null) return;
 
-            var state = JsonUtility.FromJson<FieldState>(json);
-            if (state?.savableFields == null) return;
-
+            // Despawn everything
             foreach (var f in new List<FieldController>(fields))
-                FieldFactory.Instance.Despawn("basic-field", f.gameObject); //TODO: Don't hardcode this
+                FieldFactory.Instance.Despawn(f.Model.PrefabGuid, f.gameObject);
+
             fields.Clear();
             byId.Clear();
 
-            foreach (var dto in state.savableFields)
-                DeserialiseField(dto);
+            // Respawn
+            foreach (var sd in root.Fields.Items)
+                await SpawnFromSave(sd);
 
-            Debug.Log($"FieldManager - rebuilt {state.savableFields.Count} fields from save");
+            Debug.Log($"FieldManager ▸ restored {fields.Count} fields");
         }
 
         /* ────────────────────────── helpers ────────────────────────── */
-        static FieldSaveData SerialiseField(FieldController f)
+        static FieldModel SerialiseModel(FieldController f)
         {
             var builder = f.GetComponent<FieldBuilder>();
-            var grid = builder.Grid;
             var tiles = builder.Tiles;
 
-            var flags = new StringBuilder(tiles.Length);
+            var sb = new System.Text.StringBuilder(tiles.Length);
             foreach (var t in tiles)
-                flags.Append(t.IsHarvested ? 'H'
-                           : t.IsSeeded ? 'S'
-                           : t.IsPlowed ? 'P'
-                           : '.');
+                sb.Append(t.IsHarvested ? 'H'
+                        : t.IsSeeded ? 'S'
+                        : t.IsPlowed ? 'P'
+                                        : '.');
 
-            return new FieldSaveData
+            return new FieldModel
             {
                 Id = f.GetId(),
-                Width = grid.Width,
-                Height = grid.Height,
-                TileSize = grid.TileSize,
-                PrefabGuid = "basic-field", //TODO: f.PrefabGuid or something idk - Just dont hardcode
-                TilePrefabGuid = "basic-field-tile",
+                DisplayName = f.Model.DisplayName,
+                PrefabGuid = "basic-field",       // TODO remove hard-code
                 Position = f.transform.position,
-
+                Width = builder.Grid.Width,
+                Height = builder.Grid.Height,
+                TileSize = builder.Grid.TileSize,
                 CurrentState = (int)f.Current,
-                CurrentCropId = f.currentCrop?.Id,
-                TileFlags = flags.ToString()
+                CurrentCropId = f.currentCrop != null ? f.currentCrop.Id : string.Empty,
+                TileFlags = sb.ToString()
             };
         }
 
-        //TODO: Spawning too many fields, breaking everything. Fields aren't being respawned properly.
-        static void DeserialiseField(FieldSaveData d)
+        static async Task SpawnFromSave(FieldSaveData sd)
         {
-            /* A. get or create the field ------------------------------------------------ */
-            var field = Instance.GetById(d.Id);
-            if (field == null)
-            {
-                var go = FieldFactory.Instance.Spawn(d, null, d.Position);
-                field = go.GetComponent<FieldController>();
-                field.SetId(d.Id);
-                Instance.RegisterField(field);
-            }
-            else field.transform.position = d.Position;
+            //Spawn new fields
+            var model = FieldMapper.FromSaveData(sd);
+            var go = await FieldFactory.Instance.SpawnAsync(model.PrefabGuid, null, model.Position);
+            if (go == null) return;
+            var field = go.GetComponent<FieldController>();
 
-            /* B. regenerate tiles ------------------------------------------------------- */
-            var builder = field.GetComponent<FieldBuilder>();
-            builder.BuildFromData(d);                    // Tiles[] is freshly rebuilt
-            field.runtime.Initialize(builder.Tiles);
-
-            /* C. restore high-level state ---------------------------------------------- */
-            field.currentState = (FieldController.State)d.CurrentState;
-            field.currentCrop = string.IsNullOrEmpty(d.CurrentCropId)
-                                 ? null
-                                 : CoffeeManager.Instance.GetById(d.CurrentCropId);
-
-            /* D. replay per-tile flags -------------------------------------------------- */
-            ApplyTileFlags(builder.Tiles, d.TileFlags, field.currentCrop);
+            // Initialize the field with the model
+            field.InitFromModel(model);
+            Instance.RegisterField(field);
+            go.transform.SetParent(Instance.fieldParent, false);
         }
-
-        /* ───────────────────────── helpers ───────────────────────── */
-        static void ApplyTileFlags(FieldTile[] tiles,
-                                   string flags,
-                                   CoffeeCropData crop)
-        {
-            int count = Mathf.Min(tiles.Length, flags.Length);
-
-            for (int i = 0; i < count; i++)
-            {
-                var t = tiles[i];
-                t.ResetTile();
-
-                switch (flags[i])
-                {
-                    case 'P':
-                        t.Plow();
-                        break;
-
-                    case 'S':
-                        t.Plow();
-                        t.Seed(crop);
-                        break;
-
-                    case 'H':
-                        t.Plow();
-                        t.Seed(crop);
-                        t.Harvest();
-                        break;
-                }
-            }
-        }
-
-
-
     }
 }
 

@@ -57,7 +57,7 @@ public class UIBuildingInfo : MonoBehaviour
                 SpawnImplementSlots(shed);
 
                 int implTotal = shed.Query(_ => true).Count();
-                int implReserved = shed.Query(i => shed.IsReserved(i.GetId())).Count();
+                int implReserved = shed.Query(i => shed.IsReserved(i.Model.Id)).Count();
                 txtBody.text = $"Implements: {implTotal}\nReserved:   {implReserved}";
                 break;
 
@@ -66,7 +66,7 @@ public class UIBuildingInfo : MonoBehaviour
                 SpawnVehicleSlots(garage);
 
                 int vehTotal = garage.Query(_ => true).Count();
-                int vehReserved = garage.Query(v => garage.IsReserved(v.Id)).Count();
+                int vehReserved = garage.Query(v => garage.IsReserved(v._stats.Model.Id)).Count();
                 txtBody.text = $"Tractors:   {vehTotal}\nReserved:  {vehReserved}";
                 break;
 
@@ -75,7 +75,7 @@ public class UIBuildingInfo : MonoBehaviour
                 SpawnWorkerSlots(house);
 
                 int occ = house.GetIdleWorkers().Count();
-                int cap = house.Capacity;
+                int cap = house.HouseModel.Capacity;
                 txtBody.text = $"Idle Workers: {occ}\nCapacity:     {cap}";
                 break;
 
@@ -88,7 +88,7 @@ public class UIBuildingInfo : MonoBehaviour
 
     void SpawnImplementSlots(ShedBuilding shed)
     {
-        int maxSlots = shed.ShedDef.ImplementSlots > 0 ? shed.ShedDef.ImplementSlots : defaultMaxSlots;
+        int maxSlots = shed.ShedModel.Capacity > 0 ? shed.ShedModel.Capacity : defaultMaxSlots;
         var implements = shed.Query(b => true).ToList();
         int count = Mathf.Min(implements.Count, maxSlots);
 
@@ -116,8 +116,8 @@ public class UIBuildingInfo : MonoBehaviour
 
     void SpawnVehicleSlots(GarageBuilding garage)
     {
-        int maxSlots = garage.Capacity > 0
-                     ? garage.Capacity
+        int maxSlots = garage.GarageModel.Capacity > 0
+                     ? garage.GarageModel.Capacity
                      : defaultMaxSlots;
 
         var tractors = garage.Query(_ => true).ToList();
@@ -139,8 +139,8 @@ public class UIBuildingInfo : MonoBehaviour
 
     void SpawnWorkerSlots(HouseBuilding house)
     {
-        int maxSlots = house.Capacity > 0
-                     ? house.Capacity
+        int maxSlots = house.HouseModel.Capacity > 0
+                     ? house.HouseModel.Capacity
                      : defaultMaxSlots;
 
         var workers = house.GetIdleWorkers().ToList();

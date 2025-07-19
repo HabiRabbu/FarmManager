@@ -6,22 +6,35 @@ using UnityEngine;
 using Harvey.Farm.VehicleScripts;
 using Harvey.Farm.Buildings;
 using Microsoft.Unity.VisualStudio.Editor;
+using Harvey.Farm.Events;
 
 namespace Harvey.Farm.Workers
 {
     public class Worker : MonoBehaviour, IJobAgent
     {
         public Queue<FieldJob> JobQueue { get; } = new();
+        public FieldController CurrentField => _stats.CurrentField;
+
+        public string GetId() => _stats.GetId();
+        public int CurrentTileIndex => _stats.CurrentTileIndex;
 
         private WorkerStats _stats;
         private WorkerMover _mover;
         private WorkerJobRunner _runner;
         //ImplementHandler _tools;     //TODO: Maybe in future if workers use tools? Shared but with an if to see where they get them from idk
 
+        public WorkerStats Stats => _stats;
+        public WorkerModel Model => _stats.Model;
+
         public bool IsBusy => _stats.IsBusy;
-        public string DisplayName => _stats.WorkerName;
-        public Sprite Portrait => _stats.Def.Portrait;
-        public string Id => _stats.GetId();
+        public void SetBusy(bool value)
+        {
+            _stats.SetBusy(value);
+            GameEvents.WorkerBusyChanged(this, value);
+        }
+
+        public string DisplayName => _stats.Model.DisplayName;
+
         public bool IsInitialised { get; private set; }
 
         public HouseBuilding Home => _stats.GetHome();
@@ -33,24 +46,6 @@ namespace Harvey.Farm.Workers
             _mover = GetComponent<WorkerMover>();
             _runner = GetComponent<WorkerJobRunner>();
             //_tools  = GetComponent<ImplementHandler>();
-            WorkerManager.Instance.Register(this);
-        }
-
-        public void Init(WorkerDefinition def, HouseBuilding home)
-        {
-            // cache refs
-            if (!_stats)
-                _stats = GetComponent<WorkerStats>() ?? gameObject.AddComponent<WorkerStats>();
-            if (!_mover)
-                _mover = GetComponent<WorkerMover>() ?? gameObject.AddComponent<WorkerMover>();
-            if (!_runner)
-                _runner = GetComponent<WorkerJobRunner>() ?? gameObject.AddComponent<WorkerJobRunner>();
-            //_tools = GetComponent<ImplementHandler>();
-
-            _stats.InjectDefinition(def);
-            SetHome(home);
-
-            IsInitialised = true;
         }
 
         public void ReturnHome()
@@ -63,7 +58,7 @@ namespace Harvey.Farm.Workers
 
         public void Enqueue(FieldJob job) => JobQueue.Enqueue(job);
 
-        public void StartTask(FieldJob job)
+        public void StartTask(FieldJob job, int resumeTile = 0)
         {
             if (!gameObject.activeInHierarchy)
                 Home.DeployWorker(this);
@@ -71,6 +66,7 @@ namespace Harvey.Farm.Workers
             if (_stats.IsBusy || !CanDo(job.Type)) return;
 
             _stats.SetBusy(true);
+            _stats.CurrentField = job.Field;
             _runner.Run(job);
         }
 

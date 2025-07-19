@@ -5,9 +5,7 @@ namespace Harvey.Farm.Factory
 {
     public interface IWorkerFactory
     {
-        GameObject Spawn(WorkerDefinition worker, Transform parent, Vector3 worldPos);
-        GameObject Spawn(GameObject prefab, Transform parent, Vector3 worldPos);
-        void Despawn(WorkerDefinition worker, GameObject instance);
-        void Despawn(GameObject prefab, GameObject instance);
+        GameObject Spawn(string guid, Transform parent, Vector3 worldPos);
+        void Despawn(string guid, GameObject instance);
     }
 }

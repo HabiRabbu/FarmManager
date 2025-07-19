@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07c4416a530c69a4ab70d272f94c01ec, type: 3}
   m_Name: BumptonBoroughSO
   m_EditorClassIdentifier: 
-  fieldName: Bumpton Borough
-  width: 8
-  height: 18
-  tileSize: 1
-  tilePrefabGuid: basic-field-tile
+  FieldName: Bumpton Borough
+  Width: 8
+  Height: 23
+  TileSize: 1
+  TilePrefabGuid: basic-field-tile
+  PrefabGuid: basic-field
