@@ -26,7 +26,7 @@ namespace Harvey.Farm.InputScripts
 
         private void OnEscapePressed(InputAction.CallbackContext ctx)
         {
-            GameEvents.CloseAllUI();
+            GameEvents.EscapePressed();
         }
     }
 }

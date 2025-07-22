@@ -8,5 +8,6 @@ namespace Harvey.Farm.Utilities
         public static readonly Color COLOR_YELLOW = new(1.00f, 0.77f, 0.14f);
         public static readonly Color COLOR_GREEN = new(0.18f, 0.78f, 0.29f);
         public static readonly Color COLOR_TEAL = new(0f, 0.502f, 0.502f);
+        public static readonly Color COLOR_GREY = new(0.42f, 0.42f, 0.42f);
     }
 }

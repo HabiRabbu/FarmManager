@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 6557207177883774750}
   - component: {fileID: 612432574470292769}
   - component: {fileID: 2845565585429233340}
+  - component: {fileID: 3103178845370862616}
   m_Layer: 9
   m_Name: Garage
   m_TagString: Untagged
@@ -149,6 +150,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 7.2974916, y: 3.8256142, z: 4.00131}
   m_Center: {x: 0.055644043, y: 1.4128071, z: 0.8968923}
+--- !u!114 &3103178845370862616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 527139791160972024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53c2f08693ed01949821e2b61f67dab4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleUpFactor: 1.1
+  scaleDuration: 0.15
+  hoverEmission: {r: 1, g: 1, b: 1, a: 1}
+  emissionBoost: 0.1
 --- !u!1 &1341174018856895814
 GameObject:
   m_ObjectHideFlags: 0

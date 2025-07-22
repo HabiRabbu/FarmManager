@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3905088927565801083}
   - component: {fileID: 3978106233820397825}
   - component: {fileID: 5397153677917765813}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: wheel-front-right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6538903991835684241, guid: 0c8a8c61bfac4ee48ac32ff246d7e2c2, type: 3}
+  - {fileID: 2100000, guid: 265047b924fa57a488a4723685b6014f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -95,7 +95,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 25708530042252614}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Meshes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 1032636583972098141}
   - component: {fileID: 8438135144182608816}
   - component: {fileID: 8074349323831400330}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: wheel-front-left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -186,7 +186,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6538903991835684241, guid: 0c8a8c61bfac4ee48ac32ff246d7e2c2, type: 3}
+  - {fileID: 2100000, guid: 265047b924fa57a488a4723685b6014f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -219,7 +219,7 @@ GameObject:
   - component: {fileID: 3089949542250210915}
   - component: {fileID: 5991157599090349063}
   - component: {fileID: 2362846136284834062}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: wheel-back-right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -272,7 +272,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6538903991835684241, guid: 0c8a8c61bfac4ee48ac32ff246d7e2c2, type: 3}
+  - {fileID: 2100000, guid: 265047b924fa57a488a4723685b6014f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -309,7 +309,9 @@ GameObject:
   - component: {fileID: 645615731125746934}
   - component: {fileID: 7332250704717880969}
   - component: {fileID: 7053704592844264224}
-  m_Layer: 0
+  - component: {fileID: 9206876028246473795}
+  - component: {fileID: 3000043062029912465}
+  m_Layer: 11
   m_Name: Tractor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -383,7 +385,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitchPoint: {fileID: 5700977899952194359}
-  library: {fileID: 11400000, guid: 712feede2a0fa4d479d32970d8dca184, type: 2}
+  _currentImplement: {fileID: 0}
 --- !u!114 &7332250704717880969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -410,13 +412,44 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   definition: {fileID: 0}
-  <DisplayName>k__BackingField: Vehicle
-  <Icon>k__BackingField: {fileID: 0}
-  <MoveSpeed>k__BackingField: 2
-  <Fuel>k__BackingField: 100
-  <Durability>k__BackingField: 100
-  <Price>k__BackingField: 100
-  <Capacity>k__BackingField: 100
+  CurrentField: {fileID: 0}
+--- !u!65 &9206876028246473795
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5252949776778261906}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.3300648, y: 1.7029537, z: 2.2769098}
+  m_Center: {x: -0.0046904087, y: 0.80859333, z: 0.00082087517}
+--- !u!114 &3000043062029912465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5252949776778261906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53c2f08693ed01949821e2b61f67dab4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleUpFactor: 1.3
+  scaleDuration: 0.15
+  hoverEmission: {r: 1, g: 1, b: 1, a: 1}
+  emissionBoost: 0.3
 --- !u!1 &7550567541712448358
 GameObject:
   m_ObjectHideFlags: 0
@@ -428,7 +461,7 @@ GameObject:
   - component: {fileID: 4577287251492596401}
   - component: {fileID: 6107819495938462429}
   - component: {fileID: 2188213288700157820}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: wheel-back-left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -481,7 +514,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6538903991835684241, guid: 0c8a8c61bfac4ee48ac32ff246d7e2c2, type: 3}
+  - {fileID: 2100000, guid: 265047b924fa57a488a4723685b6014f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -512,7 +545,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5700977899952194359}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: HitchPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -545,7 +578,7 @@ GameObject:
   - component: {fileID: 2200390689039807142}
   - component: {fileID: 1522155721604983672}
   - component: {fileID: 3681560809881277067}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -598,7 +631,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6538903991835684241, guid: 0c8a8c61bfac4ee48ac32ff246d7e2c2, type: 3}
+  - {fileID: 2100000, guid: 265047b924fa57a488a4723685b6014f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

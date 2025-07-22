@@ -11,6 +11,7 @@ using Harvey.Farm.Buildings;
 using UnityEditor.IMGUI.Controls;
 using Harvey.Farm.UI.Radial;
 using Harvey.Farm.Factory;
+using Harvey.Farm.Managers;
 
 namespace Harvey.Farm.UI
 {
@@ -34,6 +35,9 @@ namespace Harvey.Farm.UI
         [Header("Building Info Config")]
         [SerializeField] private GameObject buildingInfoPrefab;
 
+        [Header("Options Menu Config")]
+        [SerializeField] private GameObject optionsMenuPrefab;
+
         [Header("Radial Menu Config")]
         [SerializeField] GameObject radialPrefab;
 
@@ -47,6 +51,7 @@ namespace Harvey.Farm.UI
         private UITractorMenu fieldTractorMenu;
         private UIWorkerMenu fieldWorkerMenu;
         private UIBuildingInfo buildingInfo;
+        private OptionsMenuController optionsMenu;
 
         protected override void Awake()
         {
@@ -65,12 +70,15 @@ namespace Harvey.Farm.UI
             buildingInfo = UIFactory.Instance.Spawn(buildingInfoPrefab, canvasTransform).GetComponent<UIBuildingInfo>();
             buildingInfo.gameObject.SetActive(false);
 
+            optionsMenu = UIFactory.Instance.Spawn(optionsMenuPrefab, canvasTransform).GetComponent<OptionsMenuController>();
+            optionsMenu.gameObject.SetActive(false);
+
         }
 
         #region Event Handlers
         void OnEnable()
         {
-            GameEvents.OnCloseAllUI += CloseAll;
+            GameEvents.OnEscapePressed += HandleEscape;
 
             GameEvents.OnBuildingStatsChanged += RefreshUI;
 
@@ -86,10 +94,13 @@ namespace Harvey.Farm.UI
             GameEvents.OnRadialFieldWorkersOpened += OpenWorkerJobMenu;
 
             GameEvents.OnRadialBuildingInfoOpened += OpenBuildingInfo;
+
+            GameEvents.OnOptionsMenuOpened += HandleOptionsMenuOpened;
+            GameEvents.OnOptionsMenuClosed += HandleOptionsMenuClosed;
         }
         void OnDisable()
         {
-            GameEvents.OnCloseAllUI -= CloseAll;
+            GameEvents.OnEscapePressed -= HandleEscape;
 
             GameEvents.OnBuildingStatsChanged -= RefreshUI;
 
@@ -105,8 +116,33 @@ namespace Harvey.Farm.UI
             GameEvents.OnRadialFieldWorkersOpened -= OpenWorkerJobMenu;
 
             GameEvents.OnRadialBuildingInfoOpened -= OpenBuildingInfo;
+
+            GameEvents.OnOptionsMenuOpened -= HandleOptionsMenuOpened;
+            GameEvents.OnOptionsMenuClosed -= HandleOptionsMenuClosed;
         }
         #endregion
+
+        public bool IsAnyUIOpen()
+        {
+            return (radialMenu && radialMenu.gameObject.activeSelf) ||
+                   (fieldInfo && fieldInfo.gameObject.activeSelf) ||
+                   (fieldTractorMenu && fieldTractorMenu.gameObject.activeSelf) ||
+                   (fieldWorkerMenu && fieldWorkerMenu.gameObject.activeSelf) ||
+                   (buildingInfo && buildingInfo.gameObject.activeSelf) ||
+                   (optionsMenu && optionsMenu.gameObject.activeSelf);
+        }
+
+        public void HandleEscape()
+        {
+            if (IsAnyUIOpen())
+            {
+                CloseAll();
+            }
+            else
+            {
+                OpenOptionsMenu();
+            }
+        }
 
         public void CloseAll()
         {
@@ -115,6 +151,14 @@ namespace Harvey.Farm.UI
             if (fieldTractorMenu) fieldTractorMenu.gameObject.SetActive(false);
             if (fieldWorkerMenu) fieldWorkerMenu.gameObject.SetActive(false);
             if (buildingInfo) buildingInfo.gameObject.SetActive(false);
+            if (optionsMenu)
+            {
+                optionsMenu.Hide();
+                if (GameManager.Instance.CurrentState == GameState.Paused)
+                {
+                    GameManager.Instance.TogglePause();
+                }
+            }
 
             Debug.Log("Hide by CloseAll");
         }
@@ -197,7 +241,31 @@ namespace Harvey.Farm.UI
             ShowNotification(n);
         }
 
+        private void HandleOptionsMenuOpened()
+        {
+            Debug.Log("Options menu opened");
+        }
+
+        private void HandleOptionsMenuClosed()
+        {
+            // Options menu closed - could add logic here if needed
+            Debug.Log("Options menu closed");
+        }
+
         // -------- Show/Open UI Methods --------
+
+        public void OpenOptionsMenu()
+        {
+            if (!optionsMenu)
+            {
+                Debug.LogError("Options Menu UI is not initialized.");
+                return;
+            }
+
+            optionsMenu.Show();
+
+            GameEvents.OptionsMenuOpened();
+        }
 
         public void ShowRadial(IRadialProvider provider, Vector2 screenPos)
         {
@@ -246,7 +314,7 @@ namespace Harvey.Farm.UI
             }
             fieldWorkerMenu.Show(field);
 
-            if (fieldTractorMenu) fieldTractorMenu.gameObject.SetActive(false); 
+            if (fieldTractorMenu) fieldTractorMenu.gameObject.SetActive(false);
         }
 
         public void OpenBuildingInfo(Building b)

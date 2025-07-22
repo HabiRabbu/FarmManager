@@ -17,11 +17,13 @@ namespace Harvey.Farm.Events
 
         // *------------------- Game Management -------------------*
         public static event Action OnGameReady;
+        public static event Action OnGameIsPlaying;
         public static event Action<float> OnPreloadProgress;
         public static event Action OnPreloadComplete;
         public static event Action<string> OnAssetPreloaded;
 
         public static void GameReady() => OnGameReady?.Invoke();
+        public static void GameIsPlaying() => OnGameIsPlaying?.Invoke();
         public static void PreloadProgress(float progress) => OnPreloadProgress?.Invoke(progress);
         public static void PreloadComplete() => OnPreloadComplete?.Invoke();
         public static void AssetPreloaded(string assetId) => OnAssetPreloaded?.Invoke(assetId);
@@ -61,9 +63,14 @@ namespace Harvey.Farm.Events
 
         // *------------------- UI -------------------*
         public static event Action<FieldJob, Vehicle> OnJobButtonPressed;
-        public static event Action OnCloseAllUI;
+        public static event Action OnEscapePressed;
+        public static event Action OnOptionsMenuOpened;
+        public static event Action OnOptionsMenuClosed;
+        
         public static void JobButtonPressed(FieldJob j, Vehicle v) => OnJobButtonPressed?.Invoke(j, v);
-        public static void CloseAllUI() => OnCloseAllUI?.Invoke();
+        public static void EscapePressed() => OnEscapePressed?.Invoke();
+        public static void OptionsMenuOpened() => OnOptionsMenuOpened?.Invoke();
+        public static void OptionsMenuClosed() => OnOptionsMenuClosed?.Invoke();
 
         // *------------------- Radial Menu -------------------*
         public static event Action<FieldController> OnRadialFieldInfoOpened;

@@ -3,22 +3,33 @@ using System.Threading.Tasks;
 using Harvey.Farm.Utilities;
 using Harvey.Farm.Events;
 using Unity.VisualScripting;
+using System;
 
 namespace Harvey.Farm.Managers
 {
-    /// <summary>
-    /// Main game manager that handles game state and coordinates with PrefabPreloader.
-    /// </summary>
+    public enum GameState
+    {
+        Preloading,
+        Ready,
+        Playing,
+        Paused
+    }
+
     [DefaultExecutionOrder(-1000)]
     public class GameManager : Singleton<GameManager>
     {
         [Header("Components")]
         [SerializeField] private PrefabPreloader prefabPreloader;
+        
+        [Header("Event Handling")]
+        [Tooltip("GameEventHandler component should be attached to this GameObject or a child")]
+        [SerializeField] private GameEventHandler eventHandler;
 
         [Header("Game State")]
-        [SerializeField] private bool isGameReady = false;
+        [SerializeField] private GameState currentState = GameState.Preloading;
 
-        public bool IsGameReady => isGameReady;
+        public GameState CurrentState => currentState;
+        public bool IsGameReady => currentState != GameState.Preloading;
         public bool IsPreloadComplete => prefabPreloader?.IsPreloadComplete ?? false;
 
         protected override void Awake()
@@ -29,17 +40,17 @@ namespace Harvey.Farm.Managers
             {
                 prefabPreloader = GetComponent<PrefabPreloader>();
             }
-        }
-
-        void OnEnable()
-        {
-            GameEvents.OnPreloadComplete += OnPreloadComplete;
-            GameEvents.OnPreloadProgress += OnPreloadProgress;
-        }
-        void OnDisable()
-        {
-            GameEvents.OnPreloadComplete -= OnPreloadComplete;
-            GameEvents.OnPreloadProgress -= OnPreloadProgress;
+            
+            if (eventHandler == null)
+            {
+                eventHandler = GetComponent<GameEventHandler>();
+                if (eventHandler == null)
+                {
+                    // Create GameEventHandler if it doesn't exist
+                    eventHandler = gameObject.AddComponent<GameEventHandler>();
+                    Debug.Log("🎮 GameManager: Created GameEventHandler component automatically");
+                }
+            }
         }
 
         async void Start()
@@ -64,31 +75,58 @@ namespace Harvey.Farm.Managers
             }
         }
 
-        private void OnPreloadComplete()
-        {
-            Debug.Log("✅ GameManager: Preload complete!");
-            OnGameReady();
-        }
 
-        private void OnPreloadProgress(float progress)
-        {
-            // TODO: Update loading screen progress
-            // UIManager.Instance.UpdateLoadingProgress(progress);
-        }
 
         private void OnGameReady()
         {
-            if (isGameReady) return;
+            if (currentState != GameState.Preloading) return;
 
-            isGameReady = true;
+            SetState(GameState.Ready);
             Debug.Log("🎮 GameManager: Game is ready! All spawning will now be instant.");
 
-            // Broadcast game ready event
             GameEvents.GameReady();
 
             // TODO: Hide loading screen and show main game UI
             // UIManager.Instance.HideLoadingScreen();
             // UIManager.Instance.ShowMainGameUI();
+
+            SetState(GameState.Playing);
+            GameEvents.GameIsPlaying();
+        }
+
+        public void SetState(GameState newState)
+        {
+            if (currentState == newState) return;
+
+            var previousState = currentState;
+            currentState = newState;
+
+            Debug.Log($"🎮 GameManager: State changed from {previousState} to {newState}");
+
+            // Handle state-specific logic
+            switch (newState)
+            {
+                case GameState.Preloading:
+                    break;
+                case GameState.Ready:
+                    break;
+                case GameState.Playing:
+                    Time.timeScale = 1f;
+                    break;
+                case GameState.Paused:
+                    Time.timeScale = 0f;
+                    break;
+            }
+
+            // GameEvents.OnGameStateChanged?.Invoke(previousState, newState);
+        }
+
+        public void TogglePause()
+        {
+            if (currentState == GameState.Playing)
+                SetState(GameState.Paused);
+            else if (currentState == GameState.Paused)
+                SetState(GameState.Playing);
         }
     }
 }

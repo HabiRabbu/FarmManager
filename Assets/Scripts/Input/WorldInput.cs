@@ -17,6 +17,7 @@ namespace Harvey.Farm.InputScripts
 
         private Camera cam;
         private FarmInput input;
+        private HoverFeedback currentHovered;
 
         void Awake()
         {
@@ -33,6 +34,28 @@ namespace Harvey.Farm.InputScripts
         {
             input.World.WorldSelect.performed -= OnSelect;
             input.World.Disable();
+        }
+
+        void Update()
+        {
+            Vector2 screenPos = input.World.Pointer.ReadValue<Vector2>();
+            Ray ray = cam.ScreenPointToRay(screenPos);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, maxRayDist, clickableLayerMask))
+            {
+                var hover = hit.collider.GetComponentInParent<HoverFeedback>();
+                if (hover != currentHovered)
+                {
+                    currentHovered?.OnHoverExit();
+                    currentHovered = hover;
+                    currentHovered?.OnHoverEnter();
+                }
+            }
+            else if (currentHovered != null)
+            {
+                currentHovered.OnHoverExit();
+                currentHovered = null;
+            }
         }
 
         void OnSelect(InputAction.CallbackContext ctx)
