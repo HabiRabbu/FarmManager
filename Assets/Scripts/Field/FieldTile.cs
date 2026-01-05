@@ -16,8 +16,10 @@ namespace Harvey.Farm.Fields
         CoffeeCropData currentCrop;
         int currentStage = -1;
 
-        [SerializeField] public int GridX { get; private set; }
-        [SerializeField] public int GridZ { get; private set; }
+        [SerializeField] private int gridX;
+        [SerializeField] private int gridZ;
+        public int GridX => gridX;
+        public int GridZ => gridZ;
 
         public bool IsPlowed { get; private set; } = false;
         public bool IsSeeded { get; private set; } = false;
@@ -33,8 +35,8 @@ namespace Harvey.Farm.Fields
 
         public void Init(int x, int z)
         {
-            GridX = x;
-            GridZ = z;
+            gridX = x;
+            gridZ = z;
             rndr = GetComponentInChildren<MeshRenderer>();
             rndr.sharedMaterial = earthMat;
             IsPlowed = false;
@@ -111,7 +113,7 @@ namespace Harvey.Farm.Fields
             IsSeeded = false;
             IsHarvested = false;
             IsReserved = false;
-            
+
             currentCrop = null;
             currentStage = -1;
 

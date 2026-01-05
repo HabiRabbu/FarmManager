@@ -17,7 +17,8 @@ namespace Harvey.Farm.VehicleScripts
 {
     public class VehicleManager : Singleton<VehicleManager>, ISaveSection
     {
-        [SerializeField] public int LoadPriority { get; } = 4;
+        [SerializeField] private int loadPriority = 4;
+        public int LoadPriority => loadPriority;
 
         [SerializeField] readonly List<Vehicle> tractors = new();
         [SerializeField] readonly List<Vehicle> harvesters = new();

@@ -43,8 +43,15 @@ namespace Harvey.Farm.Managers
             GameEvents.OnOptionsMenuOpened += HandleOptionsMenuOpened;
             GameEvents.OnOptionsMenuClosed += HandleOptionsMenuClosed;
         }
-
         private void OnDisable()
+        {
+            GameEvents.OnPreloadComplete -= HandlePreloadComplete;
+            GameEvents.OnPreloadProgress -= HandlePreloadProgress;
+
+            GameEvents.OnOptionsMenuOpened -= HandleOptionsMenuOpened;
+            GameEvents.OnOptionsMenuClosed -= HandleOptionsMenuClosed;
+        }
+        private void OnDestroy()
         {
             GameEvents.OnPreloadComplete -= HandlePreloadComplete;
             GameEvents.OnPreloadProgress -= HandlePreloadProgress;

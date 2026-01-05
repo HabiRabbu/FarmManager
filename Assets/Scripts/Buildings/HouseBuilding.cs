@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Harvey.Farm.Events;
 using Harvey.Farm.Factory;
 using Harvey.Farm.Workers;
+
 using Unity.VisualScripting;
+
 using UnityEngine;
 
 namespace Harvey.Farm.Buildings
@@ -17,7 +20,7 @@ namespace Harvey.Farm.Buildings
         readonly List<Worker> occupants = new();
         readonly HashSet<Worker> idlePool = new();
 
-        [SerializeField] Transform spawnPoint;
+        [SerializeField] public Transform spawnPoint;
 
         public HouseModel HouseModel => Model as HouseModel;
 
@@ -25,7 +28,7 @@ namespace Harvey.Farm.Buildings
         {
             occupants.Clear();
             idlePool.Clear();
-            
+
             SetModel(model);
             SetId(model.Id);
             BuildingManager.Instance.Register(this);
@@ -50,7 +53,7 @@ namespace Harvey.Farm.Buildings
         public bool TryAddOccupant(Worker w)
         {
             if (!HasVacancy) return false;
-            occupants.Add(w);
+            if (!occupants.Contains(w)) occupants.Add(w);
             return true;
         }
 
@@ -73,8 +76,6 @@ namespace Harvey.Farm.Buildings
         public void ReturnWorker(Worker w)
         {
             if (!idlePool.Add(w)) return;
-            w.transform.SetParent(transform);
-            w.gameObject.SetActive(false);
             GameEvents.BuildingStatsChanged();
         }
 
@@ -84,7 +85,7 @@ namespace Harvey.Farm.Buildings
         {
             foreach (var def in houseDefinition.Preload)
             {
-                var go = await WorkerFactory.Instance.SpawnAsync(def.PrefabGuid, spawnPoint, Vector3.zero);
+                var go = await WorkerFactory.Instance.SpawnAsync(def.PrefabGuid, null, spawnPoint.position);
                 var worker = go.GetComponent<Worker>() ?? go.AddComponent<Worker>();
 
                 worker.Stats.InitFromModel(WorkerMapper.FromDefinition(def, this, worker.GetId()), this);
@@ -103,9 +104,7 @@ namespace Harvey.Farm.Buildings
             Vector3 pos = (spawnPoint ? spawnPoint.position : transform.position) +
                           new Vector3(offset.x, 0f, offset.y);
 
-            w.transform.SetParent(null);
             w.transform.position = pos;
-            w.gameObject.SetActive(true);
         }
 
         // ---------- Radial Menu Support ----------

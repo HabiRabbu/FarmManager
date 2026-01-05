@@ -153,9 +153,10 @@ GameObject:
   - component: {fileID: 942965562019714399}
   - component: {fileID: 2080089856023591541}
   - component: {fileID: 446798197495621854}
+  - component: {fileID: -2096169605470170898}
+  - component: {fileID: 2163466709753493606}
   - component: {fileID: 6167737510932083991}
   - component: {fileID: -615488190141564003}
-  - component: {fileID: -4502294641328808669}
   - component: {fileID: 6520821569171254020}
   - component: {fileID: 644852900619765493}
   - component: {fileID: 8450758909015627977}
@@ -207,6 +208,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0d2d0f2a9eebc649aa6e37145cca9bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Meshes: {fileID: 3638587131634680539}
+--- !u!114 &-2096169605470170898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3652829380966641632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb71d7284b5942b49a0a6cefa5cfcfa4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2163466709753493606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3652829380966641632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adaa56fe4b6698340be63c29c2a1e069, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &6167737510932083991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -249,18 +275,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rootTransform: {fileID: 942965562019714399}
---- !u!114 &-4502294641328808669
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3652829380966641632}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb9e38f88e7238b4d9942a2fd2507076, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!95 &6520821569171254020
 Animator:
   serializedVersion: 7

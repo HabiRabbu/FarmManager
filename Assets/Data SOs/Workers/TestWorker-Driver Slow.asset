@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ef0a147646e2074890464468aed8056, type: 3}
+  m_Name: TestWorker-Driver Slow
+  m_EditorClassIdentifier: 
+  <DisplayName>k__BackingField: Test Worker (Driver-Slow)
+  HasDrivingLicense: 1
+  WalkSpeed: 1
+  plowSeconds: 3
+  seedSeconds: 1
+  harvestSeconds: 2
+  PrefabGuid: basic-worker
+  PortraitGuid: 

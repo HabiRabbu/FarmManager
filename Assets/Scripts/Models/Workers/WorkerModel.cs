@@ -13,6 +13,8 @@ public class WorkerModel
     public string HomeId;
     public int CurrentTileIndex;
 
+    //* ---------- Stats ---------- */
+    public bool HasDrivingLicense = false;
     public float WalkSpeed;
     public float plowSeconds;
     public float seedSeconds;

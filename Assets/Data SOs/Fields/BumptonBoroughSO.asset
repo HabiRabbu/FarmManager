@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: BumptonBoroughSO
   m_EditorClassIdentifier: 
   FieldName: Bumpton Borough
-  Width: 8
-  Height: 23
+  Width: 6
+  Height: 8
   TileSize: 1
   TilePrefabGuid: basic-field-tile
   PrefabGuid: basic-field

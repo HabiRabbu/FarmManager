@@ -14,7 +14,8 @@ namespace Harvey.Farm.Fields
 {
     public class FieldManager : Singleton<FieldManager>, ISaveSection
     {
-        [SerializeField] public int LoadPriority { get; } = 2;
+        [SerializeField] private int loadPriority = 2;
+        public int LoadPriority => loadPriority;
 
         [SerializeField] Transform fieldParent;
 

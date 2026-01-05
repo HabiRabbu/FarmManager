@@ -12,8 +12,6 @@ namespace Harvey.Farm.Movement
     {
         VehicleStats stats;
 
-        Sequence seq = null;
-
         protected override void Awake()
         {
             base.Awake();
@@ -28,14 +26,15 @@ namespace Harvey.Farm.Movement
         {
             GameEvents.OnStopAllTweens -= StopAllTweens;
         }
-
-        void StopAllTweens()
+        void OnDestroy()
         {
-            if (seq != null)  // Add this null check
-            {
-                seq.Kill();
-                seq = null;
-            }
+            GameEvents.OnStopAllTweens -= StopAllTweens;
+        }
+
+        public override void StopAllTweens()
+        {
+            if (seq != null && seq.IsActive())
+                base.StopAllTweens();
         }
 
         public override IEnumerator MoveAlong(List<Vector3> wps, System.Action<int> onArrive, int resumeTile = 0)

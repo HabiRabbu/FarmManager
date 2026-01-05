@@ -56,5 +56,15 @@ namespace Harvey.Farm.VehicleScripts
             Home.ReturnVehicle(this);
         }
 
+        /// <summary>
+        /// Vehicles are operated by workers through VehicleFieldJobInstance steps.
+        /// Direct IJob execution is not supported - workers mount and control vehicles.
+        /// </summary>
+        public void StartTask(IJob job, int resumeTile = 0)
+        {
+            Debug.LogWarning($"Vehicle {DisplayName}: StartTask(IJob) called directly. " +
+                           "Vehicles should be operated via VehicleFieldJobInstance steps by workers.");
+            // Behicles DON'T execute IJob directly
+        }
     }
 }

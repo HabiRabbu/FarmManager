@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <DisplayName>k__BackingField: Test Worker
   WalkSpeed: 1
-  plowSeconds: 6
-  seedSeconds: 2
-  harvestSeconds: 4
+  plowSeconds: 3
+  seedSeconds: 1
+  harvestSeconds: 2
   PrefabGuid: basic-worker
   PortraitGuid: 

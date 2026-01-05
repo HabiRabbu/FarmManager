@@ -38,6 +38,10 @@ public static class ConsoleCommands
                 "createcoffee <name> <growSeconds> <aroma> <acid> <body>",
                 a => DebugManager.CreateCoffeeCrop(a)),
 
+            ["settime"] = new DebugConsoleCommand(
+                "settime",
+                "settime <hour> - set the current time (0-23).",
+                a => DebugManager.SetTime(a)),
 
         };
 }

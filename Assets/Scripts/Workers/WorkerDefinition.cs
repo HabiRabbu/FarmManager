@@ -9,6 +9,7 @@ namespace Harvey.Farm.Workers
         [field: SerializeField] public string DisplayName { get; private set; }
 
         [field: Header("Stats")]
+        [field: SerializeField] public bool HasDrivingLicense = false;
         [field: SerializeField] public float WalkSpeed = 1.8f;
 
         [Header("Base Action Durations (seconds)")]

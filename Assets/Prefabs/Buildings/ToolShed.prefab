@@ -836,7 +836,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slices:
   - name: Building Info
-    icon: {fileID: 21300000, guid: 45199a1712ac16c449a6cc920abd5d20, type: 3}
+    icon: {fileID: 21300000, guid: 7526771f0f580574badece438f958bb1, type: 3}
     onClick:
       m_PersistentCalls:
         m_Calls:

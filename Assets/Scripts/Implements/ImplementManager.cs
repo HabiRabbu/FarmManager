@@ -3,16 +3,19 @@ namespace Harvey.Farm.Implements
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+
     using Harvey.Data.Implements;
     using Harvey.Farm.Buildings;
     using Harvey.Farm.Factory;
     using Harvey.Farm.VehicleScripts;
     using Harvey.SaveSystem;
+
     using UnityEngine;
 
     public class ImplementManager : Singleton<ImplementManager>, ISaveSection
     {
-        [SerializeField] public int LoadPriority { get; } = 5;
+        [SerializeField] private int loadPriority = 5;
+        public int LoadPriority => loadPriority;
 
         [SerializeField] readonly List<ImplementBehaviour> plows = new();
         [SerializeField] readonly List<ImplementBehaviour> seeders = new();
@@ -53,6 +56,16 @@ namespace Harvey.Farm.Implements
 
             Debug.LogWarning($"ImplementManager: no implement found with ID '{id}'");
             return null;
+        }
+
+        public List<ImplementBehaviour> GetAllByType(ImplementType type)
+        {
+            if (type == ImplementType.Plow)
+                return new List<ImplementBehaviour>(plows);
+            else if (type == ImplementType.Seeder)
+                return new List<ImplementBehaviour>(seeders);
+            else
+                throw new ArgumentException($"Unknown implement type: {type}");
         }
 
         /* --------- Save Section ---------- */

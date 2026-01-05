@@ -1,4 +1,5 @@
 using System;
+
 using Harvey.Data.Coffee;
 using Harvey.Farm.Buildings;
 using Harvey.Farm.Fields;
@@ -28,6 +29,15 @@ namespace Harvey.Farm.Events
         public static void PreloadComplete() => OnPreloadComplete?.Invoke();
         public static void AssetPreloaded(string assetId) => OnAssetPreloaded?.Invoke(assetId);
 
+        // *------------------- Time -------------------*
+        public static event Action OnShiftStarted;
+        public static event Action OnShiftEnded;
+        public static event Action<int> OnTimeChanged;
+
+        public static void ShiftStarted() => OnShiftStarted?.Invoke();
+        public static void ShiftEnded() => OnShiftEnded?.Invoke();
+        public static void TimeChanged(int hour) => OnTimeChanged?.Invoke(hour);
+
         // *------------------- JobAgents -------------------*
         public static event Action<Vehicle, bool> OnVehicleBusyChanged;
         public static event Action<Worker, bool> OnWorkerBusyChanged;
@@ -50,8 +60,19 @@ namespace Harvey.Farm.Events
         public static void FieldHarvested(FieldController field) => OnFieldHarvested?.Invoke(field);
 
         // *------------------- Jobs -------------------*
+        public static event Action<JobEntry> OnJobPosted;
         public static event Action<IJobAgent, FieldJob> OnJobStarted;
+        public static event Action<IJob> OnJobCompleted;
+        public static event Action<IJob> OnJobPaused;
+        public static event Action<IJob, float> OnJobProgress;  // float = progress 0-1
+        public static event Action<IJob, string> OnJobFailed;   // string = error message
+
+        public static void JobPosted(JobEntry entry) => OnJobPosted?.Invoke(entry);
         public static void JobStarted(IJobAgent jobAgent, FieldJob fieldJob) => OnJobStarted?.Invoke(jobAgent, fieldJob);
+        public static void JobCompleted(IJob job) => OnJobCompleted?.Invoke(job);
+        public static void JobPaused(IJob job) => OnJobPaused?.Invoke(job);
+        public static void JobProgress(IJob job, float progress) => OnJobProgress?.Invoke(job, progress);
+        public static void JobFailed(IJob job, string error) => OnJobFailed?.Invoke(job, error);
 
         // *------------------- Buildings -------------------*
         public static event Action OnBuildingStatsChanged;
@@ -66,7 +87,7 @@ namespace Harvey.Farm.Events
         public static event Action OnEscapePressed;
         public static event Action OnOptionsMenuOpened;
         public static event Action OnOptionsMenuClosed;
-        
+
         public static void JobButtonPressed(FieldJob j, Vehicle v) => OnJobButtonPressed?.Invoke(j, v);
         public static void EscapePressed() => OnEscapePressed?.Invoke();
         public static void OptionsMenuOpened() => OnOptionsMenuOpened?.Invoke();

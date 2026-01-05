@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using System.Threading.Tasks;
+
 using Harvey.Data.Coffee;
 using Harvey.Farm.Events;
 using Harvey.Farm.Jobs;
+
 using UnityEngine;
 
 namespace Harvey.Farm.Fields
@@ -23,6 +25,7 @@ namespace Harvey.Farm.Fields
         public float TilesCompletedFraction => runtime.Completion;
         public bool Is(State s) => currentState == s;
         public State Current => currentState;
+        public string DisplayName => Model?.DisplayName ?? definition?.FieldName ?? "Unknown Field";
 
         // GuidBehaviour
         GuidBehaviour guidBehaviour;
@@ -129,8 +132,13 @@ namespace Harvey.Farm.Fields
             GameEvents.OnTileSeeded += HandleTileSeeded;
             GameEvents.OnTileHarvested += HandleTileHarvested;
         }
-
         void OnDisable()
+        {
+            GameEvents.OnTilePlowed -= HandleTilePlowed;
+            GameEvents.OnTileSeeded -= HandleTileSeeded;
+            GameEvents.OnTileHarvested -= HandleTileHarvested;
+        }
+        void OnDestroy()
         {
             GameEvents.OnTilePlowed -= HandleTilePlowed;
             GameEvents.OnTileSeeded -= HandleTileSeeded;
@@ -162,6 +170,17 @@ namespace Harvey.Farm.Fields
             JobType.Harvest => currentState is State.ReadyToHarvest,
             _ => false
         };
+
+        public JobType? GetNeededJobType()
+        {
+            return currentState switch
+            {
+                State.Idle or State.Harvested or State.Plowing => JobType.Plow,
+                State.Plowed or State.Seeding => JobType.Seed,
+                State.ReadyToHarvest => JobType.Harvest,
+                _ => null
+            };
+        }
 
         public void BeginJob(JobType job, CoffeeCropData crop = null)
         {

@@ -9,9 +9,14 @@ public class ImplementHandler : MonoBehaviour
 {
     [SerializeField] public Transform hitchPoint;
 
-    [SerializeField] public ImplementBehaviour _currentImplement;
+    [SerializeField] ImplementBehaviour _currentImplement;
+    public ImplementBehaviour CurrentImplement
+    {
+        get => _currentImplement;
+        set => _currentImplement = value;
+    }
 
-    public bool Has(JobType job) 
+    public bool Has(JobType job)
     {
         bool hasImplement = _currentImplement && _currentImplement.gameObject && _currentImplement.Model.Job == job;
         Debug.Log($"ImplementHandler.Has({job}): _currentImplement={_currentImplement?.name ?? "null"}, hasCorrectJob={hasImplement}");
@@ -21,9 +26,9 @@ public class ImplementHandler : MonoBehaviour
     public IEnumerator Fetch(JobType job, string toolId)
     {
         Debug.Log($"ImplementHandler.Fetch: Attempting to fetch {job} tool with ID {toolId}");
-        
+
         var shed = BuildingManager.Instance.GetNearestShed(transform.position);
-        if (!shed) 
+        if (!shed)
         {
             Debug.LogWarning("No shed found near tractor!");
             yield break;
@@ -35,7 +40,7 @@ public class ImplementHandler : MonoBehaviour
         ImplementBehaviour implement;
         bool success = shed.TryCheckoutByID(toolId, out implement);
         Debug.Log($"TryCheckoutByID result: {success}, implement: {implement?.name ?? "null"}");
-        
+
         _currentImplement = implement;
         if (_currentImplement)
         {
@@ -57,11 +62,11 @@ public class ImplementHandler : MonoBehaviour
 
     public IEnumerator Return()
     {
-        if (!_currentImplement) 
+        if (!_currentImplement)
         {
             yield break;
         }
-        
+
         var shed = BuildingManager.Instance.GetNearestShed(transform.position);
         yield return GetComponent<TractorMover>().MoveTo(shed.transform.position);
         shed.ReturnImplement(_currentImplement);

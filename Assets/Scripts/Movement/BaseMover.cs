@@ -9,9 +9,20 @@ public abstract class BaseMover : MonoBehaviour, IMover
 {
     [SerializeField] protected Transform rootTransform;
 
+    public Sequence seq { get; set; }
+
     protected virtual void Awake()
     {
         if (!rootTransform) rootTransform = transform;
+    }
+
+    public virtual void StopAllTweens()
+    {
+        if (seq != null)
+        {
+            seq.Kill();
+            seq = null;
+        }
     }
 
     public virtual IEnumerator MoveTo(Vector3 wp)

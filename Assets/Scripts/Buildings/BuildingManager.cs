@@ -2,16 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Harvey.Data.Buildings;
 using Harvey.Farm.Factory;
 using Harvey.SaveSystem;
+
 using UnityEngine;
 
 namespace Harvey.Farm.Buildings
 {
     public class BuildingManager : Singleton<BuildingManager>, ISaveSection
     {
-        [SerializeField] public int LoadPriority { get; } = 3;
+        [SerializeField] private int loadPriority = 3;
+        public int LoadPriority => loadPriority;
 
         [Header("Scene containers")]
         [SerializeField] Transform shedParent;
@@ -61,6 +64,8 @@ namespace Harvey.Farm.Buildings
                 return sheds.Cast<T>();
             if (typeof(T) == typeof(HouseBuilding))
                 return houses.Cast<T>();
+            if (typeof(T) == typeof(GarageBuilding))
+                return garages.Cast<T>();
 
             return Enumerable.Empty<T>();
         }
@@ -75,6 +80,37 @@ namespace Harvey.Farm.Buildings
                 return garages.FirstOrDefault(g => g.GetId() == id) as T;
 
             return null;
+        }
+
+        public string GetHomeNameById(string homeId)
+        {
+            var house = houses.FirstOrDefault(h => h.GetId() == homeId);
+            if (house != null) return house.Model.DisplayName;
+
+            var shed = sheds.FirstOrDefault(s => s.GetId() == homeId);
+            if (shed != null) return shed.Model.DisplayName;
+
+            var garage = garages.FirstOrDefault(g => g.GetId() == homeId);
+            if (garage != null) return garage.Model.DisplayName;
+
+            Debug.LogWarning($"BuildingManager: no building found with ID {homeId}");
+            return "Unknown";
+        }
+
+        public Vector3 GetHomePosition(string homeId)
+        {
+            var house = houses.FirstOrDefault(h => h.GetId() == homeId);
+            if (house != null && house.spawnPoint != null)
+                return house.spawnPoint.position;
+
+            var shed = sheds.FirstOrDefault(s => s.GetId() == homeId);
+            if (shed != null) return shed.transform.position;
+
+            var garage = garages.FirstOrDefault(g => g.GetId() == homeId);
+            if (garage != null) return garage.transform.position;
+
+            Debug.LogWarning($"BuildingManager: no building found with ID {homeId}");
+            return Vector3.zero;
         }
 
         /* ---------- Save Section ---------- */

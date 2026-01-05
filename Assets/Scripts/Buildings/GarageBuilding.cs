@@ -29,7 +29,7 @@ namespace Harvey.Farm.Buildings
         {
             stock.Clear();
             reservedIds.Clear();
-            
+
             SetModel(model);
             SetId(model.Id);
             BuildingManager.Instance.Register(this);
@@ -71,8 +71,31 @@ namespace Harvey.Farm.Buildings
             return false;
         }
 
+        public bool TryReserveVehicle(VehicleType type, out Vehicle vehicle)
+        {
+            vehicle = stock.Values.FirstOrDefault(v => v._stats.Model.Type == type && !reservedIds.Contains(v._stats.GetId()));
+            if (vehicle != null)
+            {
+                reservedIds.Add(vehicle._stats.GetId());
+                return true;
+            }
+            return false;
+        }
+
+        public bool TryReserveVehicleById(string id, out Vehicle vehicle)
+        {
+            if (stock.TryGetValue(id, out vehicle) && !reservedIds.Contains(id))
+            {
+                reservedIds.Add(id);
+                return true;
+            }
+            vehicle = null;
+            return false;
+        }
+
         public void ReturnVehicle(Vehicle v)
         {
+            Debug.Log("Returning vehicle: " + v.name);
             reservedIds.Remove(v._stats.GetId());
             stock[v._stats.GetId()] = v;
 

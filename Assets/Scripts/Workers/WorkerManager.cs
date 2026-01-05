@@ -13,7 +13,8 @@ namespace Harvey.Farm.Workers
 {
     public class WorkerManager : Singleton<WorkerManager>, ISaveSection
     {
-        [SerializeField] public int LoadPriority { get; } = 6;
+        [SerializeField] private int loadPriority = 6;
+        public int LoadPriority => loadPriority;
         readonly List<Worker> workers = new();
 
         void Start()
@@ -24,19 +25,10 @@ namespace Harvey.Farm.Workers
         public void Register(Worker w) { if (!workers.Contains(w)) workers.Add(w); }
         public void Unregister(Worker w) { workers.Remove(w); }
 
-        // All workers that are idle *and* active in the scene
-        public IEnumerable<Worker> SceneIdle =>
-            workers.Where(w => !w.IsBusy && w.gameObject.activeSelf);
-
-        // Returns ALL idle workers, including those in houses!
+        // Returns ALL idle workers that are not busy, regardless of scene
         public List<Worker> GetAllAvailable()
         {
-            var list = new List<Worker>(SceneIdle);
-
-            foreach (var h in BuildingManager.Instance.GetAllBuildings<HouseBuilding>())
-                list.AddRange(h.GetIdleWorkers());
-
-            return list;
+            return workers.Where(w => w != null && !w.IsBusy).ToList();
         }
 
         public IEnumerable<Worker> AllWorkers
@@ -48,15 +40,10 @@ namespace Harvey.Farm.Workers
             }
         }
 
-        // Query scene first, then check houses
         public Worker GetAvailable()
         {
-            var inScene = SceneIdle.FirstOrDefault();
-            if (inScene) return inScene;
-
-            foreach (var house in FindObjectsByType<HouseBuilding>(FindObjectsSortMode.None))
-                if (house.TryGetIdleWorker(out var w))
-                    return w;
+            var firstAvailable = GetAllAvailable().FirstOrDefault();
+            if (firstAvailable) return firstAvailable;
 
             return null;
         }

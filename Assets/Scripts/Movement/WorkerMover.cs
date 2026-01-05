@@ -10,8 +10,6 @@ public class WorkerMover : BaseMover
 {
     WorkerStats stats;
 
-    Sequence seq = null;
-
     Animator anim;
     int isMovingHash;
 
@@ -31,14 +29,15 @@ public class WorkerMover : BaseMover
     {
         GameEvents.OnStopAllTweens -= StopAllTweens;
     }
-
-    void StopAllTweens()
+    void OnDestroy()
     {
-        if (seq != null)  // Add this null check
-        {
-            seq.Kill();
-            seq = null;
-        }
+        GameEvents.OnStopAllTweens -= StopAllTweens;
+    }
+
+    public override void StopAllTweens()
+    {
+        base.StopAllTweens();
+        anim.SetBool(isMovingHash, false);
     }
 
     public override IEnumerator MoveAlong(List<Vector3> wps, System.Action<int> onArrive, int resumeTile = 0)

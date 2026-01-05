@@ -12,7 +12,8 @@ using System.Threading.Tasks;
 /// </summary>
 public class CoffeeManager : Singleton<CoffeeManager>, ISaveSection
 {
-    [SerializeField] public int LoadPriority { get; } = 1;
+    [SerializeField] private int loadPriority = 1;
+    public int LoadPriority => loadPriority;
 
     const string STARTER_FILE = "starter_coffee_crops.json";
     string StarterPath => Path.Combine(Application.streamingAssetsPath, STARTER_FILE);

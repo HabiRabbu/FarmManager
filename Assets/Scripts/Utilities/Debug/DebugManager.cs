@@ -1,6 +1,7 @@
 using UnityEngine;
 using Harvey.Farm.Events;
 using Harvey.SaveSystem;
+using Harvey.Farm.TimeManagement;
 
 namespace Harvey.Farm.Utilities
 {
@@ -66,6 +67,18 @@ namespace Harvey.Farm.Utilities
 
             var crop = CoffeeManager.Instance.Create(a[0], growSeconds, aroma, acid, body);
             Write($"Created crop {crop.DisplayName} ({crop.Id})", Color.green);
+        }
+
+        public static void SetTime(string[] args)
+        {
+            if (args.Length < 1 || !int.TryParse(args[0], out int hour) || hour < 0 || hour > 23)
+            {
+                Write("Usage: settime <hour> (0-23)", Color.yellow);
+                return;
+            }
+
+            TimeManager.Instance.SetTime(hour);
+            Write($"Time set to {hour:00}:00", Color.green);
         }
 
         public static void Cmd_Save(string[] args)

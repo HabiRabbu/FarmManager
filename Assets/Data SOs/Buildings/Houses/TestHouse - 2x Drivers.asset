@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d27fa9c0f6d233044bebe64348d2178a, type: 3}
+  m_Name: TestHouse - 2x Drivers
+  m_EditorClassIdentifier: 
+  <PrefabGuid>k__BackingField: basic-house
+  <DisplayName>k__BackingField: Test House - 2x Drivers
+  <Icon>k__BackingField: {fileID: 0}
+  <Price>k__BackingField: 50000
+  <Type>k__BackingField: 3
+  <Capacity>k__BackingField: 2
+  <Preload>k__BackingField:
+  - {fileID: 11400000, guid: f984015a6bf161041908465e566dfb65, type: 2}
+  - {fileID: 11400000, guid: a7a27eafcdf22874294ac4d7f227183e, type: 2}

@@ -32,7 +32,7 @@ namespace Harvey.Farm.Buildings
         {
             stock.Clear();
             reserved.Clear();
-            
+
             SetModel(model);
             SetId(model.Id);
             BuildingManager.Instance.Register(this);
@@ -60,6 +60,18 @@ namespace Harvey.Farm.Buildings
 
         public IEnumerable<ImplementBehaviour> Query(System.Func<ImplementBehaviour, bool> predicate) =>
             stock.Values.Where(b => !reserved.Contains(b.Model.Id) && predicate(b));
+
+        public bool ReserveToolById(string id, out ImplementBehaviour implement)
+        {
+            if (stock.TryGetValue(id, out implement) && !reserved.Contains(id))
+            {
+                reserved.Add(id);
+                GameEvents.BuildingStatsChanged();
+                return true;
+            }
+            implement = null;
+            return false;
+        }
 
         public bool TryCheckoutByID(string id, out ImplementBehaviour implement)
         {

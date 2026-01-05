@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+
 using Harvey.Farm.Events;
+
 using TMPro;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -28,6 +31,10 @@ public class ConsoleController : MonoBehaviour
         GameEvents.OnDebugModeToggled += Toggle;
     }
     void OnDisable()
+    {
+        GameEvents.OnDebugModeToggled -= Toggle;
+    }
+    void OnDestroy()
     {
         GameEvents.OnDebugModeToggled -= Toggle;
     }
@@ -76,7 +83,7 @@ public class ConsoleController : MonoBehaviour
         var sr = log.GetComponentInParent<ScrollRect>();
         sr.verticalNormalizedPosition = 0f;
     }
-    
+
     public void Clear()
     {
         log.text = string.Empty;
