@@ -26,11 +26,11 @@ namespace Harvey.Farm.Jobs.VehicleField
             _getGarage = getGarage ?? throw new ArgumentNullException(nameof(getGarage));
         }
 
-        public bool Tick(float dt)
+        public StepResult Tick(float dt)
         {
             Debug.Log($"Ticking ReturnVehicleStep");
             var vehicle = _getVehicle();
-            if (vehicle == null) return true; // No vehicle to return
+            if (vehicle == null) return StepResult.Done; // No vehicle to return
 
             if (_co == null)
             {
@@ -38,7 +38,7 @@ namespace Harvey.Farm.Jobs.VehicleField
                 if (mover == null)
                 {
                     Debug.LogWarning($"Vehicle {vehicle.name} is missing TractorMover component");
-                    return true; // Skip this step
+                    return StepResult.Done; // Skip this step
                 }
 
                 Debug.Log($"Returning vehicle {vehicle.name} to garage");
@@ -46,7 +46,7 @@ namespace Harvey.Farm.Jobs.VehicleField
             }
 
             Debug.Log("Finished? " + _finished);
-            return _finished;
+            return _finished ? StepResult.Done : StepResult.Running;
         }
 
         IEnumerator ReturnRoutine(TractorMover mover)

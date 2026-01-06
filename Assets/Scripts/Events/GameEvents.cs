@@ -78,6 +78,10 @@ namespace Harvey.Farm.Events
         public static event Action OnBuildingStatsChanged;
         public static void BuildingStatsChanged() => OnBuildingStatsChanged?.Invoke();
 
+        // *------------------- Resources -------------------*
+        public static event Action OnResourcesAvailable;
+        public static void ResourcesAvailable() => OnResourcesAvailable?.Invoke();
+
         // *------------------- Debug -------------------*
         public static event Action<bool> OnDebugModeToggled;
         public static void DebugModeToggled(bool enabled) => OnDebugModeToggled?.Invoke(enabled);

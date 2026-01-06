@@ -13,6 +13,7 @@ namespace Harvey.Farm.Workers
         void Awake() => _worker = GetComponent<Worker>();
 
         public bool IsRunning => _current != null && _current.State == JobState.Active;
+        public bool IsWaitingForResources => _current != null && _current.State == JobState.WaitingForResources;
 
         public void StartJob(IJob job, int resumeToken = 0)
         {
@@ -43,14 +44,38 @@ namespace Harvey.Farm.Workers
             _current = null;
         }
 
+        /// <summary>
+        /// Resume a job that was waiting for resources.
+        /// </summary>
+        public void ResumeJob()
+        {
+            if (_current == null) return;
+
+            if (_current.State == JobState.WaitingForResources)
+            {
+                _current.Resume();
+                Debug.Log($"Resumed job from WaitingForResources state");
+            }
+        }
+
         void Update()
         {
             if (_current == null) return;
-            _current.Tick(Time.deltaTime);
+
+            // Only tick if the job is active
+            if (_current.State == JobState.Active)
+            {
+                _current.Tick(Time.deltaTime);
+            }
 
             if (_current.State == JobState.Completed)
             {
                 GameEvents.JobCompleted(_current);
+                _current = null;
+            }
+            else if (_current.State == JobState.Failed)
+            {
+                GameEvents.JobFailed(_current, "Job step failed permanently");
                 _current = null;
             }
         }

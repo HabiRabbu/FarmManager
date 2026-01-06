@@ -22,10 +22,10 @@ namespace Harvey.Farm.Jobs.VehicleField
             _getVehicle = getVehicle ?? throw new ArgumentNullException(nameof(getVehicle));
         }
 
-        public bool Tick(float dt)
+        public StepResult Tick(float dt)
         {
             var vehicle = _getVehicle();
-            if (vehicle == null) return false;
+            if (vehicle == null) return StepResult.Running;
 
             try
             {
@@ -33,12 +33,12 @@ namespace Harvey.Farm.Jobs.VehicleField
                 vehicle.Detach(); // Ensure vehicle is detached before mounting
                 _worker.transform.SetParent(vehicle.transform, true);
                 _worker.Meshes.SetActive(false);
-                return true;
+                return StepResult.Done;
             }
             catch (Exception ex)
             {
                 Debug.LogError($"MountVehicleStep failed: {ex.Message}");
-                return false;
+                return StepResult.Failed;
             }
         }
     }
@@ -57,22 +57,22 @@ namespace Harvey.Farm.Jobs.VehicleField
             _getVehicle = getVehicle ?? throw new ArgumentNullException(nameof(getVehicle));
         }
 
-        public bool Tick(float dt)
+        public StepResult Tick(float dt)
         {
             var vehicle = _getVehicle();
-            if (vehicle == null) return true; // No vehicle to dismount from
+            if (vehicle == null) return StepResult.Done; // No vehicle to dismount from
 
             try
             {
                 _worker.transform.SetParent(null, true);
                 _worker.transform.position = vehicle.transform.position + Vector3.right;
                 _worker.Meshes.SetActive(true);
-                return true;
+                return StepResult.Done;
             }
             catch (Exception ex)
             {
                 Debug.LogError($"DismountVehicleStep failed: {ex.Message}");
-                return true; // Continue even if dismount fails
+                return StepResult.Done; // Continue even if dismount fails
             }
         }
     }

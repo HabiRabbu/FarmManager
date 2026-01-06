@@ -54,6 +54,7 @@ namespace Harvey.Farm.Buildings
         public bool Reserve(string id) => stock.ContainsKey(id) && reservedIds.Add(id);
         public void Unreserve(string id) => reservedIds.Remove(id);
         public bool IsReserved(string id) => reservedIds.Contains(id);
+        public bool HasVehicle(string id) => stock.ContainsKey(id);
 
         public IEnumerable<Vehicle> Query(System.Func<Vehicle, bool> predicate) =>
             stock.Values.Where(v => !reservedIds.Contains(v._stats.GetId()) && predicate(v));
@@ -103,6 +104,7 @@ namespace Harvey.Farm.Buildings
             var anchor = GetFreeAnchor();
             v.AttachTo(anchor);
             GameEvents.BuildingStatsChanged();
+            GameEvents.ResourcesAvailable();
         }
 
         /* ---------- internal ---------- */

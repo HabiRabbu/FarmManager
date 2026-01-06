@@ -1,5 +1,7 @@
 using UnityEngine;
+
 using System.Collections;
+
 using Harvey.Farm.Movement;
 
 namespace Harvey.Farm.Jobs
@@ -9,21 +11,61 @@ namespace Harvey.Farm.Jobs
         readonly IMover mover;
         readonly Vector3 target;
         Coroutine _runningCoroutine;
-        bool _movementCompleted = false;
+        bool _movementCompleted;
+        bool _movementFailed;
+
+        // Stuck detection
+        const float StuckCheckInterval = 1f;
+        const float StuckThreshold = 0.1f;
+
+        float _stuckCheckTimer;
+        Vector3 _lastPosition;
 
         public MoveToStep(IMover mover, Vector3 target) =>
             (this.mover, this.target) = (mover, target);
 
-        public bool Tick(float dt)
+        public StepResult Tick(float dt)
         {
-            if (_runningCoroutine == null && !_movementCompleted)
+            // Already failed
+            if (_movementFailed)
+                return StepResult.Failed;
+
+            // Already done
+            if (_movementCompleted)
+                return StepResult.Done;
+
+            // Start movement if not started
+            if (_runningCoroutine == null)
             {
-                _runningCoroutine = ((MonoBehaviour)mover).StartCoroutine(MoveToWithCallback());
-                return false; // Movement just started, not completed yet
+                var mono = (MonoBehaviour)mover;
+                _lastPosition = mono.transform.position;
+                _runningCoroutine = mono.StartCoroutine(MoveToWithCallback());
+                return StepResult.Running;
             }
 
-            // Return true only when the movement has completed
-            return _movementCompleted;
+            _stuckCheckTimer += dt;
+
+            // Check if stuck (not making progress)
+            if (_stuckCheckTimer >= StuckCheckInterval)
+            {
+                var currentPos = ((MonoBehaviour)mover).transform.position;
+                float distanceMoved = Vector3.Distance(currentPos, _lastPosition);
+                float distanceToTarget = Vector3.Distance(currentPos, target);
+
+                // If we haven't moved much AND we're not close to the target
+                if (distanceMoved < StuckThreshold && distanceToTarget > 0.5f)
+                {
+                    Debug.LogWarning($"MoveToStep: Worker appears stuck at {currentPos}, target was {target}");
+                    _movementFailed = true;
+                    Cancel();
+                    return StepResult.Failed;
+                }
+
+                _lastPosition = currentPos;
+                _stuckCheckTimer = 0f;
+            }
+
+            return StepResult.Running;
         }
 
         public void Cancel()
@@ -39,7 +81,7 @@ namespace Harvey.Farm.Jobs
         IEnumerator MoveToWithCallback()
         {
             yield return mover.MoveTo(target);
-            _movementCompleted = true; // Signal completion
+            _movementCompleted = true;
         }
     }
 }

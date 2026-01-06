@@ -44,15 +44,15 @@ namespace Harvey.Farm.Jobs.VehicleField
             _saveTileIndex = saveIndex ?? throw new ArgumentNullException(nameof(saveIndex));
         }
 
-        public bool Tick(float dt)
+        public StepResult Tick(float dt)
         {
             if (!_isInitialised)
             {
-                if (!InitialiseMovement()) return false;
+                if (!InitialiseMovement()) return StepResult.Running;
                 _isInitialised = true;
             }
 
-            return _tileIndex >= _waypoints.Length;
+            return _tileIndex >= _waypoints.Length ? StepResult.Done : StepResult.Running;
         }
 
         bool InitialiseMovement()

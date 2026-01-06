@@ -56,10 +56,27 @@ namespace Harvey.Farm.Jobs.VehicleField
                 return;
             }
 
-            if (_steps.Peek().Tick(dt))
+            var result = _steps.Peek().Tick(dt);
+            switch (result)
             {
-                _steps.Dequeue();
-                _macroIdx++;
+                case StepResult.Done:
+                    _steps.Dequeue();
+                    _macroIdx++;
+                    break;
+
+                case StepResult.Running:
+                    // Continue ticking
+                    break;
+
+                case StepResult.WaitForResources:
+                    // Signal to WorkerBrain that we need to wait
+                    State = JobState.WaitingForResources;
+                    return;
+
+                case StepResult.Failed:
+                    Debug.LogError($"Job step failed permanently. Aborting job.");
+                    State = JobState.Failed;
+                    return;
             }
 
             if (_steps.Count == 0)
@@ -91,6 +108,12 @@ namespace Harvey.Farm.Jobs.VehicleField
                     step.Cancel();
                 _steps.Clear();
             }
+        }
+
+        public void Resume()
+        {
+            if (State == JobState.WaitingForResources)
+                State = JobState.Active;
         }
 
         public int GetResumeData() => (_macroIdx << TokenBitWidth) | _serpTileIdx;

@@ -24,10 +24,10 @@ namespace Harvey.Farm.Jobs
             this.actionDuration = worker?.Stats.GetActionDuration(type) ?? 1f; // fallback to default
         }
 
-        public bool Tick(float dt)
+        public StepResult Tick(float dt)
         {
             timer += dt;
-            if (timer < actionDuration) return false;
+            if (timer < actionDuration) return StepResult.Running;
 
             switch (type)
             {
@@ -36,7 +36,7 @@ namespace Harvey.Farm.Jobs
                 case JobType.Harvest: tile.Harvest(); break;
             }
             tile.ClearReservation();
-            return true;
+            return StepResult.Done;
         }
     }
 
@@ -44,6 +44,6 @@ namespace Harvey.Farm.Jobs
     {
         float timeLeft;
         public WaitStep(float seconds) => timeLeft = seconds;
-        public bool Tick(float dt) => (timeLeft -= dt) <= 0f;
+        public StepResult Tick(float dt) => (timeLeft -= dt) <= 0f ? StepResult.Done : StepResult.Running;
     }
 }

@@ -9,7 +9,7 @@ using UnityEngine;
 public class WorkerBrain : MonoBehaviour
 {
     Worker w;
-    public enum State { OffShift, Looking, Working, Idle, GoingHome }
+    public enum State { OffShift, Looking, Working, Idle, GoingHome, WaitingForResources }
     [SerializeField] State state = State.OffShift;
     JobEntry current;
     JobExecutor exec;
@@ -46,12 +46,14 @@ public class WorkerBrain : MonoBehaviour
             GameEvents.OnShiftStarted += HandleShiftStart;
             GameEvents.OnShiftEnded += HandleShiftEnd;
             GameEvents.OnJobPosted += HandleJobPosted;
+            GameEvents.OnResourcesAvailable += HandleResourcesAvailable;
         }
         else
         {
             GameEvents.OnShiftStarted -= HandleShiftStart;
             GameEvents.OnShiftEnded -= HandleShiftEnd;
             GameEvents.OnJobPosted -= HandleJobPosted;
+            GameEvents.OnResourcesAvailable -= HandleResourcesAvailable;
         }
     }
     #endregion
@@ -77,6 +79,16 @@ public class WorkerBrain : MonoBehaviour
         }
     }
 
+    void HandleResourcesAvailable()
+    {
+        // When resources become available, retry if waiting
+        if (state == State.WaitingForResources && current != null)
+        {
+            Debug.Log($"[{w.DisplayName}] Resources available, resuming job...");
+            ResumeWaitingJob();
+        }
+    }
+
     void Update()
     {
         switch (state)
@@ -94,7 +106,10 @@ public class WorkerBrain : MonoBehaviour
                 idleTime += Time.deltaTime;
                 break;
             case State.Working:
-                if (!exec.IsRunning) FinishJob();
+                CheckJobState();
+                break;
+            case State.WaitingForResources:
+                // Do nothing - wait for OnResourcesAvailable event
                 break;
             case State.OffShift:
                 //TODO: Make it all utility-y but for now just go home or look for a job
@@ -117,6 +132,44 @@ public class WorkerBrain : MonoBehaviour
                 }
                 break;
         }
+    }
+
+    void CheckJobState()
+    {
+        if (current == null || current.Job == null)
+        {
+            FinishJob();
+            return;
+        }
+
+        switch (current.Job.State)
+        {
+            case JobState.Completed:
+                FinishJob();
+                break;
+
+            case JobState.WaitingForResources:
+                Debug.Log($"[{w.DisplayName}] Job is waiting for resources...");
+                state = State.WaitingForResources;
+                break;
+
+            case JobState.Failed:
+                Debug.LogWarning($"[{w.DisplayName}] Job failed permanently.");
+                FinishJob();
+                break;
+
+            case JobState.Active:
+                // Job still running
+                break;
+        }
+    }
+
+    void ResumeWaitingJob()
+    {
+        if (current?.Job == null) return;
+
+        state = State.Working;
+        exec.ResumeJob();
     }
 
     void TryGetJob()

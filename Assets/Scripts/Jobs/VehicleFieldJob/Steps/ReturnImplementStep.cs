@@ -27,18 +27,18 @@ namespace Harvey.Farm.Jobs.VehicleField
             _toolId = toolId;
         }
 
-        public bool Tick(float dt)
+        public StepResult Tick(float dt)
         {
-            if (string.IsNullOrEmpty(_toolId)) return true;
+            if (string.IsNullOrEmpty(_toolId)) return StepResult.Done;
 
             var veh = _getVehicle();
-            if (veh == null) return true;
+            if (veh == null) return StepResult.Done;
 
             var implements = veh.GetComponent<ImplementHandler>();
-            if (implements == null) return true;
+            if (implements == null) return StepResult.Done;
             if (implements.CurrentImplement != null)
             {
-                if (implements.CurrentImplement.GetGuid() != _toolId) return true;
+                if (implements.CurrentImplement.GetGuid() != _toolId) return StepResult.Done;
             }
 
             if (_co == null)
@@ -47,14 +47,14 @@ namespace Harvey.Farm.Jobs.VehicleField
                 if (shed == null)
                 {
                     Debug.LogWarning($"No shed to return implement {_toolId}");
-                    return true;
+                    return StepResult.Done;
                 }
 
                 _co = veh.StartCoroutine(ReturnRoutine(implements, shed));
             }
 
             Debug.Log($"ReturnImplementStep: Finished? {_finished}");
-            return _finished;
+            return _finished ? StepResult.Done : StepResult.Running;
         }
 
         IEnumerator ReturnRoutine(ImplementHandler impl, ShedBuilding shed)

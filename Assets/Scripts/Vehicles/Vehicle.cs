@@ -28,6 +28,10 @@ namespace Harvey.Farm.VehicleScripts
         {
             _stats.SetBusy(value);
             GameEvents.VehicleBusyChanged(this, value);
+
+            // Notify waiting workers that a resource is now available
+            if (!value)
+                GameEvents.ResourcesAvailable();
         }
 
         public string DisplayName => _stats.Model.DisplayName;

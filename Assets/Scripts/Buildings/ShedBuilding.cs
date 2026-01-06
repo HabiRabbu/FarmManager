@@ -57,6 +57,7 @@ namespace Harvey.Farm.Buildings
         public bool Reserve(string id) => stock.ContainsKey(id) && reserved.Add(id);
         public void Unreserve(string id) => reserved.Remove(id);
         public bool IsReserved(string id) => reserved.Contains(id);
+        public bool HasImplement(string id) => stock.ContainsKey(id);
 
         public IEnumerable<ImplementBehaviour> Query(System.Func<ImplementBehaviour, bool> predicate) =>
             stock.Values.Where(b => !reserved.Contains(b.Model.Id) && predicate(b));
@@ -110,6 +111,7 @@ namespace Harvey.Farm.Buildings
             implement.AttachTo(anchor);
 
             GameEvents.BuildingStatsChanged();
+            GameEvents.ResourcesAvailable();
         }
 
         // ---------- Internal ----------

@@ -51,8 +51,26 @@ namespace Harvey.Farm.Jobs
                 }
             }
 
-            if (_steps.Peek().Tick(dt))           // step finished?
-                _steps.Dequeue();
+            var result = _steps.Peek().Tick(dt);
+            switch (result)
+            {
+                case StepResult.Done:
+                    _steps.Dequeue();
+                    break;
+
+                case StepResult.Running:
+                    // Continue ticking
+                    break;
+
+                case StepResult.WaitForResources:
+                    _state = JobState.WaitingForResources;
+                    return;
+
+                case StepResult.Failed:
+                    Debug.LogError($"Job step failed permanently. Aborting job.");
+                    _state = JobState.Failed;
+                    return;
+            }
         }
 
         public void Pause()
@@ -68,6 +86,12 @@ namespace Harvey.Farm.Jobs
             foreach (var step in _steps)
                 step.Cancel();
             _steps.Clear();
+        }
+
+        public void Resume()
+        {
+            if (_state == JobState.WaitingForResources)
+                _state = JobState.Active;
         }
 
         public int GetResumeData() => _tileIndex;

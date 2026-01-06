@@ -4,15 +4,16 @@ namespace Harvey.Farm.Jobs
 {
     public interface IJob
     {
-        JobState   State          { get; }
-        string     OwnerId        { get; }
-        AgentType  RequiredAgent  { get; }
+        JobState State { get; }
+        string OwnerId { get; }
+        AgentType RequiredAgent { get; }
 
         void Begin(IJobAgent agent, int resumeData = 0);
         void Tick(float dt);
         void Pause();
-        int  GetResumeData();
+        void Resume();  // Resume from WaitingForResources state
+        int GetResumeData();
     }
 
-    public enum JobState { Pending, Active, Paused, Completed }
+    public enum JobState { Pending, Active, Paused, Completed, WaitingForResources, Failed }
 }

@@ -17,6 +17,7 @@ namespace Harvey.Farm.Jobs.VehicleField
         readonly VehicleFieldJobInstance _parent;
         readonly string _wantedId;
         readonly Worker _worker;
+        bool _vehicleExistsButBusy;
 
         public ReserveVehicleStep(VehicleFieldJobInstance parent,
                                   string wantedVehicleId,
@@ -27,32 +28,71 @@ namespace Harvey.Farm.Jobs.VehicleField
             _worker = worker ?? throw new System.ArgumentNullException(nameof(worker));
         }
 
-        public bool Tick(float dt)
+        public StepResult Tick(float dt)
         {
             if (_parent.Vehicle != null)
             {
                 if (!_parent.Vehicle.IsBusy)
                     _parent.Vehicle.SetBusy(true);
-                return true;
+                return StepResult.Done;
             }
 
+            // Check if the vehicle exists anywhere first
+            var allGarages = BuildingManager.Instance.GetAllBuildings<GarageBuilding>();
+            bool vehicleExists = false;
+            _vehicleExistsButBusy = false;
+
             // Find closest garage that owns an idle matching vehicle
-            var garages = BuildingManager.Instance
-                           .GetAllBuildings<GarageBuilding>()
+            var garages = allGarages
                            .OrderBy(g => Vector3.Distance(_worker.transform.position, g.transform.position));
 
             foreach (var garage in garages)
             {
-                if (garage.TryReserveVehicleById(_wantedId, out var reservedVehicle))
+                // Check if this garage has the vehicle at all
+                if (garage.HasVehicle(_wantedId))
                 {
-                    _parent.Vehicle = reservedVehicle;
-                    _parent.Garage = garage;
-                    Debug.Log($"Reserved vehicle '{_wantedId}' from garage '{garage.name}' for worker '{_worker.name}'");
-                    return true;
+                    vehicleExists = true;
+
+                    if (garage.TryReserveVehicleById(_wantedId, out var reservedVehicle))
+                    {
+                        _parent.Vehicle = reservedVehicle;
+                        _parent.Garage = garage;
+                        Debug.Log($"Reserved vehicle '{_wantedId}' from garage '{garage.name}' for worker '{_worker.name}'");
+                        return StepResult.Done;
+                    }
+                    else
+                    {
+                        // Vehicle exists but is reserved/busy
+                        _vehicleExistsButBusy = true;
+                    }
                 }
             }
+
+            // Also check if the vehicle is out in the world (in use)
+            var vehicleInWorld = VehicleManager.Instance.GetById(_wantedId);
+            if (vehicleInWorld != null)
+            {
+                vehicleExists = true;
+                if (vehicleInWorld.IsBusy)
+                {
+                    _vehicleExistsButBusy = true;
+                }
+            }
+
+            if (!vehicleExists)
+            {
+                Debug.LogError($"Vehicle with ID '{_wantedId}' does not exist!");
+                return StepResult.Failed;
+            }
+
+            if (_vehicleExistsButBusy)
+            {
+                Debug.Log($"Vehicle '{_wantedId}' exists but is currently busy. Waiting for resources...");
+                return StepResult.WaitForResources;
+            }
+
             Debug.LogWarning($"No available vehicle with ID '{_wantedId}' found in any garage.");
-            return false;
+            return StepResult.WaitForResources;
         }
     }
 }
