@@ -165,7 +165,7 @@ namespace Harvey.Farm.VehicleScripts
                 // Debug logging
                 Debug.Log($"Respawned tractor: {tractor.DisplayName}, IsBusy: {tractor.IsBusy}, Model.IsBusy: {tractor._stats.Model.IsBusy}, CanDo(Plow): {tractor.CanDo(JobType.Plow)}");
 
-                if (!tractor._stats.Model.IsBusy && tractor.JobQueue.Count <= 0)
+                if (!tractor._stats.Model.IsBusy)
                     tractor.ReturnHome();
             }
         }
@@ -189,7 +189,7 @@ namespace Harvey.Farm.VehicleScripts
                 // Debug logging
                 Debug.Log($"Respawned harvester: {harvester.DisplayName}, IsBusy: {harvester.IsBusy}, Model.IsBusy: {harvester._stats.Model.IsBusy}, CanDo(Harvest): {harvester.CanDo(JobType.Harvest)}");
 
-                if (!harvester._stats.Model.IsBusy && harvester.JobQueue.Count <= 0)
+                if (!harvester._stats.Model.IsBusy)
                     harvester.ReturnHome();
             }
         }

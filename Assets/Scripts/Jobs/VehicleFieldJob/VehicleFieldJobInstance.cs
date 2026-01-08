@@ -15,11 +15,10 @@ namespace Harvey.Farm.Jobs.VehicleField
     {
         readonly VehicleFieldJob _def;
 
-        /// Bit width for packing macro step index and tile index into a single resume token (16 bits each).
         const int TokenBitWidth = 16;
-
         const float PostJobDelay = 0.1f;
 
+        public VehicleFieldJob Definition => _def;
         public Vehicle Vehicle { get; internal set; }
         public GarageBuilding Garage { get; internal set; }
 
@@ -122,16 +121,15 @@ namespace Harvey.Farm.Jobs.VehicleField
         void BuildSteps(Worker w)
         {
             _steps = new Queue<IJobStep>();
-            Debug.Log("Building steps for VehicleFieldJobInstance");
-            Debug.Log($"Macro index: {_macroIdx}, Serpentine tile index: {_serpTileIdx}");
 
             bool isResumingMidDrive = _macroIdx >= 4 && _serpTileIdx > 0;
+            bool vehicleAlreadyAssigned = Vehicle != null;
 
-            if (_macroIdx <= 0 || isResumingMidDrive)
+            if (!vehicleAlreadyAssigned && (_macroIdx <= 0 || isResumingMidDrive))
                 _steps.Enqueue(new ReserveVehicleStep(this, _def.VehicleId, w));
-            if (_macroIdx <= 1 || isResumingMidDrive)
+            if (!vehicleAlreadyAssigned && (_macroIdx <= 1 || isResumingMidDrive))
                 _steps.Enqueue(new MoveWorkerToVehicleStep(w, () => Vehicle));
-            if (_macroIdx <= 2 || isResumingMidDrive)
+            if (!vehicleAlreadyAssigned && (_macroIdx <= 2 || isResumingMidDrive))
                 _steps.Enqueue(new MountVehicleStep(w, () => Vehicle));
             if (_macroIdx <= 3)
                 _steps.Enqueue(new EnsureImplementStep(() => Vehicle, _def.ImplementId, _def.Type));

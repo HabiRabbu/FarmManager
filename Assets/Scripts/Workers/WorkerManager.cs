@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Harvey.Data.Workers;
 using Harvey.Farm.Buildings;
 using Harvey.Farm.Events;
 using Harvey.Farm.Factory;
 using Harvey.SaveSystem;
+
 using UnityEngine;
 
 namespace Harvey.Farm.Workers
@@ -101,14 +103,12 @@ namespace Harvey.Farm.Workers
 
                 var goWorker = go.GetComponent<Worker>();
 
+                model.IsBusy = false;
                 goWorker.Stats.InitFromModel(model, home);
 
-                home.TryAddOccupant(goWorker);
+                goWorker.Meshes.SetActive(true);
 
-                if (!model.ActiveInScene)
-                {
-                    goWorker.ReturnHome();
-                }
+                home.TryAddOccupant(goWorker);
             }
         }
     }

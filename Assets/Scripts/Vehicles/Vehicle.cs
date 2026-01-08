@@ -1,24 +1,22 @@
 using UnityEngine;
-using Harvey.Farm.Fields;
-using System.Collections;
-using System.Collections.Generic;
-using Harvey.Farm.Events;
-using Harvey.Farm.Jobs;
+
 using DG.Tweening;
+
 using Harvey.Farm.Buildings;
+using Harvey.Farm.Events;
+using Harvey.Farm.Fields;
+using Harvey.Farm.Jobs;
 
 namespace Harvey.Farm.VehicleScripts
 {
     public abstract class Vehicle : MonoBehaviour, IJobAgent
     {
-        public Queue<FieldJob> JobQueue { get; } = new();
         public FieldController CurrentField => _stats.CurrentField;
 
         public string GetId() => _stats.GetId();
         public int CurrentTileIndex => _stats.CurrentTileIndex;
 
         public abstract bool CanDo(JobType type);
-        public abstract void StartTask(FieldJob job, int resumeTile = 0);
 
         // Cache
         public VehicleStats _stats { get; private set; }
@@ -44,8 +42,6 @@ namespace Harvey.Farm.VehicleScripts
             _stats = GetComponent<VehicleStats>();
         }
 
-        public void Enqueue(FieldJob job) => JobQueue.Enqueue(job);
-
         public void AttachTo(Transform anchor)
         {
             transform.SetParent(anchor, false);
@@ -55,20 +51,17 @@ namespace Harvey.Farm.VehicleScripts
 
         public void Detach() => transform.SetParent(null, true);
 
-        public void ReturnHome()
-        {
-            Home.ReturnVehicle(this);
-        }
+        public void ReturnHome() => Home.ReturnVehicle(this);
 
         /// <summary>
         /// Vehicles are operated by workers through VehicleFieldJobInstance steps.
         /// Direct IJob execution is not supported - workers mount and control vehicles.
+        /// This method exists to satisfy IJobAgent interface but should never be called.
         /// </summary>
         public void StartTask(IJob job, int resumeTile = 0)
         {
             Debug.LogWarning($"Vehicle {DisplayName}: StartTask(IJob) called directly. " +
                            "Vehicles should be operated via VehicleFieldJobInstance steps by workers.");
-            // Behicles DON'T execute IJob directly
         }
     }
 }

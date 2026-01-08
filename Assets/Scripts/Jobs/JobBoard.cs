@@ -90,4 +90,26 @@ public class JobBoard : Singleton<JobBoard>
     {
         UpdateJobsDisplay();
     }
+
+    /* ─────────── save/load support ─────────── */
+
+    public IEnumerable<(JobEntry entry, bool isOwnerJob, string ownerId, AgentType agentType)> GetAllPendingJobs()
+    {
+        foreach (var kvp in ownerJobs)
+            foreach (var entry in kvp.Value)
+                yield return (entry, true, kvp.Key, entry.RequiredAgent);
+
+        foreach (var kvp in openJobs)
+            foreach (var entry in kvp.Value)
+                yield return (entry, false, null, kvp.Key);
+    }
+
+    public void ClearAllJobs()
+    {
+        ownerJobs.Clear();
+        openJobs.Clear();
+        UpdateJobsDisplay();
+    }
+
+    public int PendingJobCount => ownerJobs.Values.Sum(q => q.Count) + openJobs.Values.Sum(q => q.Count);
 }

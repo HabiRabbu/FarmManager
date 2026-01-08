@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+
 using Harvey.Data.Coffee;
 using Harvey.Data.Fields;
 using Harvey.Data.Implements;
@@ -59,8 +60,15 @@ public class JobSection
 /* ------------------------------------------------- ------------------------------------------------- */
 
 [Serializable]
+public class TimeSection
+{
+    public float Hour;
+}
+
+[Serializable]
 public class GameSaveData
 {
+    public TimeSection Time = new();
     public CoffeeSection Coffee = new();
 
     public FieldSection Fields = new();

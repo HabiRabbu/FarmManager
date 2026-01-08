@@ -19,6 +19,20 @@ public class WorkerBrain : MonoBehaviour
 
     public State GetCurrentState() => state;
 
+    public JobEntry CurrentJobEntry => current;
+
+    public void SetCurrentJob(JobEntry entry, int resumeToken)
+    {
+        current = entry;
+        if (entry == null) return;
+
+        w.StopAllCoroutines();
+        w.Mover.StopAllTweens();
+        exec.StartJob(entry.Job, resumeToken);
+        state = State.Working;
+        idleTime = 0f;
+    }
+
     void Awake()
     {
         w = GetComponent<Worker>();
@@ -33,10 +47,18 @@ public class WorkerBrain : MonoBehaviour
     void OnDisable()
     {
         SetupEventListeners(false);
+        ResetState();
     }
     void OnDestroy()
     {
         SetupEventListeners(false);
+    }
+
+    void ResetState()
+    {
+        state = State.OffShift;
+        current = null;
+        idleTime = 0f;
     }
 
     void SetupEventListeners(bool enable)
@@ -109,19 +131,18 @@ public class WorkerBrain : MonoBehaviour
                 CheckJobState();
                 break;
             case State.WaitingForResources:
-                // Do nothing - wait for OnResourcesAvailable event
                 break;
             case State.OffShift:
-                //TODO: Make it all utility-y but for now just go home or look for a job
-                if (!AtHome())
-                {
-                    state = State.GoingHome;
-                    w.ReturnHome();
-                }
-                else if (IsShiftTime())
+                // Check shift time first - if it's work time, start looking regardless of position
+                if (IsShiftTime())
                 {
                     state = State.Looking;
                     idleTime = 0f;
+                }
+                else if (!AtHome())
+                {
+                    state = State.GoingHome;
+                    w.ReturnHome();
                 }
                 break;
             case State.GoingHome:
@@ -174,14 +195,32 @@ public class WorkerBrain : MonoBehaviour
 
     void TryGetJob()
     {
-        if (JobBoard.Instance.TryTake(w.GetId(), AgentType.FieldWorker, out var entry))
+        JobEntry entry;
+
+        // If has driving license - Check for vehicle operator jobs first
+        if (w.Stats.Model.HasDrivingLicense)
         {
-            current = entry;
-            int resumeToken = entry.Job.State == JobState.Paused ? entry.Job.GetResumeData() : 0;
-            exec.StartJob(entry.Job, resumeToken);
-            state = State.Working;
-            idleTime = 0f;
+            if (JobBoard.Instance.TryTake(w.GetId(), AgentType.VehicleOperator, out entry))
+            {
+                StartJobEntry(entry);
+                return;
+            }
         }
+
+        if (JobBoard.Instance.TryTake(w.GetId(), AgentType.FieldWorker, out entry))
+        {
+            StartJobEntry(entry);
+            return;
+        }
+    }
+
+    void StartJobEntry(JobEntry entry)
+    {
+        current = entry;
+        int resumeToken = entry.Job.State == JobState.Paused ? entry.Job.GetResumeData() : 0;
+        exec.StartJob(entry.Job, resumeToken);
+        state = State.Working;
+        idleTime = 0f;
     }
 
     void FinishJob()

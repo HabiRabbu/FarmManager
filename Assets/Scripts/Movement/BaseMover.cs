@@ -1,7 +1,10 @@
 using UnityEngine;
+
 using DG.Tweening;
+
 using System.Collections;
 using System.Collections.Generic;
+
 using Harvey.Farm.Movement;
 using Harvey.Farm.Events;
 
@@ -14,6 +17,12 @@ public abstract class BaseMover : MonoBehaviour, IMover
     protected virtual void Awake()
     {
         if (!rootTransform) rootTransform = transform;
+    }
+
+    protected virtual void OnDisable()
+    {
+        DOTween.Kill(rootTransform);
+        seq = null;
     }
 
     public virtual void StopAllTweens()
@@ -40,8 +49,12 @@ public abstract class BaseMover : MonoBehaviour, IMover
     protected Tween YawLookAt(Vector3 target, float turnTime)
     {
         Vector3 flat = new Vector3(target.x, rootTransform.position.y, target.z);
-        return rootTransform.DOLookAt(flat, turnTime, AxisConstraint.Y).SetEase(Ease.Linear);
+        return rootTransform.DOLookAt(flat, turnTime, AxisConstraint.Y)
+            .SetEase(Ease.Linear)
+            .SetLink(gameObject);
     }
     protected Tween TranslateTo(Vector3 target, float time) =>
-        rootTransform.DOMove(target, time).SetEase(Ease.Linear);
+        rootTransform.DOMove(target, time)
+            .SetEase(Ease.Linear)
+            .SetLink(gameObject);
 }

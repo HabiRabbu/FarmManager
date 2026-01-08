@@ -1,5 +1,6 @@
 using Harvey.Farm.Events;
 using Harvey.Farm.Jobs;
+
 using UnityEngine;
 
 namespace Harvey.Farm.Workers
@@ -11,6 +12,12 @@ namespace Harvey.Farm.Workers
         Worker _worker;
 
         void Awake() => _worker = GetComponent<Worker>();
+
+        void OnDisable()
+        {
+            // Clear current job when pooled!
+            _current = null;
+        }
 
         public bool IsRunning => _current != null && _current.State == JobState.Active;
         public bool IsWaitingForResources => _current != null && _current.State == JobState.WaitingForResources;

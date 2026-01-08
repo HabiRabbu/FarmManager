@@ -13,6 +13,8 @@ public class WorkerMover : BaseMover
     Animator anim;
     int isMovingHash;
 
+    Tween _currentMoveTween;
+
     protected override void Awake()
     {
         base.Awake();
@@ -25,9 +27,12 @@ public class WorkerMover : BaseMover
     {
         GameEvents.OnStopAllTweens += StopAllTweens;
     }
-    void OnDisable()
+    protected override void OnDisable()
     {
         GameEvents.OnStopAllTweens -= StopAllTweens;
+        _currentMoveTween?.Kill();
+        _currentMoveTween = null;
+        base.OnDisable();
     }
     void OnDestroy()
     {
@@ -37,6 +42,8 @@ public class WorkerMover : BaseMover
     public override void StopAllTweens()
     {
         base.StopAllTweens();
+        _currentMoveTween?.Kill();
+        _currentMoveTween = null;
         anim.SetBool(isMovingHash, false);
     }
 
@@ -53,9 +60,11 @@ public class WorkerMover : BaseMover
             float dist = Vector3.Distance(rootTransform.position, wps[i]);
             float time = dist / stats.Model.WalkSpeed;
 
-            yield return TranslateTo(wps[i], time).WaitForCompletion();
+            _currentMoveTween = TranslateTo(wps[i], time);
+            yield return _currentMoveTween.WaitForCompletion();
             onArrive?.Invoke(i);
         }
+        _currentMoveTween = null;
 
         anim.SetBool(isMovingHash, false);
         anim.speed = originalSpeed;
@@ -64,13 +73,19 @@ public class WorkerMover : BaseMover
     public override IEnumerator ReturnToHome()
     {
         anim.SetBool(isMovingHash, true);
+        anim.Play("Hop", 0, Random.value);
+        float originalSpeed = anim.speed;
+        anim.speed = Random.Range(0.9f, 1.1f);
 
         var homePos = stats.GetHome().transform.position;
         float dist = Vector3.Distance(rootTransform.position, homePos);
         float time = dist / stats.Model.WalkSpeed;
 
-        yield return TranslateTo(homePos, time).WaitForCompletion();
+        _currentMoveTween = TranslateTo(homePos, time);
+        yield return _currentMoveTween.WaitForCompletion();
+        _currentMoveTween = null;
 
         anim.SetBool(isMovingHash, false);
+        anim.speed = originalSpeed;
     }
 }

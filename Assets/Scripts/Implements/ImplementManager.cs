@@ -142,6 +142,8 @@ namespace Harvey.Farm.Implements
                     if (handler?.hitchPoint != null)
                     {
                         beh.AttachTo(handler.hitchPoint);
+                        handler.CurrentImplement = beh;
+                        Debug.Log($"ImplementManager: Restored implement {beh.Model.DisplayName} attached to vehicle {vehicle.DisplayName}");
                     }
                     else
                         Debug.LogWarning($"Vehicle '{vehicle.name}' lacks ImplementHandler/hitchPoint");

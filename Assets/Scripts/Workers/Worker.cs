@@ -1,7 +1,10 @@
 using System.Collections;
+
 using Harvey.Farm.Jobs;
 using Harvey.Farm.Buildings;
 using Harvey.Farm.Events;
+using Harvey.Farm.Fields;
+
 using UnityEngine;
 
 namespace Harvey.Farm.Workers
@@ -54,6 +57,16 @@ namespace Harvey.Farm.Workers
             //_tools  = GetComponent<ImplementHandler>();
         }
 
+        void OnDisable()
+        {
+            StopAllCoroutines();
+            if (_mover != null)
+            {
+                ((MonoBehaviour)_mover).StopAllCoroutines();
+                _mover.StopAllTweens();
+            }
+        }
+
         public void ReturnHome()
         {
             Debug.Log($"Worker {DisplayName} returning home to {GetHomeName()}");
@@ -91,8 +104,12 @@ namespace Harvey.Farm.Workers
             gameObject.SetActive(true);
             Meshes.SetActive(true);
             transform.SetParent(null);
-            this.StopAllCoroutines();
-            _mover.StopAllTweens();
+            StopAllCoroutines();
+            if (_mover != null)
+            {
+                ((MonoBehaviour)_mover).StopAllCoroutines();
+                _mover.StopAllTweens();
+            }
         }
     }
 }

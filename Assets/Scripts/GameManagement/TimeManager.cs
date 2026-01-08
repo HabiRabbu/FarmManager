@@ -1,12 +1,14 @@
 using System;
+using System.Threading.Tasks;
 
 using Harvey.Farm.Events;
+using Harvey.SaveSystem;
 
 using UnityEngine;
 
 namespace Harvey.Farm.TimeManagement
 {
-    public class TimeManager : Singleton<TimeManager>
+    public class TimeManager : Singleton<TimeManager>, ISaveSection
     {
         [Tooltip("Real-time minutes that make up one full in-game day (0-24h).")]
         [SerializeField] private float realMinutesPerDay = 10f;
@@ -17,6 +19,32 @@ namespace Harvey.Farm.TimeManagement
         public float Hour { get; private set; }
 
         public float GetTime() => Hour;
+
+        void Start()
+        {
+            SaveService.Instance.Register(this);
+        }
+
+        // ─────────────────── Save/Load ───────────────────
+        public int LoadPriority => 0;
+
+        public void Capture(GameSaveData root)
+        {
+            root.Time.Hour = Hour;
+        }
+
+        public Task Restore(GameSaveData root)
+        {
+            SetTimeImmediate(root.Time.Hour);
+            return Task.CompletedTask;
+        }
+
+        public void SetTimeImmediate(float hour)
+        {
+            Hour = Mathf.Clamp(hour, 0f, 23.999f);
+            _lastWholeHour = Mathf.FloorToInt(Hour);
+            GameEvents.TimeChanged(_lastWholeHour);
+        }
 
         // ────────────────────────────────────────────────
         void Update()

@@ -16,10 +16,11 @@ namespace Harvey.Farm.Jobs
         readonly FieldJob _def;
         readonly Queue<IJobStep> _steps = new();
         IJobAgent _agent;
-        int _tileIndex;                     // resume token
+        int _tileIndex;
         JobState _state = JobState.Pending;
         FieldTile _currentReservedTile;
 
+        public FieldJob Definition => _def;
         public string OwnerId { get; }
         public AgentType RequiredAgent => AgentType.FieldWorker;
         public JobState State => _state;
